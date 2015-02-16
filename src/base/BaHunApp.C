@@ -1,10 +1,10 @@
-#include "StorkApp.h"
+#include "BaHunApp.h"
 #include "Moose.h"
 #include "AppFactory.h"
 #include "ModulesApp.h"
 
 template<>
-InputParameters validParams<StorkApp>()
+InputParameters validParams<BaHunApp>()
 {
   InputParameters params = validParams<MooseApp>();
 
@@ -13,36 +13,36 @@ InputParameters validParams<StorkApp>()
   return params;
 }
 
-StorkApp::StorkApp(const std::string & name, InputParameters parameters) :
+BaHunApp::BaHunApp(const std::string & name, InputParameters parameters) :
     MooseApp(name, parameters)
 {
   srand(processor_id());
 
   Moose::registerObjects(_factory);
   ModulesApp::registerObjects(_factory);
-  StorkApp::registerObjects(_factory);
+  BaHunApp::registerObjects(_factory);
 
   Moose::associateSyntax(_syntax, _action_factory);
   ModulesApp::associateSyntax(_syntax, _action_factory);
-  StorkApp::associateSyntax(_syntax, _action_factory);
+  BaHunApp::associateSyntax(_syntax, _action_factory);
 }
 
-StorkApp::~StorkApp()
+BaHunApp::~BaHunApp()
 {
 }
 
 void
-StorkApp::registerApps()
+BaHunApp::registerApps()
 {
-  registerApp(StorkApp);
+  registerApp(BaHunApp);
 }
 
 void
-StorkApp::registerObjects(Factory & factory)
+BaHunApp::registerObjects(Factory & factory)
 {
 }
 
 void
-StorkApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
+BaHunApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
 }
