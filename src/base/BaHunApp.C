@@ -31,6 +31,7 @@ BaHunApp::~BaHunApp()
 {
 }
 
+extern "C" void BaHunApp__registerApps() { BaHunApp::registerApps(); }
 void
 BaHunApp::registerApps()
 {
