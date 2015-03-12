@@ -3,6 +3,9 @@
 #include "AppFactory.h"
 #include "ModulesApp.h"
 
+// Materials
+#include "BAMaterial.h"
+
 template<>
 InputParameters validParams<BaHunApp>()
 {
@@ -40,6 +43,8 @@ BaHunApp::registerApps()
 void
 BaHunApp::registerObjects(Factory & factory)
 {
+  // Materials
+  registerMaterial(BAMaterial);
 }
 
 void
