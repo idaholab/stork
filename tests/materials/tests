@@ -1,0 +1,49 @@
+[Tests]
+  [./except01]
+    type = 'RunException'
+    input = 'except01.i'
+    expect_err = 'BAMaterial: For clarity kh and kv must have the same size'
+  [../]
+  [./except02]
+    type = 'RunException'
+    input = 'except02.i'
+    expect_err = 'BAMaterial: For clarity change_kh and change_kv must have the same size'
+  [../]
+  [./except03]
+    type = 'RunException'
+    input = 'except03.i'
+    expect_err = 'BAMaterial: insitu_perm_zone is -1 which is negative!'
+  [../]
+  [./except04]
+    type = 'RunException'
+    input = 'except04.i'
+    expect_err = 'BAMaterial: change_perm_zone is -1 which is negative!'
+  [../]
+  [./except05]
+    type = 'RunException'
+    input = 'except05.i'
+    expect_err = 'BAMaterial: insitu_perm_zone is 1 which is not smaller than the size of kh!'
+  [../]
+  [./except06]
+    type = 'RunException'
+    input = 'except06.i'
+    expect_err = 'BAMaterial: change_perm_zone is 1 which is not smaller than the size of change_kh!'
+  [../]
+
+  [./zones01]
+    type = 'Exodiff'
+    input = 'zones01.i'
+    exodiff = 'zones01.e'
+  [../]
+  [./zones02]
+    type = 'Exodiff'
+    input = 'zones02.i'
+    exodiff = 'zones02.e'
+  [../]
+  [./zones03]
+    type = 'Exodiff'
+    input = 'zones03.i'
+    exodiff = 'zones03.e'
+  [../]
+
+[]
