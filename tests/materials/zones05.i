@@ -1,9 +1,4 @@
-# insitu zones only
-# As ASCII art, the zones are:
-#
-# 23
-# 12
-#
+# With depth for porosity
 [Mesh]
   type = GeneratedMesh
   dim = 2
@@ -86,6 +81,10 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
+  [./depth]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
   [./kxx]
     order = CONSTANT
     family = MONOMIAL
@@ -114,13 +113,17 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
+  [./por]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
 []
 
 [AuxKernels]
   [./i_zone]
     type = FunctionAux
     variable = i_zone
-    function = 'x+y'
+    function = 0
   [../]
   [./ch_zone]
     type = ConstantAux
@@ -131,6 +134,11 @@
     type = ConstantAux
     variable = por_zone
     value = 0
+  [../]
+  [./depth]
+    type = FunctionAux
+    variable = depth
+    function = 'x'
   [../]
   [./kxx]
     type = RealTensorValueAux
@@ -174,6 +182,11 @@
     index_i = 2
     index_j = 2
   [../]
+  [./por]
+    type = MaterialRealAux
+    variable = por
+    property = porosity
+  [../]
 []
 
 [Materials]
@@ -184,10 +197,14 @@
     mat_permeability = '0 0 0  0 0 0  0 0 0'
     gravity = '0 0 0'
     insitu_perm_zone = i_zone
-    kh = '0 1 2 3'
-    kv = '6 7 8 9'
+    kh = '1'
+    kv = '1'
     insitu_por_zone = por_zone
-    por = 0.1
+    por = 1
+
+    depth = depth
+    decayp = 1
+
     change_perm_zone = ch_zone
     change_kh = 0
     change_kv = 0
@@ -215,7 +232,7 @@
 []
 
 [Outputs]
-  file_base = zones01
+  file_base = zones05
   print_perf_log = true
   [./exodus]
     type = Exodus

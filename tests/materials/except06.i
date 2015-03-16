@@ -80,6 +80,10 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
+  [./por_zone]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
 []
 
 [AuxKernels]
@@ -93,6 +97,11 @@
     variable = ch_zone
     value = 1
   [../]
+  [./por_zone]
+    type = ConstantAux
+    variable = por_zone
+    value = 0
+  [../]
 []
 
 [Materials]
@@ -105,6 +114,8 @@
     insitu_perm_zone = i_zone
     kh = '1'
     kv = 1
+    insitu_por_zone = por_zone
+    por = 0.1
     change_perm_zone = ch_zone
     change_kh = '1'
     change_kv = 1

@@ -25,6 +25,13 @@ InputParameters validParams<BAMaterial>();
  *
  * where "insitu" and "change" depend on the zones.  The zones are
  * defined through AuxVariables.
+ *
+ * The porosity is similar:
+ *
+ * porosity = insitu_value
+ *
+ * where "insitu" depend on the porosity zone, which is defined
+ * through an AuxVariable
  */
 class BAMaterial : public RichardsMaterial
 {
@@ -42,9 +49,13 @@ private:
   std::vector<Real> _kh;
   std::vector<Real> _kv;
 
+  VariableValue & _insitu_por_zone;
+  std::vector<Real> _por;
+
   VariableValue & _depth;
   Real _decayh;
   Real _decayv;
+  Real _decayp;
 
   VariableValue & _change_perm_zone;
   std::vector<Function *> _change_kh;

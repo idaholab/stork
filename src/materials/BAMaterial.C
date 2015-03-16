@@ -18,9 +18,14 @@ InputParameters validParams<BAMaterial>()
   params.addRequiredParam<std::vector<Real> >("kh", "A vector of horizontal insitu permeability values.  For insitu_perm_zone=0, the first of these is used.  For insitu_perm_zone=1, the second is used.  Etc.  You must ensure that for each insitu_perm_zone there is a value!");
   params.addRequiredParam<std::vector<Real> >("kv", "A vector of vertical insitu permeability values.  For insitu_perm_zone=0, the first of these is used.  For insitu_perm_zone=1, the second is used.  Etc.  You must ensure that for each insitu_perm_zone there is a value!");
 
+  params.addRequiredCoupledVar("insitu_por_zone", "An auxillary variable the defines the zone for insitu porosity.  For each element, the zone must be a nonnegative integer");
+  params.addRequiredParam<std::vector<Real> >("por", "A vector of horizontal insitu pporosity values.  For insitu_perm_zone=0, the first of these is used.  For insitu_perm_zone=1, the second is used.  Etc.  You must ensure that for each insitu_por_zone there is a value!");
+
+
   params.addCoupledVar("depth", 0, "An auxillary variable the defines depth of an element.  This is used to modify the insitu permeabilities.  If not given then it defaults to zero");
   params.addParam<Real>("decayh", 0.0, "The insitu horizontal permeabilities will be multiplied by Exp(-decayh*depth)");
   params.addParam<Real>("decayv", 0.0, "The insitu vertical permeabilities will be multiplied by Exp(-decayv*depth)");
+  params.addParam<Real>("decayp", 0.0, "The insitu porosities will be multiplied by Exp(-decayp*depth)");
 
   params.addRequiredCoupledVar("change_perm_zone", "An auxillary variable the defines the zone for changes in permeability.  For each element, the zone must be a nonnegative integer");
   params.addRequiredParam<std::vector<FunctionName> >("change_kh", "A vector of changes in horizontal permeability.  For change_perm_zone=0, the first of these is used.  For change_perm_zone=1, the second is used.  Etc. permeability = kh*Exp(-decayh*depth)*10**change_kh.   You must ensure that for each change_perm_zone there is a value!");
@@ -36,9 +41,13 @@ BAMaterial::BAMaterial(const std::string & name, InputParameters parameters) :
     _kh(getParam<std::vector<Real> >("kh")),
     _kv(getParam<std::vector<Real> >("kv")),
 
+    _insitu_por_zone(coupledValue("insitu_por_zone")),
+    _por(getParam<std::vector<Real> >("por")),
+
     _depth(coupledValue("depth")),
     _decayh(getParam<Real>("decayh")),
     _decayv(getParam<Real>("decayv")),
+    _decayp(getParam<Real>("decayp")),
 
     _change_perm_zone(coupledValue("change_perm_zone"))
 {
@@ -75,6 +84,13 @@ BAMaterial::computeProperties()
   if (i_zone >= _kh.size())
     mooseError("BAMaterial: insitu_perm_zone is " << i_zone << " which is not smaller than the size of kh!\n");
 
+  // the insitu_por_zone is assumed to be the same for each qp in the element
+  if (_insitu_por_zone[0] < 0)
+    mooseError("BAMaterial: insitu_por_zone is " << _insitu_por_zone[0] << " which is negative!\n");
+  unsigned int ipor_zone = (unsigned) _insitu_por_zone[0] + 0.5;
+  if (ipor_zone >= _por.size())
+    mooseError("BAMaterial: insitu_por_zone is " << ipor_zone << " which is not smaller than the size of por!\n");
+
   // the change_perm_zone is assumed to be the same for each qp in the element
   if (_change_perm_zone[0] < 0)
     mooseError("BAMaterial: change_perm_zone is " << _change_perm_zone[0] << " which is negative!\n");
@@ -86,8 +102,8 @@ BAMaterial::computeProperties()
   // porosity, permeability, and gravity
   for (unsigned int qp = 0; qp < _qrule->n_points(); qp++)
   {
-    _porosity[qp] = _material_por + (*_por_change)[qp];
-    _porosity_old[qp] = _material_por + (*_por_change_old)[qp];
+    _porosity[qp] = _por[ipor_zone]*std::exp(-_decayp*_depth[qp]);
+    _porosity_old[qp] = _por[ipor_zone]*std::exp(-_decayp*_depth[qp]);
 
     _permeability[qp] = RealTensorValue();
     _permeability[qp](0, 0) = _permeability[qp](1, 1) = _kh[i_zone]*std::exp(-_decayh*_depth[qp])*std::pow(10, _change_kh[ch_zone]->value(_t, _q_point[qp]));

@@ -109,9 +109,18 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
+  [./por_zone]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
 []
 
 [AuxKernels]
+  [./por_zone]
+    type = ConstantAux
+    variable = por_zone
+    value = 0
+  [../]
   [./i_zone]
     type = ConstantAux
     variable = i_zone
@@ -184,6 +193,8 @@
     insitu_perm_zone = i_zone
     kh = '1'
     kv = '1'
+    insitu_por_zone = por_zone
+    por = 0.1
 
     depth = depth
     decayh = 1
@@ -219,6 +230,9 @@
   file_base = zones03
   output_initial = true
   output_final = true
-  exodus = true
   print_perf_log = true
+  [./exodus]
+    type = Exodus
+    hide = por_zone
+  [../]
 []

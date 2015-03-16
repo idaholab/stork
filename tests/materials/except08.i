@@ -1,18 +1,12 @@
-# insitu zones only
-# As ASCII art, the zones are:
-#
-# 23
-# 12
-#
 [Mesh]
   type = GeneratedMesh
   dim = 2
   nx = 2
-  xmin = 0
-  xmax = 2
+  xmin = -1
+  xmax = 1
   ny = 2
-  ymin = 0
-  ymax = 2
+  ymin = -1
+  ymax = 1
 []
 
 
@@ -86,30 +80,6 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
-  [./kxx]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./kxy]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./kxz]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./kyy]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./kyz]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./kzz]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
   [./por_zone]
     order = CONSTANT
     family = MONOMIAL
@@ -118,9 +88,9 @@
 
 [AuxKernels]
   [./i_zone]
-    type = FunctionAux
+    type = ConstantAux
     variable = i_zone
-    function = 'x+y'
+    value = 0
   [../]
   [./ch_zone]
     type = ConstantAux
@@ -130,49 +100,7 @@
   [./por_zone]
     type = ConstantAux
     variable = por_zone
-    value = 0
-  [../]
-  [./kxx]
-    type = RealTensorValueAux
-    variable = kxx
-    tensor = permeability
-    index_i = 0
-    index_j = 0
-  [../]
-  [./kxy]
-    type = RealTensorValueAux
-    variable = kxy
-    tensor = permeability
-    index_i = 0
-    index_j = 1
-  [../]
-  [./kxz]
-    type = RealTensorValueAux
-    variable = kxz
-    tensor = permeability
-    index_i = 0
-    index_j = 2
-  [../]
-  [./kyy]
-    type = RealTensorValueAux
-    variable = kyy
-    tensor = permeability
-    index_i = 1
-    index_j = 1
-  [../]
-  [./kyz]
-    type = RealTensorValueAux
-    variable = kyz
-    tensor = permeability
-    index_i = 1
-    index_j = 2
-  [../]
-  [./kzz]
-    type = RealTensorValueAux
-    variable = kzz
-    tensor = permeability
-    index_i = 2
-    index_j = 2
+    value = 2
   [../]
 []
 
@@ -184,13 +112,13 @@
     mat_permeability = '0 0 0  0 0 0  0 0 0'
     gravity = '0 0 0'
     insitu_perm_zone = i_zone
-    kh = '0 1 2 3'
-    kv = '6 7 8 9'
+    kh = 1
+    kv = 1
     insitu_por_zone = por_zone
-    por = 0.1
+    por = '0.1 0.04'
     change_perm_zone = ch_zone
-    change_kh = 0
-    change_kv = 0
+    change_kh = 1
+    change_kv = 1
     linear_shape_fcns = true
   [../]
 []
@@ -208,17 +136,10 @@
 
 [Executioner]
   type = Transient
-  start_time = 0
-  end_time = 1
-  dt = 1
   solve_type = Newton
 []
 
 [Outputs]
-  file_base = zones01
+  exodus = true
   print_perf_log = true
-  [./exodus]
-    type = Exodus
-    hide = por_zone
-  [../]
 []

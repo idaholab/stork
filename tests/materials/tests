@@ -29,6 +29,16 @@
     input = 'except06.i'
     expect_err = 'BAMaterial: change_perm_zone is 1 which is not smaller than the size of change_kh!'
   [../]
+  [./except07]
+    type = 'RunException'
+    input = 'except07.i'
+    expect_err = 'BAMaterial: insitu_por_zone is -1 which is negative!'
+  [../]
+  [./except08]
+    type = 'RunException'
+    input = 'except08.i'
+    expect_err = 'BAMaterial: insitu_por_zone is 2 which is not smaller than the size of por!'
+  [../]
 
   [./zones01]
     type = 'Exodiff'
@@ -44,6 +54,16 @@
     type = 'Exodiff'
     input = 'zones03.i'
     exodiff = 'zones03.e'
+  [../]
+  [./zones04]
+    type = 'Exodiff'
+    input = 'zones04.i'
+    exodiff = 'zones04.e'
+  [../]
+  [./zones05]
+    type = 'Exodiff'
+    input = 'zones05.i'
+    exodiff = 'zones05.e'
   [../]
 
 []
