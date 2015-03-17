@@ -77,37 +77,43 @@ BAMaterial::computeProperties()
   // with algorithms depending on the _richards_name_UO.var_types()
   computePandSeff();
 
-  // the insitu_perm_zone is assumed to be the same for each qp in the element
+  // all of the following are assumed to be constant throughout the material
+  unsigned int i_zone = (unsigned) _insitu_perm_zone[0] + 0.5;
+  unsigned int ipor_zone = (unsigned) _insitu_por_zone[0] + 0.5;
+  unsigned int ch_zone = (unsigned) _change_perm_zone[0] + 0.5;
+
+  // error checking
   if (_insitu_perm_zone[0] < 0)
     mooseError("BAMaterial: insitu_perm_zone is " << _insitu_perm_zone[0] << " which is negative!\n");
-  unsigned int i_zone = (unsigned) _insitu_perm_zone[0] + 0.5;
   if (i_zone >= _kh.size())
     mooseError("BAMaterial: insitu_perm_zone is " << i_zone << " which is not smaller than the size of kh!\n");
-
-  // the insitu_por_zone is assumed to be the same for each qp in the element
   if (_insitu_por_zone[0] < 0)
     mooseError("BAMaterial: insitu_por_zone is " << _insitu_por_zone[0] << " which is negative!\n");
-  unsigned int ipor_zone = (unsigned) _insitu_por_zone[0] + 0.5;
   if (ipor_zone >= _por.size())
     mooseError("BAMaterial: insitu_por_zone is " << ipor_zone << " which is not smaller than the size of por!\n");
-
-  // the change_perm_zone is assumed to be the same for each qp in the element
   if (_change_perm_zone[0] < 0)
     mooseError("BAMaterial: change_perm_zone is " << _change_perm_zone[0] << " which is negative!\n");
-  unsigned int ch_zone = (unsigned) _change_perm_zone[0] + 0.5;
   if (ch_zone >= _change_kh.size())
     mooseError("BAMaterial: change_perm_zone is " << ch_zone << " which is not smaller than the size of change_kh!\n");
 
+  // all of the following are assumed to be constant throughout the material
+  // This is a requirement in other parts of Richards
+  Real depth = _depth[0];
+  Real change_kh = _change_kh[ch_zone]->value(_t, _q_point[0]);
+  Real change_kv = _change_kv[ch_zone]->value(_t, _q_point[0]);
+  Real porosity = _por[ipor_zone]*std::exp(-_decayp*depth);
+  Real permh = _kh[i_zone]*std::exp(-_decayh*depth)*std::pow(10, change_kh);
+  Real permv = _kv[i_zone]*std::exp(-_decayv*depth)*std::pow(10, change_kv);
 
   // porosity, permeability, and gravity
   for (unsigned int qp = 0; qp < _qrule->n_points(); qp++)
   {
-    _porosity[qp] = _por[ipor_zone]*std::exp(-_decayp*_depth[qp]);
-    _porosity_old[qp] = _por[ipor_zone]*std::exp(-_decayp*_depth[qp]);
+    _porosity[qp] = porosity;
+    _porosity_old[qp] = porosity;
 
     _permeability[qp] = RealTensorValue();
-    _permeability[qp](0, 0) = _permeability[qp](1, 1) = _kh[i_zone]*std::exp(-_decayh*_depth[qp])*std::pow(10, _change_kh[ch_zone]->value(_t, _q_point[qp]));
-    _permeability[qp](2, 2) = _kv[i_zone]*std::exp(-_decayv*_depth[qp])*std::pow(10, _change_kv[ch_zone]->value(_t, _q_point[qp]));
+    _permeability[qp](0, 0) = _permeability[qp](1, 1) = permh;
+    _permeability[qp](2, 2) = permv;
 
     _gravity[qp] = _material_gravity;
   }
