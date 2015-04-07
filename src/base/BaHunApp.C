@@ -6,6 +6,9 @@
 // Materials
 #include "BAMaterial.h"
 
+// DiracKernels
+#include "BAPolyLineSink.h"
+
 template<>
 InputParameters validParams<BaHunApp>()
 {
@@ -46,6 +49,9 @@ BaHunApp::registerObjects(Factory & factory)
 {
   // Materials
   registerMaterial(BAMaterial);
+
+  // DiracKernels
+  registerDiracKernel(BAPolyLineSink);
 }
 
 void
