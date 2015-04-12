@@ -9,6 +9,9 @@
 // DiracKernels
 #include "BAPolyLineSink.h"
 
+// BCs
+#include "BAPiecewiseLinearSink.h"
+
 template<>
 InputParameters validParams<BaHunApp>()
 {
@@ -52,6 +55,9 @@ BaHunApp::registerObjects(Factory & factory)
 
   // DiracKernels
   registerDiracKernel(BAPolyLineSink);
+
+  // BCs
+  registerBoundaryCondition(BAPiecewiseLinearSink);
 }
 
 void
