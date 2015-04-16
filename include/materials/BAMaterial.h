@@ -57,6 +57,9 @@ private:
   Real _decayv;
   Real _decayp;
 
+  Real _max_kh_change;
+  Real _max_kv_change;
+
   VariableValue & _change_perm_zone;
   std::vector<Function *> _change_kh;
   std::vector<Function *> _change_kv;

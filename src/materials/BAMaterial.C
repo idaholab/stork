@@ -31,6 +31,9 @@ InputParameters validParams<BAMaterial>()
   params.addRequiredParam<std::vector<FunctionName> >("change_kh", "A vector of changes in horizontal permeability.  For change_perm_zone=0, the first of these is used.  For change_perm_zone=1, the second is used.  Etc. permeability = kh*Exp(-decayh*depth)*10**change_kh.   You must ensure that for each change_perm_zone there is a value!");
   params.addRequiredParam<std::vector<FunctionName> >("change_kv", "A vector of changes in vertical permeability.  For change_perm_zone=0, the first of these is used.  For change_perm_zone=1, the second is used.  Etc. permeability = kv*Exp(-decayv*depth)*10**change_kv.   You must ensure that for each change_perm_zone there is a value!");
 
+  params.addParam<Real>("max_kh_change", 15.0, "The maximum change in horizontal permeabilities allowed");
+  params.addParam<Real>("max_kv_change", 15.0, "The maximum change in vertical permeabilities allowed");
+
   params.addClassDescription("Material designed to work well with the BA project which has a lot of different zones, so is not suitable for dividing into blocks");
   return params;
 }
@@ -48,6 +51,9 @@ BAMaterial::BAMaterial(const std::string & name, InputParameters parameters) :
     _decayh(getParam<Real>("decayh")),
     _decayv(getParam<Real>("decayv")),
     _decayp(getParam<Real>("decayp")),
+
+    _max_kh_change(getParam<Real>("max_kh_change")),
+    _max_kv_change(getParam<Real>("max_kv_change")),
 
     _change_perm_zone(coupledValue("change_perm_zone"))
 {
@@ -100,7 +106,9 @@ BAMaterial::computeProperties()
   // This is a requirement in other parts of Richards
   Real depth = _depth[0];
   Real change_kh = _change_kh[ch_zone]->value(_t, _q_point[0]);
+  change_kh = std::min(change_kh, _max_kh_change);
   Real change_kv = _change_kv[ch_zone]->value(_t, _q_point[0]);
+  change_kv = std::min(change_kv, _max_kv_change);
   Real porosity = _por[ipor_zone]*std::exp(-_decayp*depth);
   Real permh = _kh[i_zone]*std::exp(-_decayh*depth)*std::pow(10, change_kh);
   Real permv = _kv[i_zone]*std::exp(-_decayv*depth)*std::pow(10, change_kv);

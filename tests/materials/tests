@@ -65,5 +65,10 @@
     input = 'zones05.i'
     exodiff = 'zones05.e'
   [../]
+  [./zones06]
+    type = 'Exodiff'
+    input = 'zones06.i'
+    exodiff = 'zones06.e'
+  [../]
 
 []
