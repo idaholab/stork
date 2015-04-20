@@ -22,6 +22,8 @@ class BAPolyLineSink : public RichardsPolyLineSink
 public:
   BAPolyLineSink(const std::string & name, InputParameters parameters);
 
+  virtual void addPoints();
+
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
 
@@ -31,6 +33,16 @@ public:
 protected:
 
   Function & _p0;
+
+private:
+
+  bool _cache_here;
+
+  bool _have_added_points;
+
+  std::vector<const Elem *> _the_elems;
+
+
 };
 
 #endif //BAPOLYLINESINK_H
