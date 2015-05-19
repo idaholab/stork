@@ -2,6 +2,7 @@
 #define BAPOLYLINESINK_H
 
 #include "RichardsPolyLineSink.h"
+#include "BAQuantity.h"
 #include "Function.h"
 
 //Forward Declarations
@@ -39,6 +40,9 @@ private:
   bool _cache_here;
 
   bool _have_added_points;
+
+  /// This is where the Dirac point's porepressure is recorded
+  BAQuantity & _point_pp;
 
   std::vector<const Elem *> _the_elems;
 

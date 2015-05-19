@@ -11,4 +11,27 @@
     csvdiff = 'st01.csv'
     rel_err = 1E-5
   [../]
+
+  [./st04]
+    type = 'CSVDiff'
+    input = 'st04.i'
+    csvdiff = 'st04.csv'
+    rel_err = 1E-5
+  [../]
+  [./st05]
+    type = 'CSVDiff'
+    input = 'st05.i'
+    csvdiff = 'st05.csv'
+    rel_err = 1E-5
+    min_parallel = 4
+    max_parallel = 4
+  [../]
+  [./st06]
+    type = 'CSVDiff'
+    input = 'st06.i'
+    csvdiff = 'st06.csv'
+    rel_err = 1E-5
+    min_parallel = 4
+    max_parallel = 4
+  [../]
 []

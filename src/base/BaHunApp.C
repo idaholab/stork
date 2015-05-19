@@ -9,6 +9,12 @@
 // DiracKernels
 #include "BAPolyLineSink.h"
 
+// UserObjects
+#include "BAQuantity.h"
+
+// Postprocessors
+#include "BAPlotQuantity.h"
+
 // BCs
 #include "BAPiecewiseLinearSink.h"
 
@@ -55,6 +61,12 @@ BaHunApp::registerObjects(Factory & factory)
 
   // DiracKernels
   registerDiracKernel(BAPolyLineSink);
+
+  // UserObjects
+  registerUserObject(BAQuantity);
+
+  // Postprocessors
+  registerPostprocessor(BAPlotQuantity);
 
   // BCs
   registerBoundaryCondition(BAPiecewiseLinearSink);

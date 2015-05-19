@@ -1,16 +1,15 @@
-# fully-saturated
-# production
+# checking that the BAQuantity works properly for single-processor
 [Mesh]
   type = GeneratedMesh
   dim = 3
   nx = 1
   ny = 1
   nz = 1
-  xmin = -1
+  xmin = 0
   xmax = 1
-  ymin = -1
+  ymin = 0
   ymax = 1
-  zmin = -1
+  zmin = 0
   zmax = 1
 []
 
@@ -67,16 +66,13 @@
 
 [ICs]
   [./p_ic]
-    type = FunctionIC
+    type = RandomIC
     variable = pressure
-    function = initial_pressure
+    min = 0
+    max = 2E6
   [../]
 []
 
-[AuxVariables]
-  [./Seff1VG_Aux]
-  [../]
-[]
 
 
 [Kernels]
@@ -94,10 +90,10 @@
 [DiracKernels]
   [./stream]
     type = BAPolyLineSink
-    pressures = '0.4E7 1.0E7'
-    fluxes = '1 2'
+    pressures = 0
+    fluxes = 0
     point_file = st01.stream
-    p0 = -0.2E7
+    p0 = 1E9
     SumQuantityUO = stream_total_outflow_mass
     porepressure_val_UO = stream_pp_uo
     variable = pressure
@@ -106,35 +102,14 @@
 
 
 [Postprocessors]
-  [./stream_report]
+  [./should_be_zero]
     type = RichardsPlotQuantity
     uo = stream_total_outflow_mass
   [../]
-  [./stream_pp]
+  [./should_be_p0]
     type = BAPlotQuantity
     uo = stream_pp_uo
   [../]
-
-  [./fluid_mass0]
-    type = RichardsMass
-    variable = pressure
-    execute_on = timestep_begin
-    #output = file
-  [../]
-
-  [./fluid_mass1]
-    type = RichardsMass
-    variable = pressure
-    execute_on = timestep_end
-    #output = file
-  [../]
-
-  [./zmass_error]
-    type = PlotFunction
-    function = mass_bal_fcn
-    execute_on = timestep_end
-  [../]
-
   [./p0]
     type = PointValue
     variable = pressure
@@ -144,22 +119,6 @@
 []
 
 
-[Functions]
- active = 'mass_bal_fcn initial_pressure'
-
-  [./initial_pressure]
-    type = ParsedFunction
-    value = 1E7
-  [../]
-
-  [./mass_bal_fcn]
-    type = ParsedFunction
-    value = abs((a-c+d)/2/(a+c))
-    vars = 'a c d'
-    vals = 'fluid_mass1 fluid_mass0 stream_report'
-  [../]
-[]
-
 
 [Materials]
   [./all]
@@ -167,7 +126,7 @@
     block = 0
     viscosity = 1E-3
     mat_porosity = 0.1
-    mat_permeability = '1E-12 0 0  0 1E-12 0  0 0 1E-12'
+    mat_permeability = '1E-15 0 0  0 1E-15 0  0 0 1E-15'
     density_UO = DensityConstBulk
     relperm_UO = RelPermPower
     sat_UO = Saturation
@@ -178,14 +137,6 @@
   [../]
 []
 
-[AuxKernels]
-  [./Seff1VG_AuxK]
-    type = RichardsSeffAux
-    variable = Seff1VG_Aux
-    seff_UO = Seff1VG
-    pressure_vars = pressure
-  [../]
-[]
 
 
 [Preconditioning]
@@ -193,22 +144,22 @@
     type = SMP
     full = true
     petsc_options = '-snes_converged_reason'
-    petsc_options_iname = '-ksp_type -pc_type -snes_atol -snes_rtol -snes_max_it -ksp_max_it'
-    petsc_options_value = 'bcgs bjacobi 1E-10 1E-10 10000 30'
+    petsc_options_iname = '-ksp_type -pc_type -snes_rtol -snes_max_it -ksp_max_it'
+    petsc_options_value = 'bcgs bjacobi 1E-8 10000 30'
   [../]
 []
 
 
 [Executioner]
   type = Transient
-  end_time = 2.5
-  dt = 0.1
+  end_time = 10
+  dt = 1
   solve_type = NEWTON
 
 []
 
 [Outputs]
-  file_base = st02
+  file_base = st04
   output_initial = false
   exodus = false
   csv = true

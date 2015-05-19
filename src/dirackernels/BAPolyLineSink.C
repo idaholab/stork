@@ -5,6 +5,7 @@ InputParameters validParams<BAPolyLineSink>()
 {
   InputParameters params = validParams<RichardsPolyLineSink>();
   params.addRequiredParam<FunctionName>("p0", "Base porepressure.  SinkFlux = _sink_func(p - p0)");
+  params.addRequiredParam<UserObjectName>("porepressure_val_UO", "The porepressure at the Dirac point will be recorded into this user object.  Must be a UserObject of type=BAQuantity");
   params.addParam<bool>("cache_here", true, "Cache elements: only needed until DiracKernel is OK");
   params.addClassDescription("Approximates a polyline sink in the mesh by using a number of point sinks whose positions are read from a file.  This extends RichardsPolyLineSink by adding a function for the base porepressure p0.");
   return params;
@@ -14,7 +15,8 @@ BAPolyLineSink::BAPolyLineSink(const std::string & name, InputParameters paramet
     RichardsPolyLineSink(name, parameters),
     _p0(getFunction("p0")),
     _cache_here(getParam<bool>("cache_here")),
-    _have_added_points(false)
+    _have_added_points(false),
+    _point_pp(const_cast<BAQuantity &>(getUserObject<BAQuantity>("porepressure_val_UO")))
 {
   _the_elems.resize(0);
 }
@@ -23,6 +25,7 @@ void
 BAPolyLineSink::addPoints()
 {
   _total_outflow_mass.zero();
+  _point_pp.zero();
 
   // For the _cache_here=true case I'm assuming:
   // (1) the points aren't moving around
@@ -50,6 +53,7 @@ BAPolyLineSink::computeQpResidual()
   Real test_fcn = _test[_i][_qp];
   Real flow = test_fcn*_sink_func.sample(_pp[_qp][_pvar] - _p0.value(_t, _q_point[_qp]));
   _total_outflow_mass.add(flow*_dt);
+  _point_pp.record(_pp[_qp][_pvar]);
   return flow;
 }
 
