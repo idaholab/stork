@@ -37,6 +37,12 @@ protected:
 
 private:
 
+  // only for _start_time <= t <= _end_time will the BAPolyLineSink be active
+  Real _start_time;
+
+  // only for _start_time <= t <= _end_time will the BAPolyLineSink be active
+  Real _end_time;
+
   bool _cache_here;
 
   bool _have_added_points;

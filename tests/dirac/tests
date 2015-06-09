@@ -34,4 +34,12 @@
     min_parallel = 4
     max_parallel = 4
   [../]
+
+  [./st07]
+    type = 'CSVDiff'
+    input = 'st07.i'
+    csvdiff = 'st07.csv'
+    rel_err = 1E-5
+  [../]
+
 []
