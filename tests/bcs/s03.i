@@ -90,22 +90,24 @@
     execute_on = timestep_end
   [../]
   [./left_flux_out]
-    type = RichardsPiecewiseLinearSinkFlux
+    type = BAPiecewiseLinearSinkFlux
     boundary = left
     variable = pressure
     pressures = '-1 1'
     bare_fluxes = '1E2 2E2'
     use_mobility = true
     use_relperm = true
+    aux_var = one_hundred
   [../]
   [./right_flux_out]
-    type = RichardsPiecewiseLinearSinkFlux
+    type = BAPiecewiseLinearSinkFlux
     boundary = right
     variable = pressure
     pressures = '-1 1'
     bare_fluxes = '1E2 2E2'
     use_mobility = true
     use_relperm = true
+    aux_var = -10
   [../]
   [./p0]
     type = PointValue
