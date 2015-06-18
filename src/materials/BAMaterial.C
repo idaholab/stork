@@ -34,6 +34,14 @@ InputParameters validParams<BAMaterial>()
   params.addParam<Real>("max_kh_change", 15.0, "The maximum change in horizontal permeabilities allowed");
   params.addParam<Real>("max_kv_change", 15.0, "The maximum change in vertical permeabilities allowed");
 
+  params.addParam<Real>("max_kh", 1.0E30, "The maximum horizontal permeability allowed");
+  params.addParam<Real>("max_kv", 1.0E30, "The maximum vertical permeability allowed");
+  params.addParam<Real>("max_por", 1.0, "The maximum porosity allowed");
+
+  params.addParam<Real>("min_kh", 0, "The maximum horizontal permeability allowed");
+  params.addParam<Real>("min_kv", 0, "The maximum vertical permeability allowed");
+  params.addParam<Real>("min_por", 0, "The maximum porosity allowed");
+
   params.addClassDescription("Material designed to work well with the BA project which has a lot of different zones, so is not suitable for dividing into blocks");
   return params;
 }
@@ -54,6 +62,14 @@ BAMaterial::BAMaterial(const std::string & name, InputParameters parameters) :
 
     _max_kh_change(getParam<Real>("max_kh_change")),
     _max_kv_change(getParam<Real>("max_kv_change")),
+
+    _max_kh(getParam<Real>("max_kh")),
+    _max_kv(getParam<Real>("max_kv")),
+    _max_por(getParam<Real>("max_por")),
+
+    _min_kh(getParam<Real>("min_kh")),
+    _min_kv(getParam<Real>("min_kv")),
+    _min_por(getParam<Real>("min_por")),
 
     _change_perm_zone(coupledValue("change_perm_zone"))
 {
@@ -112,6 +128,10 @@ BAMaterial::computeProperties()
   Real porosity = _por[ipor_zone]*std::exp(-_decayp*depth);
   Real permh = _kh[i_zone]*std::exp(-_decayh*depth)*std::pow(10, change_kh);
   Real permv = _kv[i_zone]*std::exp(-_decayv*depth)*std::pow(10, change_kv);
+
+  permh = std::min(std::max(permh, _min_kh), _max_kh);
+  permv = std::min(std::max(permv, _min_kv), _max_kv);
+  porosity = std::min(std::max(porosity, _min_por), _max_por);
 
   // porosity, permeability, and gravity
   for (unsigned int qp = 0; qp < _qrule->n_points(); qp++)

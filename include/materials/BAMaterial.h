@@ -60,6 +60,14 @@ private:
   Real _max_kh_change;
   Real _max_kv_change;
 
+  Real _max_kh;
+  Real _max_kv;
+  Real _max_por;
+
+  Real _min_kh;
+  Real _min_kv;
+  Real _min_por;
+
   VariableValue & _change_perm_zone;
   std::vector<Function *> _change_kh;
   std::vector<Function *> _change_kv;
