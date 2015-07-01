@@ -15,9 +15,11 @@
 // Postprocessors
 #include "BAPlotQuantity.h"
 #include "BAPiecewiseLinearSinkFlux.h"
+#include "BAHalfCubicSinkFlux.h"
 
 // BCs
 #include "BAPiecewiseLinearSink.h"
+#include "BAHalfCubicSink.h"
 
 template<>
 InputParameters validParams<BaHunApp>()
@@ -69,9 +71,11 @@ BaHunApp::registerObjects(Factory & factory)
   // Postprocessors
   registerPostprocessor(BAPlotQuantity);
   registerPostprocessor(BAPiecewiseLinearSinkFlux);
+  registerPostprocessor(BAHalfCubicSinkFlux);
 
   // BCs
   registerBoundaryCondition(BAPiecewiseLinearSink);
+  registerBoundaryCondition(BAHalfCubicSink);
 }
 
 void

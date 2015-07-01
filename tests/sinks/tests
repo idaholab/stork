@@ -1,0 +1,14 @@
+[Tests]
+  [./s02]
+    type = 'CSVDiff'
+    input = 's02.i'
+    csvdiff = 's02.csv'
+    rel_err = 1.0E-5
+  [../]
+  [./s05]
+    type = 'CSVDiff'
+    input = 's05.i'
+    csvdiff = 's05.csv'
+    rel_err = 1.0E-5
+  [../]
+[]

@@ -1,0 +1,9 @@
+[Tests]
+  [./jn21]
+    type = 'PetscJacobianTester'
+    input = 'jn21.i'
+    # can't make too tight as finite-difference constant state bums out due to precision loss
+    ratio_tol = 1E-5
+    difference_tol = 1E10
+  [../]
+[]
