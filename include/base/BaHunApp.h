@@ -11,7 +11,7 @@ InputParameters validParams<BaHunApp>();
 class BaHunApp : public MooseApp
 {
 public:
-  BaHunApp(const std::string & name, InputParameters parameters);
+  BaHunApp(InputParameters parameters);
   virtual ~BaHunApp();
 
   static void registerApps();

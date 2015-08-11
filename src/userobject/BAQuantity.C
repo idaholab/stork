@@ -16,8 +16,8 @@ InputParameters validParams<BAQuantity>()
   return params;
 }
 
-BAQuantity::BAQuantity(const std::string & name, InputParameters parameters) :
-    GeneralUserObject(name, parameters),
+BAQuantity::BAQuantity(const InputParameters & parameters) :
+    GeneralUserObject(parameters),
     _quant(0)
 {
 }

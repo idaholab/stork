@@ -32,7 +32,7 @@ InputParameters validParams<BAHalfCubicSink>();
 class BAHalfCubicSink : public IntegratedBC
 {
 public:
-  BAHalfCubicSink(const std::string & name, InputParameters parameters);
+  BAHalfCubicSink(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();

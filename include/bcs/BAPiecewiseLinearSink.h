@@ -24,7 +24,7 @@ class BAPiecewiseLinearSink : public RichardsPiecewiseLinearSink
 {
 public:
 
-  BAPiecewiseLinearSink(const std::string & name, InputParameters parameters);
+  BAPiecewiseLinearSink(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();

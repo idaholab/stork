@@ -31,10 +31,9 @@ InputParameters validParams<BaHunApp>()
   return params;
 }
 
-BaHunApp::BaHunApp(const std::string & name, InputParameters parameters) :
-    MooseApp(name, parameters)
+BaHunApp::BaHunApp(InputParameters parameters) :
+    MooseApp(parameters)
 {
-  srand(processor_id());
 
   Moose::registerObjects(_factory);
   ModulesApp::registerObjects(_factory);

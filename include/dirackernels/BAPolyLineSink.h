@@ -21,7 +21,7 @@ InputParameters validParams<BAPolyLineSink>();
 class BAPolyLineSink : public RichardsPolyLineSink
 {
 public:
-  BAPolyLineSink(const std::string & name, InputParameters parameters);
+  BAPolyLineSink(const InputParameters & parameters);
 
   virtual void addPoints();
 

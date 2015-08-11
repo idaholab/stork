@@ -46,8 +46,8 @@ InputParameters validParams<BAMaterial>()
   return params;
 }
 
-BAMaterial::BAMaterial(const std::string & name, InputParameters parameters) :
-    RichardsMaterial(name, parameters),
+BAMaterial::BAMaterial(const InputParameters & parameters) :
+    RichardsMaterial(parameters),
     _insitu_perm_zone(coupledValue("insitu_perm_zone")),
     _kh(getParam<std::vector<Real> >("kh")),
     _kv(getParam<std::vector<Real> >("kv")),
