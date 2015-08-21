@@ -26,7 +26,7 @@ InputParameters validParams<BAQuantity>();
 class BAQuantity : public GeneralUserObject
 {
 public:
-  BAQuantity(const std::string & name, InputParameters parameters);
+  BAQuantity(const InputParameters & parameters);
   virtual ~BAQuantity();
 
   /// sets _quant = 0

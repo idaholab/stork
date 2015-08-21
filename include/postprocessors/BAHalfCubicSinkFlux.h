@@ -34,7 +34,7 @@ InputParameters validParams<BAHalfCubicSinkFlux>();
 class BAHalfCubicSinkFlux: public SideIntegralVariablePostprocessor
 {
 public:
-  BAHalfCubicSinkFlux(const std::string & name, InputParameters parameters);
+  BAHalfCubicSinkFlux(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpIntegral();

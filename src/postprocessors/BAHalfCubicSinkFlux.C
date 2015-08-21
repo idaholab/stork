@@ -23,8 +23,8 @@ InputParameters validParams<BAHalfCubicSinkFlux>()
   return params;
 }
 
-BAHalfCubicSinkFlux::BAHalfCubicSinkFlux(const std::string & name, InputParameters parameters) :
-    SideIntegralVariablePostprocessor(name, parameters),
+BAHalfCubicSinkFlux::BAHalfCubicSinkFlux(const InputParameters & parameters) :
+    SideIntegralVariablePostprocessor(parameters),
     _feproblem(dynamic_cast<FEProblem &>(_subproblem)),
     _maximum(getParam<Real>("max")),
     _cutoff(getParam<Real>("cutoff")),

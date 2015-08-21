@@ -16,8 +16,8 @@ InputParameters validParams<BAPiecewiseLinearSink>()
   return params;
 }
 
-BAPiecewiseLinearSink::BAPiecewiseLinearSink(const std::string & name, InputParameters parameters) :
-    RichardsPiecewiseLinearSink(name,parameters),
+BAPiecewiseLinearSink::BAPiecewiseLinearSink(const InputParameters & parameters) :
+    RichardsPiecewiseLinearSink(parameters),
     _aux_var(coupledValue("aux_var"))
 {
 }

@@ -23,7 +23,7 @@ InputParameters validParams<BAPlotQuantity>();
 class BAPlotQuantity : public GeneralPostprocessor
 {
 public:
-  BAPlotQuantity(const std::string & name, InputParameters parameters);
+  BAPlotQuantity(const InputParameters & parameters);
   virtual ~BAPlotQuantity();
 
   virtual void initialize();

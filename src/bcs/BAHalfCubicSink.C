@@ -24,8 +24,8 @@ InputParameters validParams<BAHalfCubicSink>()
   return params;
 }
 
-BAHalfCubicSink::BAHalfCubicSink(const std::string & name, InputParameters parameters) :
-    IntegratedBC(name,parameters),
+BAHalfCubicSink::BAHalfCubicSink(const InputParameters & parameters) :
+    IntegratedBC(parameters),
     _maximum(getParam<Real>("max")),
     _cutoff(getParam<Real>("cutoff")),
     _cutoff3(_cutoff*_cutoff*_cutoff),

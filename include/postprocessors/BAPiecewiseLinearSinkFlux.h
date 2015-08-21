@@ -24,7 +24,7 @@ class BAPiecewiseLinearSinkFlux:
   public RichardsPiecewiseLinearSinkFlux
 {
 public:
-  BAPiecewiseLinearSinkFlux(const std::string & name, InputParameters parameters);
+  BAPiecewiseLinearSinkFlux(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpIntegral();

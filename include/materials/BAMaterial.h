@@ -36,7 +36,7 @@ InputParameters validParams<BAMaterial>();
 class BAMaterial : public RichardsMaterial
 {
 public:
-  BAMaterial(const std::string & name, InputParameters parameters);
+  BAMaterial(const InputParameters & parameters);
 
 protected:
 

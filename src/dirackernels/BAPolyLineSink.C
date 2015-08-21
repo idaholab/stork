@@ -13,8 +13,8 @@ InputParameters validParams<BAPolyLineSink>()
   return params;
 }
 
-BAPolyLineSink::BAPolyLineSink(const std::string & name, InputParameters parameters) :
-    RichardsPolyLineSink(name, parameters),
+BAPolyLineSink::BAPolyLineSink(const InputParameters & parameters) :
+    RichardsPolyLineSink(parameters),
     _p0(getFunction("p0")),
     _start_time(getParam<Real>("start_time")),
     _end_time(getParam<Real>("end_time")),

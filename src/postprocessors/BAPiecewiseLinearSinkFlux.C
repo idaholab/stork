@@ -18,8 +18,8 @@ InputParameters validParams<BAPiecewiseLinearSinkFlux>()
   return params;
 }
 
-BAPiecewiseLinearSinkFlux::BAPiecewiseLinearSinkFlux(const std::string & name, InputParameters parameters) :
-    RichardsPiecewiseLinearSinkFlux(name, parameters),
+BAPiecewiseLinearSinkFlux::BAPiecewiseLinearSinkFlux(const InputParameters & parameters) :
+    RichardsPiecewiseLinearSinkFlux(parameters),
     _aux_var(coupledValue("aux_var"))
 {
 }

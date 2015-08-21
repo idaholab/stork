@@ -18,8 +18,8 @@ InputParameters validParams<BAPlotQuantity>()
   return params;
 }
 
-BAPlotQuantity::BAPlotQuantity(const std::string & name, InputParameters parameters) :
-    GeneralPostprocessor(name, parameters),
+BAPlotQuantity::BAPlotQuantity(const InputParameters & parameters) :
+    GeneralPostprocessor(parameters),
     _total_value(getUserObject<BAQuantity>("uo"))
 {
 }
