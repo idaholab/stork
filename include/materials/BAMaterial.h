@@ -69,9 +69,13 @@ private:
   Real _min_por;
 
   VariableValue & _change_perm_zone;
+
+  bool _use_transverse_direction;
+
   std::vector<Function *> _change_kh;
   std::vector<Function *> _change_kv;
 
+  std::vector<VariableValue *> _trans_dir;
 };
 
 #endif //BAMATERIAL_H

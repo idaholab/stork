@@ -7,6 +7,7 @@
 
 
 #include "BAMaterial.h"
+#include "RotationMatrix.h"
 
 
 
@@ -42,6 +43,8 @@ InputParameters validParams<BAMaterial>()
   params.addParam<Real>("min_kv", 0, "The maximum vertical permeability allowed");
   params.addParam<Real>("min_por", 0, "The maximum porosity allowed");
 
+  params.addCoupledVar("transverse_directions", 0, "List of AuxVariables (of type BATransverseDirectionAux) that calculate the transverse direction for each element");
+
   params.addClassDescription("Material designed to work well with the BA project which has a lot of different zones, so is not suitable for dividing into blocks");
   return params;
 }
@@ -71,7 +74,9 @@ BAMaterial::BAMaterial(const InputParameters & parameters) :
     _min_kv(getParam<Real>("min_kv")),
     _min_por(getParam<Real>("min_por")),
 
-    _change_perm_zone(coupledValue("change_perm_zone"))
+    _change_perm_zone(coupledValue("change_perm_zone")),
+
+    _use_transverse_direction(false)
 {
   if (_kh.size() != _kv.size())
     mooseError("BAMaterial: For clarity kh and kv must have the same size\n");
@@ -90,11 +95,20 @@ BAMaterial::BAMaterial(const InputParameters & parameters) :
     _change_kh[i] = &getFunctionByName(fcn_namesh[i]);
     _change_kv[i] = &getFunctionByName(fcn_namesv[i]);
   }
+
+  _trans_dir.resize(3);
+  if (isParamValid("transverse_directions") && (coupledComponents("transverse_directions") == 3))
+  {
+    _use_transverse_direction = true;
+    for (unsigned i = 0 ; i < 3 ; ++i)
+      _trans_dir[i] = &coupledValue("transverse_directions", i);
+  }
 }
 
 void
 BAMaterial::computeProperties()
 {
+
   // compute porepressures and effective saturations
   // with algorithms depending on the _richards_name_UO.var_types()
   computePandSeff();
@@ -144,6 +158,17 @@ BAMaterial::computeProperties()
     _permeability[qp](2, 2) = permv;
 
     _gravity[qp] = _material_gravity;
+  }
+
+  if (_use_transverse_direction)
+  {
+    RealVectorValue av_norm((*_trans_dir[0])[0], (*_trans_dir[1])[0], (*_trans_dir[2])[0]); // evaluate at the zeroth qp because these should be CONSTANT MONOMIAL
+    if (!(av_norm(0) == 0 && av_norm(1) == 0 && av_norm(2) == 0))
+    {
+      RealTensorValue rot = RotationMatrix::rotVecToZ(av_norm);
+      for (unsigned int qp = 0; qp < _qrule->n_points(); qp++)
+        _permeability[qp] = (rot.transpose()*_permeability[qp])*rot;
+    }
   }
 
 

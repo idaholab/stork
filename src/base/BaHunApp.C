@@ -21,6 +21,9 @@
 #include "BAPiecewiseLinearSink.h"
 #include "BAHalfCubicSink.h"
 
+// AuxKernels
+#include "BATransverseDirectionAux.h"
+
 template<>
 InputParameters validParams<BaHunApp>()
 {
@@ -75,6 +78,9 @@ BaHunApp::registerObjects(Factory & factory)
   // BCs
   registerBoundaryCondition(BAPiecewiseLinearSink);
   registerBoundaryCondition(BAHalfCubicSink);
+
+  // AuxKernels
+  registerAuxKernel(BATransverseDirectionAux);
 }
 
 void

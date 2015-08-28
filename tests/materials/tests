@@ -71,4 +71,24 @@
     exodiff = 'zones06.e'
   [../]
 
+  [./transverse1]
+    type = 'Exodiff'
+    input = 'transverse1.i'
+    exodiff = 'transverse1.e'
+  [../]
+  [./transverse2]
+    type = 'Exodiff'
+    input = 'transverse2.i'
+    exodiff = 'transverse2.e'
+  [../]
+  [./transverse3]
+    type = 'Exodiff'
+    input = 'transverse3.i'
+    exodiff = 'transverse3.e'
+  [../]
+  [./transverse4]
+    type = 'Exodiff'
+    input = 'transverse4.i'
+    exodiff = 'transverse4.e'
+  [../]
 []
