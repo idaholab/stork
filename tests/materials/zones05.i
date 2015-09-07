@@ -141,46 +141,46 @@
     function = 'x'
   [../]
   [./kxx]
-    type = RealTensorValueAux
+    type = MaterialRealTensorValueAux
     variable = kxx
-    tensor = permeability
-    index_i = 0
-    index_j = 0
+    property = permeability
+    row = 0
+    column = 0
   [../]
   [./kxy]
-    type = RealTensorValueAux
+    type = MaterialRealTensorValueAux
     variable = kxy
-    tensor = permeability
-    index_i = 0
-    index_j = 1
+    property = permeability
+    row = 0
+    column = 1
   [../]
   [./kxz]
-    type = RealTensorValueAux
+    type = MaterialRealTensorValueAux
     variable = kxz
-    tensor = permeability
-    index_i = 0
-    index_j = 2
+    property = permeability
+    row = 0
+    column = 2
   [../]
   [./kyy]
-    type = RealTensorValueAux
+    type = MaterialRealTensorValueAux
     variable = kyy
-    tensor = permeability
-    index_i = 1
-    index_j = 1
+    property = permeability
+    row = 1
+    column = 1
   [../]
   [./kyz]
-    type = RealTensorValueAux
+    type = MaterialRealTensorValueAux
     variable = kyz
-    tensor = permeability
-    index_i = 1
-    index_j = 2
+    property = permeability
+    row = 1
+    column = 2
   [../]
   [./kzz]
-    type = RealTensorValueAux
+    type = MaterialRealTensorValueAux
     variable = kzz
-    tensor = permeability
-    index_i = 2
-    index_j = 2
+    property = permeability
+    row = 2
+    column = 2
   [../]
   [./por]
     type = MaterialRealAux
