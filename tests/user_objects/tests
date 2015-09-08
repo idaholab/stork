@@ -1,0 +1,8 @@
+[Tests]
+  [./test_uo3]
+    type = 'CSVDiff'
+    input = 'uo3.i'
+    csvdiff = 'uo3.csv'
+    abs_zero = 1E-5
+  [../]
+[]

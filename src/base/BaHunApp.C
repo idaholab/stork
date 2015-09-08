@@ -11,6 +11,7 @@
 
 // UserObjects
 #include "BAQuantity.h"
+#include "BASeff1VG.h"
 
 // Postprocessors
 #include "BAPlotQuantity.h"
@@ -69,6 +70,7 @@ BaHunApp::registerObjects(Factory & factory)
 
   // UserObjects
   registerUserObject(BAQuantity);
+  registerUserObject(BASeff1VG);
 
   // Postprocessors
   registerPostprocessor(BAPlotQuantity);
