@@ -45,10 +45,7 @@ protected:
   Real _maximum;
 
   /// Denote x = porepressure - centre.  Then Flux out = (max/cutoff^3)*(2x + cutoff)(x - cutoff)^2 for cutoff < x < 0.  Flux out = max for x >= 0.  Flux out = 0 for x <= cutoff.
-  Real _cutoff;
-
-  /// _cutoff*_cutoff*_cutoff
-  Real _cutoff3;
+  Function & _cutoff;
 
   /// Denote x = porepressure - centre.  Then Flux out = (max/cutoff^3)*(2x + cutoff)(x - cutoff)^2 for cutoff < x < 0.  Flux out = max for x >= 0.  Flux out = 0 for x <= cutoff.
   Real _centre;
