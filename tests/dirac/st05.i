@@ -158,10 +158,9 @@
 []
 
 [Outputs]
+  execute_on = 'timestep_end'
   file_base = st05
   output_initial = false
   exodus = false
   csv = true
-  print_linear_residuals = true
-  print_perf_log = true
 []

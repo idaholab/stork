@@ -103,7 +103,7 @@
     variable = pressure
   [../]
   [./mass_bal]
-    type = PlotFunction
+    type = FunctionValuePostprocessor
     function = mass_bal_fcn
   [../]
 []
@@ -171,10 +171,10 @@
 []
 
 [Outputs]
+  execute_on = 'timestep_end'
   file_base = s02
   output_initial = false
   csv = true
-  print_perf_log = true
 []
 
 [Problem]

@@ -174,6 +174,4 @@
 [Outputs]
   file_base = transverse4
   exodus = true
-  output_initial = true
-  print_perf_log = true
 []

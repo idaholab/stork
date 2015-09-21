@@ -236,9 +236,7 @@
 
 [Outputs]
   file_base = zones06
-  output_initial = true
   output_final = true
-  print_perf_log = true
   [./exodus]
     type = Exodus
     hide = por_zone
