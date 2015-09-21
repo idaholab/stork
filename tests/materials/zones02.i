@@ -224,8 +224,8 @@
 []
 
 [Outputs]
+  execute_on = 'timestep_end'
   file_base = zones02
-  print_perf_log = true
   [./exodus]
     type = Exodus
     hide = por_zone

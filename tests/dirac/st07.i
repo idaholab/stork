@@ -132,7 +132,7 @@
   [../]
 
   [./zmass_error]
-    type = PlotFunction
+    type = FunctionValuePostprocessor
     function = mass_bal_fcn
     execute_on = timestep_end
   [../]
@@ -210,10 +210,9 @@
 []
 
 [Outputs]
+  execute_on = 'timestep_end'
   file_base = st07
   output_initial = false
   exodus = false
   csv = true
-  print_linear_residuals = true
-  print_perf_log = true
 []
