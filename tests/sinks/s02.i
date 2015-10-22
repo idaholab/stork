@@ -56,6 +56,33 @@
   [../]
 []
 
+[AuxVariables]
+  [./left_flux]
+  [../]
+  [./right_flux]
+  [../]
+[]
+
+[AuxKernels]
+  [./left_flux]
+    type = BAHalfCubicSinkAux
+    variable = left_flux
+    pressure_var = pressure
+    centre = 1.5
+    max = 2
+    cutoff = -1
+  [../]
+  [./right_flux]
+    type = BAHalfCubicSinkAux
+    variable = right_flux
+    pressure_var = pressure
+    centre = 1.5
+    max = 2
+    cutoff = -1
+  [../]
+[]
+
+
 [Functions]
   [./initial_pressure]
     type = ParsedFunction
@@ -101,6 +128,16 @@
     type = PointValue
     point = '0 0 0'
     variable = pressure
+  [../]
+  [./left_flux_val]
+    type = PointValue
+    point = '0 0.5 0'
+    variable = left_flux
+  [../]
+  [./right_flux_val]
+    type = PointValue
+    point = '1 0.5 0'
+    variable = right_flux
   [../]
   [./mass_bal]
     type = FunctionValuePostprocessor

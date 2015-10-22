@@ -24,6 +24,7 @@
 
 // AuxKernels
 #include "BATransverseDirectionAux.h"
+#include "BAHalfCubicSinkAux.h"
 
 template<>
 InputParameters validParams<BaHunApp>()
@@ -85,6 +86,7 @@ BaHunApp::registerObjects(Factory & factory)
 
   // AuxKernels
   registerAuxKernel(BATransverseDirectionAux);
+  registerAuxKernel(BAHalfCubicSinkAux);
 }
 
 void
