@@ -60,7 +60,8 @@ BASumPostprocessor::getValue()
 {
   Real val = 0;
   for (unsigned i = 0 ; i < _num_w ; ++i)
-    val += (*_pps_vals[i])/(*_w[i]);
+    if ((*_pps_vals[i]) != 0)
+      val += (*_pps_vals[i])/(*_w[i]);
   return val;
 }
 
