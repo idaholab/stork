@@ -17,6 +17,7 @@
 #include "BAPlotQuantity.h"
 #include "BAPiecewiseLinearSinkFlux.h"
 #include "BAHalfCubicSinkFlux.h"
+#include "BASumPostprocessor.h"
 
 // BCs
 #include "BAPiecewiseLinearSink.h"
@@ -79,6 +80,7 @@ BaHunApp::registerObjects(Factory & factory)
   registerPostprocessor(BAPlotQuantity);
   registerPostprocessor(BAPiecewiseLinearSinkFlux);
   registerPostprocessor(BAHalfCubicSinkFlux);
+  registerPostprocessor(BASumPostprocessor);
 
   // BCs
   registerBoundaryCondition(BAPiecewiseLinearSink);

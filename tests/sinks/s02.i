@@ -124,6 +124,11 @@
     max = 2
     cutoff = -1
   [../]
+  [./total_flux_out]
+    type = BASumPostprocessor
+    w = '1 1'
+    postprocessors = 'left_flux_out right_flux_out'
+  [../]
   [./p0]
     type = PointValue
     point = '0 0 0'
