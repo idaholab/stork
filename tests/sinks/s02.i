@@ -124,9 +124,14 @@
     max = 2
     cutoff = -1
   [../]
+  [./one]
+    type = FunctionValuePostprocessor
+    function = 1
+    outputs = ''
+  [../]
   [./total_flux_out]
     type = BASumPostprocessor
-    w = '1 1'
+    w = 'one one'
     postprocessors = 'left_flux_out right_flux_out'
   [../]
   [./p0]
@@ -214,6 +219,7 @@
 
 [Outputs]
   execute_on = 'timestep_end'
+  hide = one
   file_base = s02
   output_initial = false
   csv = true

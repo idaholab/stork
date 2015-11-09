@@ -22,9 +22,7 @@ template<>
 InputParameters validParams<BASumPostprocessor>();
 
 /**
- * Computes the difference between two postprocessors
- *
- * result = value1 - value2
+ * This postprocessor will return Sum_over_i(postprocessors_i/w_i)
  */
 class BASumPostprocessor : public GeneralPostprocessor
 {
@@ -39,9 +37,9 @@ public:
 
 protected:
 
-  std::vector<Real> _w;
   unsigned int _num_w;
   std::vector<const PostprocessorValue *> _pps_vals;
+  std::vector<const PostprocessorValue *> _w;
 };
 
 
