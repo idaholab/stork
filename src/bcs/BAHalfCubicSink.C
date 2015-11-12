@@ -8,6 +8,7 @@
 
 #include "BAHalfCubicSink.h"
 #include "Material.h"
+#include "Function.h"
 
 #include <iostream>
 

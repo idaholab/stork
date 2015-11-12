@@ -8,6 +8,10 @@
 
 #include "BAMaterial.h"
 #include "RotationMatrix.h"
+#include "Function.h"
+
+// libmesh includes
+#include "libmesh/quadrature.h"
 
 
 
