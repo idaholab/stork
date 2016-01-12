@@ -1,6 +1,7 @@
 #include "BaHunApp.h"
 #include "Moose.h"
 #include "AppFactory.h"
+#include "MooseSyntax.h"
 #include "ModulesApp.h"
 
 // Materials
