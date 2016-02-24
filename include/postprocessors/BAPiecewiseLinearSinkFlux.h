@@ -31,7 +31,7 @@ protected:
 
 private:
 
-  VariableValue & _aux_var;
+  const VariableValue & _aux_var;
 
 
 };

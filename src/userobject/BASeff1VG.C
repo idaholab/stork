@@ -31,19 +31,19 @@ BASeff1VG::BASeff1VG(const InputParameters & parameters) :
 
 
 Real
-BASeff1VG::seff(std::vector<VariableValue *> p, unsigned int qp) const
+BASeff1VG::seff(std::vector<const VariableValue *> p, unsigned int qp) const
 {
   return RichardsSeffVG::seff((*p[0])[qp] - _modflow_shift, _al, _m);
 }
 
 void
-BASeff1VG::dseff(std::vector<VariableValue *> p, unsigned int qp, std::vector<Real> & result) const
+BASeff1VG::dseff(std::vector<const VariableValue *> p, unsigned int qp, std::vector<Real> & result) const
 {
   result[0] = RichardsSeffVG::dseff((*p[0])[qp] - _modflow_shift, _al, _m);
 }
 
 void
-BASeff1VG::d2seff(std::vector<VariableValue *> p, unsigned int qp, std::vector<std::vector<Real> > & result) const
+BASeff1VG::d2seff(std::vector<const VariableValue *> p, unsigned int qp, std::vector<std::vector<Real> > & result) const
 {
   result[0][0] = RichardsSeffVG::d2seff((*p[0])[qp] - _modflow_shift, _al, _m);
 }

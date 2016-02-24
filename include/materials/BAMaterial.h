@@ -45,14 +45,14 @@ protected:
 
 private:
 
-  VariableValue & _insitu_perm_zone;
+  const VariableValue & _insitu_perm_zone;
   std::vector<Real> _kh;
   std::vector<Real> _kv;
 
-  VariableValue & _insitu_por_zone;
+  const VariableValue & _insitu_por_zone;
   std::vector<Real> _por;
 
-  VariableValue & _depth;
+  const VariableValue & _depth;
   Real _decayh;
   Real _decayv;
   Real _decayp;
@@ -68,14 +68,14 @@ private:
   Real _min_kv;
   Real _min_por;
 
-  VariableValue & _change_perm_zone;
+  const VariableValue & _change_perm_zone;
 
   bool _use_transverse_direction;
 
   std::vector<Function *> _change_kh;
   std::vector<Function *> _change_kv;
 
-  std::vector<VariableValue *> _trans_dir;
+  std::vector<const VariableValue *> _trans_dir;
 };
 
 #endif //BAMATERIAL_H
