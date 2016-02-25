@@ -41,7 +41,7 @@ private:
   Real _centre;
 
   /// The porepressure
-  VariableValue & _pressure_var;
+  const VariableValue & _pressure_var;
 
   /// the multiplier function: the flux out will be multiplied by this function
   Function & _m_func;
