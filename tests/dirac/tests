@@ -8,7 +8,7 @@
   [./st02]
     type = 'CSVDiff'
     input = 'st02.i'
-    csvdiff = 'st01.csv'
+    csvdiff = 'st02.csv'
     rel_err = 1E-5
   [../]
 
