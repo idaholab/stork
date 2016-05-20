@@ -113,6 +113,7 @@
   [./stream_pp]
     type = BAPlotQuantity
     uo = stream_pp_uo
+    outputs = 'none'
   [../]
 
   [./fluid_mass0]
