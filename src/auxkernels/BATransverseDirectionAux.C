@@ -45,7 +45,7 @@ BATransverseDirectionAux::computeValue()
       av_norm = norm/len;
     else
       av_norm = -norm/len;
-    
+
     unsigned int n = _current_elem->n_vertices();
     p0 = _current_elem->point(n-1);
     p1 = _current_elem->point(n-2);

@@ -24,7 +24,7 @@ InputParameters validParams<BAHalfCubicSink>();
  * Denote x = porepressure - centre.  Then
  * Then Flux out = (max/cutoff^3)*(2x + cutoff)(x - cutoff)^2 for cutoff < x < 0.
  * Flux out = max for x >= 0.
- * Flux out = 0 for x <= cutoff.  
+ * Flux out = 0 for x <= cutoff.
  * If a function, _m_func, is used then the flux is multiplied by _m_func.
  * This is typically used for modelling evapotranspiration
  * from the top of a groundwater model
