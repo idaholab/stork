@@ -4,6 +4,9 @@
 #include "ModulesApp.h"
 #include "MooseSyntax.h"
 
+// App-specific includes
+#include "GaussianFunction.h"
+
 template<>
 InputParameters validParams<PrariedogApp>()
 {
@@ -45,6 +48,7 @@ extern "C" void PrariedogApp__registerObjects(Factory & factory) { PrariedogApp:
 void
 PrariedogApp::registerObjects(Factory & factory)
 {
+  registerFunction(GaussianFunction);
 }
 
 // External entry point for dynamic syntax association

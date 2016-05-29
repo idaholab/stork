@@ -1,0 +1,26 @@
+[Tests]
+  [./gaussian_function_1d]
+    type = 'CSVDiff'
+    input = 'gaussian_function_1d.i'
+    csvdiff = 'gaussian_function_1d_out.csv'
+  [../]
+
+  [./gaussian_function_2d]
+    type = 'CSVDiff'
+    input = 'gaussian_function_2d.i'
+    csvdiff = 'gaussian_function_2d_out.csv'
+  [../]
+
+  [./gaussian_function_3d]
+    type = 'CSVDiff'
+    input = 'gaussian_function_3d.i'
+    csvdiff = 'gaussian_function_3d_out.csv'
+  [../]
+
+  [./gaussian_function_2d_periodic]
+    type = 'Exodiff'
+    input = 'gaussian_function_2d_periodic.i'
+    exodiff = 'gaussian_function_2d_periodic_out.e'
+  [../]
+
+[]
