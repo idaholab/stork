@@ -15,6 +15,7 @@
     type = 'CSVDiff'
     input = 'gaussian_function_3d.i'
     csvdiff = 'gaussian_function_3d_out.csv'
+    heavy = true
   [../]
 
   [./gaussian_function_2d_periodic]

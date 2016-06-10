@@ -33,8 +33,9 @@
     type = GaussianFunction
     sigma = 0.05
     scale = 2.0
-    peak_location = '0.05 0.95 0.0'
     periodic_variable = u
+    use_random_point = true
+    random_point_user_object = random_point_uo
   [../]
 []
 
@@ -46,6 +47,13 @@
   [./diffusion]
     type = Diffusion
     variable = u
+  [../]
+[]
+
+[UserObjects]
+  [./random_point_uo]
+    type = RandomPointUserObject
+    seed = 1
   [../]
 []
 
@@ -67,6 +75,5 @@
 []
 
 [Outputs]
-  csv = true
   exodus = true
 []

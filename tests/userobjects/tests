@@ -1,0 +1,7 @@
+[Tests]
+  [./random_point]
+    type = 'Exodiff'
+    input = 'random_point.i'
+    exodiff = 'random_point_out.e'
+  [../]
+[]
