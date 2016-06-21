@@ -19,7 +19,7 @@ template<>
 InputParameters validParams<RandomPointUserObject>()
 {
   InputParameters params = validParams<GeneralUserObject>();
-  params.addParam<unsigned int>("seed", 1, "The seed for the random number generator");
+  params.addParam<unsigned int>("seed", 0, "The seed for the random number generator");
   return params;
 }
 

@@ -1,0 +1,17 @@
+[Tests]
+  [./event_inserter_exponential]
+    type = 'CSVDiff'
+    input = 'event_inserter_exponential.i'
+    csvdiff = 'event_inserter_exponential_out.csv'
+  [../]
+  [./event_inserter_test_event]
+    type = 'CSVDiff'
+    input = 'event_inserter_test_event.i'
+    csvdiff = 'event_inserter_test_event_out.csv'
+  [../]
+  [./event_inserter_time_tolerance]
+    type = 'CSVDiff'
+    input = 'event_inserter_time_tolerance.i'
+    csvdiff = 'event_inserter_time_tolerance_out.csv'
+  [../]
+[]

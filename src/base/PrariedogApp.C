@@ -7,6 +7,10 @@
 // App-specific includes
 #include "GaussianFunction.h"
 #include "RandomPointUserObject.h"
+#include "EventInserter.h"
+#include "GaussianUserObject.h"
+#include "EventTimeStepper.h"
+#include "EventInserterSource.h"
 
 template<>
 InputParameters validParams<PrariedogApp>()
@@ -51,7 +55,13 @@ PrariedogApp::registerObjects(Factory & factory)
 {
   registerFunction(GaussianFunction);
 
+  registerKernel(EventInserterSource);
+
+  registerTimeStepper(EventTimeStepper);
+
   registerUserObject(RandomPointUserObject);
+  registerUserObject(EventInserter);
+  registerUserObject(GaussianUserObject);
 }
 
 // External entry point for dynamic syntax association

@@ -1,0 +1,7 @@
+[Tests]
+  [./event_timestepper]
+    type = 'CSVDiff'
+    input = 'event_timestepper.i'
+    csvdiff = 'event_timestepper_out.csv'
+  [../]
+[]
