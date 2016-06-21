@@ -1,0 +1,7 @@
+[Tests]
+  [./event_marker]
+    type = 'Exodiff'
+    input = 'event_marker.i'
+    exodiff = 'event_marker_out.e-s002'
+  [../]
+[]

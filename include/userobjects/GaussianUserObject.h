@@ -58,7 +58,7 @@ public:
    */
   Real value(const Point & p, const Point & center) const;
 
-  //Real getSigma() { return _sigma };
+  const Real getSigma() const { return _sigma; }
 
 protected:
   /// Value to multiply function by

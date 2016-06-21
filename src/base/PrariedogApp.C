@@ -11,6 +11,7 @@
 #include "GaussianUserObject.h"
 #include "EventTimeStepper.h"
 #include "EventInserterSource.h"
+#include "EventMarker.h"
 
 template<>
 InputParameters validParams<PrariedogApp>()
@@ -56,6 +57,8 @@ PrariedogApp::registerObjects(Factory & factory)
   registerFunction(GaussianFunction);
 
   registerKernel(EventInserterSource);
+
+  registerMarker(EventMarker);
 
   registerTimeStepper(EventTimeStepper);
 
