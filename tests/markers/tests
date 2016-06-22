@@ -4,4 +4,9 @@
     input = 'event_marker.i'
     exodiff = 'event_marker_out.e-s002'
   [../]
+  [./event_marker_initial_adaptivity]
+    type = 'Exodiff'
+    input = 'event_marker_initial_adaptivity.i'
+    exodiff = 'event_marker_initial_adaptivity_out.e'
+  [../]
 []

@@ -1,11 +1,3 @@
-###########################################################
-# This is a simple test with a time-dependent problem
-# demonstrating the use of a "Transient" Executioner.
-#
-# @Requirement F1.10
-###########################################################
-
-
 [Mesh]
   type = GeneratedMesh
   dim = 2
@@ -98,11 +90,10 @@
     type = EventInserter
     distribution = 'uniform'
     mean = 0.4
-    insert_test = true
-    test_time = 0.15
-    test_location = '0.1 0.2 0.0'
+    insert_initial = true
     random_point_user_object = random_point_uo
     verbose = true
+    seed = 3
   [../]
   [./gaussian_uo]
     type = GaussianUserObject
@@ -113,8 +104,10 @@
 []
 
 [Adaptivity]
-  cycles_per_step = 2
+  initial_marker = event_marker
+  initial_steps = 2
   marker = event_marker
+  cycles_per_step = 2
   max_h_level = 2
   recompute_markers_during_cycles = true
   [./Markers]

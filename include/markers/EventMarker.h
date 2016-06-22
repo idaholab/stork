@@ -34,15 +34,21 @@ public:
   virtual ~EventMarker(){};
 
 protected:
+  virtual void initialSetup();
+
   virtual void timestepSetup();
 
   virtual MarkerValue computeElementMarker();
+
+  void checkForEvent();
 
   const EventInserter & _inserter;
 
   const GaussianUserObject & _gaussian_uo;
 
   const Real _marker_radius;
+
+  const bool _verbose;
 
   const Real _refine_distance;
 
