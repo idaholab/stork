@@ -122,7 +122,7 @@
       type = EventMarker
       inserter = inserter
       gaussian_user_object = gaussian_uo
-      refine_radius = 3.0
+      marker_radius = 3.0
     [../]
   [../]
 []
