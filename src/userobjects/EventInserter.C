@@ -19,8 +19,8 @@ InputParameters validParams<EventInserter>()
 
   params.addRequiredParam<Real>("mean", "Mean (time) of probability distribution");
   params.addRequiredParam<UserObjectName>("random_point_user_object", "Name of RandomPointUserObject to get random points on the mesh.");
-  params.addParam<bool>("random_timing", false, "Use random timing (true) or uniform timing (false).");
-  params.addParam<MooseEnum>("distribution", distribution, "Type of probability distribution to use in picking event times.");
+  params.addParam<bool>("random_timing", false, "Use random timing (true) or constistent timing (false).");
+  params.addParam<MooseEnum>("distribution", distribution, "Type of probability distribution to use in picking random event times.");
   params.addParam<bool>("insert_initial", false, "Insert an event at the beginning of the simulation.");
   params.addParam<bool>("insert_test", false, "Insert a test event. If set 'test_time' and 'test_location' need to be set.");
   params.addParam<Real>("test_time", "Insert an event at this time in the simulation cell");

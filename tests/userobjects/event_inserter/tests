@@ -1,8 +1,13 @@
 [Tests]
-  [./event_inserter_exponential]
+  [./event_inserter]
     type = 'CSVDiff'
-    input = 'event_inserter_exponential.i'
-    csvdiff = 'event_inserter_exponential_out.csv'
+    input = 'event_inserter.i'
+    csvdiff = 'event_inserter_out.csv'
+  [../]
+  [./event_inserter_exponential_timing]
+    type = 'CSVDiff'
+    input = 'event_inserter_exponential_timing.i'
+    csvdiff = 'event_inserter_exponential_timing_out.csv'
   [../]
   [./event_inserter_test_event]
     type = 'CSVDiff'
@@ -13,5 +18,10 @@
     type = 'CSVDiff'
     input = 'event_inserter_time_tolerance.i'
     csvdiff = 'event_inserter_time_tolerance_out.csv'
+  [../]
+  [./event_inserter_initial_event]
+    type = 'Exodiff'
+    input = 'event_inserter_initial_event.i'
+    exodiff = 'event_inserter_initial_event_out.e'
   [../]
 []
