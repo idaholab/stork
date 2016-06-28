@@ -18,6 +18,7 @@
 
 #include "GeneralUserObject.h"
 #include "MooseMesh.h"
+#include "RandomInterface.h"
 
 //Forward Declarations
 class RandomPointUserObject;
@@ -26,7 +27,8 @@ template<>
 InputParameters validParams<RandomPointUserObject>();
 
 class RandomPointUserObject :
-  public GeneralUserObject
+  public GeneralUserObject,
+  public RandomInterface
 {
 public:
   RandomPointUserObject(const InputParameters & parameters);
