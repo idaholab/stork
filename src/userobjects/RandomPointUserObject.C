@@ -58,7 +58,11 @@ RandomPointUserObject::getRandomPoint() const
   Point random_point;
   while (1)
   {
-    random_point = Point(x_min + MooseRandom::rand()*x_length, y_min + MooseRandom::rand()*y_length, z_min + MooseRandom::rand()*z_length);
+    Real random_x = x_min + MooseRandom::rand()*x_length;
+    Real random_y = y_min + MooseRandom::rand()*y_length;
+    Real random_z = z_min + MooseRandom::rand()*z_length;
+
+    random_point = Point(random_x, random_y, random_z);
 
     // check if point is valid
     std::vector<Point> point_vec(1, random_point);
