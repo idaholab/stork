@@ -18,6 +18,7 @@
 #include "Marker.h"
 #include "EventInserter.h"
 #include "GaussianUserObject.h"
+#include "Coupleable.h"
 
 // libmesh includes
 #include "libmesh/mesh_tools.h"
@@ -27,7 +28,7 @@ class EventMarker;
 template<>
 InputParameters validParams<EventMarker>();
 
-class EventMarker : public Marker
+class EventMarker : public Marker, public Coupleable
 {
 public:
   EventMarker(const InputParameters & parameters);
@@ -49,6 +50,8 @@ protected:
   const Real _marker_radius;
 
   const bool _verbose;
+
+  const unsigned int _periodic_var;
 
   const Real _refine_distance;
 
