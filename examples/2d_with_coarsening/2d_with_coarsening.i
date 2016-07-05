@@ -59,9 +59,8 @@
   [../]
   [./inserter]
     type = EventInserter
-    random_timing = true
     insert_initial = true
-    distribution = exponential
+    random_timing = true
     mean = 1.0
     random_point_user_object = random_point_uo
     seed = 3
@@ -89,6 +88,10 @@
       inserter = inserter
       gaussian_user_object = gaussian_uo
       marker_radius = 6.0
+      coarsen_events = true
+      coarsen_method = time
+      coarsen_time = 2.0
+      verbose = true
       periodic_variable = u
     [../]
   [../]
@@ -114,7 +117,7 @@
     type = EventTimeStepper
     dt = 0.01
     event_inserter = inserter
-    growth_factor = 1.1
+    growth_factor = 2.0
   [../]
 []
 
