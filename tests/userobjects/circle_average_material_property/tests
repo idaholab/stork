@@ -1,0 +1,8 @@
+[Tests]
+  [./circle_average_material_property]
+    type = 'CSVDiff'
+    input = 'circle_average_material_property.i'
+    csvdiff = 'circle_average_material_property_out.csv'
+    max_parallel = 2
+  [../]
+[]
