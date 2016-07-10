@@ -14,4 +14,9 @@
     input = 'event_marker_periodic.i'
     exodiff = 'event_marker_periodic_out.e-s002'
   [../]
+  [./event_marker_coarsening]
+    type = 'Exodiff'
+    input = 'event_marker_coarsening.i'
+    exodiff = 'event_marker_coarsening_out.e-s002'
+  [../]
 []

@@ -34,6 +34,14 @@ public:
   EventMarker(const InputParameters & parameters);
   virtual ~EventMarker(){};
 
+  // copying these from EventInserter.h
+
+  /// An event has an start time and a location
+  typedef std::pair<Real, Point> Event;
+
+  /// A list of future time/location pairs
+  typedef std::vector<Event> EventList;
+
 protected:
   virtual void initialSetup();
 
@@ -53,6 +61,14 @@ protected:
 
   const unsigned int _periodic_var;
 
+  const bool _coarsen_events;
+
+  const MooseEnum _coarsen_method;
+
+  const Real _coarsen_time;
+
+  const Real _coarsen_sigma;
+
   const Real _refine_distance;
 
   bool _event_incoming;
@@ -60,6 +76,10 @@ protected:
   Point _event_location;
 
   unsigned int _input_cycles_per_step;
+
+  EventList _old_event_list;
+
+  bool _coarsening_needed;
 };
 
 #endif /* EVENTMARKER_H */

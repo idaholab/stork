@@ -12,6 +12,9 @@
 #include "EventTimeStepper.h"
 #include "EventInserterSource.h"
 #include "EventMarker.h"
+#include "CircleAverageMaterialProperty.h"
+#include "CircleAverageMaterialPropertyPPS.h"
+#include "MaterialDiffusion.h"
 
 template<>
 InputParameters validParams<PrariedogApp>()
@@ -57,14 +60,18 @@ PrariedogApp::registerObjects(Factory & factory)
   registerFunction(GaussianFunction);
 
   registerKernel(EventInserterSource);
+  registerKernel(MaterialDiffusion);
 
   registerMarker(EventMarker);
+
+  registerPostprocessor(CircleAverageMaterialPropertyPPS);
 
   registerTimeStepper(EventTimeStepper);
 
   registerUserObject(RandomPointUserObject);
   registerUserObject(EventInserter);
   registerUserObject(GaussianUserObject);
+  registerUserObject(CircleAverageMaterialProperty);
 }
 
 // External entry point for dynamic syntax association

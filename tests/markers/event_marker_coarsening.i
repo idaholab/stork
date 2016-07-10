@@ -1,6 +1,3 @@
-# Using a gaussian sigma that too small to be sufficiently be resolved on this mesh, so lots of adaptivity is needed
-# Integral of variable over domain should be close to 1
-
 [Mesh]
   type = GeneratedMesh
   dim = 2
@@ -8,11 +5,13 @@
   xmax = 1
   ymin = -1
   ymax = 1
-  nx = 20
-  ny = 20
+  nx = 10
+  ny = 10
 []
 
 [Variables]
+  active = 'u'
+
   [./u]
     order = FIRST
     family = LAGRANGE
@@ -24,7 +23,22 @@
   [../]
 []
 
+[Functions]
+  [./forcing_fn]
+    type = ParsedFunction
+    # dudt = 3*t^2*(x^2 + y^2)
+    value = 3*t*t*((x*x)+(y*y))-(4*t*t*t)
+  [../]
+
+  [./exact_fn]
+    type = ParsedFunction
+    value = t*t*t*((x*x)+(y*y))
+  [../]
+[]
+
 [Kernels]
+  active = 'diff ie ffn'
+
   [./ie]
     type = TimeDerivative
     variable = u
@@ -35,20 +49,35 @@
     variable = u
   [../]
 
-  [./event_inserter_source]
-    type = EventInserterSource
+  [./ffn]
+    type = UserForcingFunction
     variable = u
-    inserter = inserter
-    gaussian_user_object = gaussian_uo
+    function = forcing_fn
   [../]
 []
 
 [BCs]
-  [./Periodic]
-    [./all]
-      variable = u
-      auto_direction = 'x y'
-    [../]
+  active = 'all'
+
+  [./all]
+    type = FunctionDirichletBC
+    variable = u
+    boundary = '0 1 2 3'
+    function = exact_fn
+  [../]
+
+  [./left]
+    type = DirichletBC
+    variable = u
+    boundary = 3
+    value = 0
+  [../]
+
+  [./right]
+    type = DirichletBC
+    variable = u
+    boundary = 1
+    value = 1
   [../]
 []
 
@@ -59,28 +88,26 @@
   [../]
   [./inserter]
     type = EventInserter
-    random_timing = true
+    distribution = 'uniform'
+    mean = 0.4
     insert_initial = true
-    distribution = exponential
-    mean = 1.0
     random_point_user_object = random_point_uo
-    seed = 3
     verbose = true
+    seed = 3
   [../]
   [./gaussian_uo]
     type = GaussianUserObject
-    sigma = 0.05
-    use_random_points = true
-    random_point_user_object = random_point_uo
+    sigma = 0.1
+    peak_location = '0.1 0.2 0.0'
     periodic_variable = u
   [../]
 []
 
 [Adaptivity]
   initial_marker = event_marker
-  initial_steps = 4
+  initial_steps = 2
   marker = event_marker
-  cycles_per_step = 4
+  cycles_per_step = 2
   max_h_level = 2
   recompute_markers_during_cycles = true
   [./Markers]
@@ -88,8 +115,11 @@
       type = EventMarker
       inserter = inserter
       gaussian_user_object = gaussian_uo
-      marker_radius = 6.0
-      periodic_variable = u
+      marker_radius = 3.0
+      verbose = true
+      coarsen_events = true
+      coarsen_method = time
+      coarsen_time = 0.2
     [../]
   [../]
 []
@@ -98,30 +128,18 @@
   type = Transient
   scheme = 'implicit-euler'
 
-  solve_type = 'NEWTON'
+  # Preconditioned JFNK (default)
+  solve_type = 'PJFNK'
 
   start_time = 0.0
-  end_time = 10.0
+  end_time = 0.39
 
   verbose = true
-
-  petsc_options_iname = '-pc_type -pc_hypre_type'
-  petsc_options_value = 'hypre boomeramg'
-
-  nl_abs_tol = 1.0e-12
-
   [./TimeStepper]
     type = EventTimeStepper
-    dt = 0.01
+    dt = 0.1
     event_inserter = inserter
-    growth_factor = 1.1
-  [../]
-[]
-
-[Preconditioning]
-  [./smp]
-    type = SMP
-    full = true
+    verbose = true
   [../]
 []
 
@@ -129,16 +147,10 @@
   [./dt]
     type = TimestepSize
   [../]
-  [./integral]
-    type = ElementIntegralVariablePostprocessor
-    variable = u
-  [../]
 []
 
 [Outputs]
   exodus = true
-  csv = true
-  execute_on = 'initial timestep_end'
   [./console]
     type = Console
     print_mesh_changed_info = true
