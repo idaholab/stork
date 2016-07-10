@@ -1,3 +1,4 @@
+
 [Mesh]
   type = GeneratedMesh
   dim = 2
@@ -94,6 +95,9 @@
     random_point_user_object = random_point_uo
     verbose = true
     seed = 3
+    track_old_events = true
+    removal_method = time
+    removal_time = 0.15
   [../]
   [./gaussian_uo]
     type = GaussianUserObject
@@ -118,8 +122,6 @@
       marker_radius = 3.0
       verbose = true
       coarsen_events = true
-      coarsen_method = time
-      coarsen_time = 0.2
     [../]
   [../]
 []

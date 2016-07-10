@@ -63,12 +63,6 @@ protected:
 
   const bool _coarsen_events;
 
-  const MooseEnum _coarsen_method;
-
-  const Real _coarsen_time;
-
-  const Real _coarsen_sigma;
-
   const Real _refine_distance;
 
   bool _event_incoming;
@@ -77,9 +71,9 @@ protected:
 
   unsigned int _input_cycles_per_step;
 
-  EventList _old_event_list;
-
   bool _coarsening_needed;
+
+  EventList _old_event_list;
 };
 
 #endif /* EVENTMARKER_H */

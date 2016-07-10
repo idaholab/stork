@@ -19,17 +19,12 @@ InputParameters validParams<EventMarker>()
 {
   InputParameters params = validParams<Marker>();
 
-  MooseEnum coarsen_method("time sigma", "time");
-
   params.addRequiredParam<UserObjectName>("inserter", "The name of the EventInserter UserObject.");
   params.addRequiredParam<UserObjectName>("gaussian_user_object", "The name of the GaussianUserObject.");
   params.addParam<Real>("marker_radius", 3.0, "How many sigmas to mark away from event center.");
   params.addParam<bool>("verbose", false, "Print out extra information when marker is active.");
   params.addCoupledVar("periodic_variable", "Use perodic boundary conditions of this variable to determine the distance to the function peak location");
-  params.addParam<bool>("coarsen_events", false, "Coarsen events at some later time. If true, choose method with 'coarsen_method'.");
-  params.addParam<MooseEnum>("coarsen_method", coarsen_method, "How to decide when to coarsen old cascade events. Choices are 'time' or 'target_sigma'.");
-  params.addParam<Real>("coarsen_time", "Time to wait after an event to coarsen the mesh in the vicinity of that event.");
-  params.addParam<Real>("coarsen_sigma", "Target (approx.) sigma value at which to coarsen the mesh in the vicinity of that event.");
+  params.addParam<bool>("coarsen_events", false, "Coarsen events at some later time. If true, set 'track_old_events=true' in EventInserter.");
 
   return params;
 }
@@ -44,24 +39,16 @@ EventMarker::EventMarker(const InputParameters & parameters) :
     _verbose(getParam<bool>("verbose")),
     _periodic_var(isCoupled("periodic_variable") ? (int) coupled("periodic_variable") : -1),
     _coarsen_events(getParam<bool>("coarsen_events")),
-    _coarsen_method(getParam<MooseEnum>("coarsen_method")),
-    _coarsen_time(((_coarsen_events) && (_coarsen_method == "time")) ? getParam<Real>("coarsen_time") : std::numeric_limits<Real>::max()),
-    _coarsen_sigma(((_coarsen_events) && (_coarsen_method == "sigma")) ? getParam<Real>("coarsen_sigma") : std::numeric_limits<Real>::max()),
     _refine_distance(_marker_radius * _gaussian_uo.getSigma()),
     _event_incoming(false),
     _event_location(0),
     _input_cycles_per_step(_adaptivity.getCyclesPerStep()),
-    _old_event_list(0),
-    _coarsening_needed(false)
+    _coarsening_needed(false),
+    _old_event_list(0)
 {
   // Check input logic for coarsening events
-  if (_coarsen_events)
-  {
-    if ((_coarsen_method == "time") && (!parameters.isParamSetByUser("coarsen_time")))
-      mooseError("User requested to coarsen events by time but 'coarsen_time' was not set.");
-    if ((_coarsen_method == "target_sigma") && (!parameters.isParamSetByUser("sigma")))
-      mooseError("User requested to coarsen events by time but 'coarsen_sigma' was not set.");
-  }
+  if ((_coarsen_events) && (!_inserter.areOldEventsBeingTracked())) // need to tell EventInserter to track old events
+    mooseError("When coarsening old events ('coarsen_events = true'), EventInserter object needs to track old events. Please set 'track_old_events = true' in EventInserter block.");
 }
 
 void
@@ -77,33 +64,15 @@ EventMarker::timestepSetup()
   // check for events at the next timestep
   checkForEvent();
 
-  // check if event needs to be coarsened
-  if (_coarsen_events)
+  // get old event list if coarsening requested
+  _coarsening_needed = false;
+  if ((_coarsen_events) && (_inserter.wasOldEventRemoved()))
   {
+    _old_event_list = _inserter.getOldEventList();
+    _coarsening_needed = true;
+    _adaptivity.setCyclesPerStep(_input_cycles_per_step);  // turn adaptivity on
     if (_verbose)
-      for (unsigned int i=0; i<_old_event_list.size(); i++)
-        _console << "old list " << i << ": time: " << _old_event_list[i].first << " location: " << _old_event_list[i].second << std::endl;
-
-    _coarsening_needed = false;
-    for (unsigned int i=0; i<_old_event_list.size(); i++)
-    {
-      if (_coarsen_method == "time")
-      {
-        if (_old_event_list[i].first < _fe_problem.time() - _coarsen_time) // check if event is old enough
-        {
-          _coarsening_needed = true;
-          _adaptivity.setCyclesPerStep(_input_cycles_per_step);  // turn adaptivity on
-
-          if (_verbose)
-            _console << "event needs to be coarsened: (old) event time: " << _old_event_list[i].first << " location: " << _old_event_list[i].second << std::endl;
-
-          // remove old event from list as we will signal the marker to coarsen everywhere where events are active
-          _old_event_list[i] = _old_event_list.back();
-          _old_event_list.pop_back();
-          break;
-        }
-      }
-    }
+      _console << "EventMarker detected an old event was removed, coarsening mesh (at the end of timestep)..." << std::endl;
   }
 }
 
@@ -169,9 +138,5 @@ EventMarker::checkForEvent()
       _console << "Event incoming! location: " << _event_location << std::endl;
     _adaptivity.setCyclesPerStep(_input_cycles_per_step);  // turn adaptivity on
     _event_incoming = true;
-
-    // save old events if coarsening requested
-    if (_coarsen_events)
-      _old_event_list.push_back(Event(_fe_problem.time(), _event_location));
   }
 }

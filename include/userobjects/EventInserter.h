@@ -28,8 +28,6 @@ class EventInserter :
 public:
   EventInserter(const InputParameters & parameters);
 
-  virtual void timestepSetup();
-
   virtual void initialize(){} // Not used
   virtual void execute();
   virtual void finalize(){} // Not used
@@ -43,8 +41,17 @@ public:
   /// Get the event list
   const EventList & getEventList() const { return _global_event_list; }
 
+  /// Get the old event list
+  const EventList & getOldEventList() const { return _old_event_list; }
+
   /// Get time tolerance
   const Real & getTimeTolerance() const { return _time_tol; }
+
+  /// Get old event tracking flag
+  const bool & areOldEventsBeingTracked() const { return _track_old_events; }
+
+  /// Get old event removed flag
+  const bool & wasOldEventRemoved() const { return _old_event_removed; }
 
   /// Calculate time to next event
   Real getNewEventInterval();
@@ -63,13 +70,13 @@ public:
 
 protected:
   /// Timing to use between event
-  bool _use_random_timing;
+  const bool _use_random_timing;
 
   /// Type of probability distribution to use for picking next event time
-  MooseEnum _distribution;
+  const MooseEnum _distribution;
 
   /// Mean value of probability distribution
-  Real _mean;
+  const Real _mean;
 
   /// Flag to add an event at the beginning of the simulation
   bool _insert_initial;
@@ -95,6 +102,21 @@ protected:
   /// Tolerance when comparing times
   const Real _time_tol;
 
+  /// Flag to track old events
+  const bool _track_old_events;
+
+  /// How to choose when old events should be removed from list
+  const MooseEnum _removal_method;
+
+  /// Age at which to expire an old event
+  const Real _removal_time;
+
+  /// Target Event sigma value to remove old event
+  const Real _removal_sigma;
+
+  /// Flag when Event has been removed from old list
+  bool _old_event_removed;
+
   /// Flag to insert the first event
   bool _insert_first;
 
@@ -103,6 +125,9 @@ protected:
 
   /// the global list of all events
   EventList _global_event_list;
+
+  /// List of old events
+  EventList _old_event_list;
 };
 
 #endif //EVENTINSERTER_H
