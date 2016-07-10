@@ -16,6 +16,7 @@ InputParameters validParams<EventInserter>()
   params += validParams<RandomInterface>();
 
   MooseEnum distribution("uniform exponential", "uniform");
+  MooseEnum removal_method("time sigma", "time");
 
   params.addRequiredParam<Real>("mean", "Mean (time) of probability distribution");
   params.addRequiredParam<UserObjectName>("random_point_user_object", "Name of RandomPointUserObject to get random points on the mesh.");
@@ -28,6 +29,11 @@ InputParameters validParams<EventInserter>()
   params.addParam<unsigned int>("seed", 0, "Feed the random number generator. If not supplied, system time is used.");
   params.addParam<bool>("verbose", false, "Print out extra information about when events are inserted and deleted.");
   params.addParam<Real>("time_tolerance", 1.0e-12, "Tolerance when comparing times.");
+  params.addParam<bool>("track_old_events", false, "Enable this to allow mesh from previous events to be coarsened. If true, choose removal method with 'removal_method'.");
+  params.addParam<MooseEnum>("removal_method", removal_method, "How to decide when to remove old cascade events. Choices are 'time' or 'target_sigma'.");
+  params.addParam<Real>("removal_time", "Time to wait after an event to remove from the list.");
+  params.addParam<Real>("removal_sigma", "Target (approx.) sigma value at which to remove the event from the list.");
+
   MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
   setup_options = "timestep_begin";
   params.set<MultiMooseEnum>("execute_on") = setup_options;
@@ -48,9 +54,15 @@ EventInserter::EventInserter(const InputParameters & parameters) :
     _seed(getParam<unsigned int>("seed")),
     _verbose(getParam<bool>("verbose")),
     _time_tol(getParam<Real>("time_tolerance")),
+    _track_old_events(getParam<bool>("track_old_events")),
+    _removal_method(getParam<MooseEnum>("removal_method")),
+    _removal_time(((_track_old_events) && (_removal_method == "time")) ? getParam<Real>("removal_time") : std::numeric_limits<Real>::max()),
+    _removal_sigma(((_track_old_events) && (_removal_method == "sigma")) ? getParam<Real>("removal_sigma") : std::numeric_limits<Real>::max()),
+    _old_event_removed(false),
     _insert_first(true),
     _insert_second(true),
-    _global_event_list(0)
+    _global_event_list(0),
+    _old_event_list(0)
 {
   setRandomResetFrequency(EXEC_INITIAL);
   if (parameters.isParamSetByUser("seed"))
@@ -62,6 +74,15 @@ EventInserter::EventInserter(const InputParameters & parameters) :
     mooseError("'test_time' parameter is required");
   if ((parameters.isParamSetByUser("insert_test")) && (!parameters.isParamSetByUser("test_location")))
     mooseError("'test_location' parameter is required");
+
+  // Check input logic for removing old events
+  if (_track_old_events)
+  {
+    if ((_removal_method == "time") && (!parameters.isParamSetByUser("removal_time")))
+      mooseError("User requested to remove old events by time but 'removal_time' was not set.");
+    if ((_removal_method == "target_sigma") && (!parameters.isParamSetByUser("sigma")))
+      mooseError("User requested to remove old events by sigma but 'removal_sigma' was not set.");
+  }
 
   // populate global_event_list so TimeStepper can access it immediately
 
@@ -105,8 +126,20 @@ EventInserter::EventInserter(const InputParameters & parameters) :
 }
 
 void
-EventInserter::timestepSetup()
+EventInserter::execute()
 {
+  // print out events for debugging
+  if (_verbose)
+  {
+    _console << " *** time: " << _t << " list size: " << _global_event_list.size() << std::endl;
+    for (unsigned int i=0; i<_global_event_list.size(); i++)
+      _console << " *** i: " << i << " first: " << _global_event_list[i].first << " second: " << _global_event_list[i].second << std::endl;
+
+    if (_track_old_events)
+      for (unsigned int i=0; i<_old_event_list.size(); i++)
+        _console << "old list " << i << ": time: " << _old_event_list[i].first << " location: " << _old_event_list[i].second << std::endl;
+  }
+
   // expire entries from the list (if the current timestep converged) then add the next one
   if (_fe_problem.converged())
   {
@@ -116,10 +149,14 @@ EventInserter::timestepSetup()
     {
       if (_global_event_list[i].first < _t)
       {
-        // remove entry (by replacing with last element and shrinking size by one)
+        // add Event to old list if requested
+        if (_track_old_events)
+          _old_event_list.push_back(_global_event_list[i]);
+
+        // remove Event (by replacing with last element and shrinking size by one)
         if (_verbose)
           _console << "*** removing entry at time " << _global_event_list[i].first << std::endl;
-        if (_global_event_list[i].first != _test_time) // do not add event when removing test event, messes with statistics
+        if (_global_event_list[i].first - _test_time > _time_tol) // do not add event when removing test event, messes with statistics
           add_event = true;
         _global_event_list[i] = _global_event_list.back();
         _global_event_list.pop_back();
@@ -127,6 +164,7 @@ EventInserter::timestepSetup()
       else
         ++i;
     }
+
     // if entries were removed, add a new event
     if (add_event)
     {
@@ -136,17 +174,28 @@ EventInserter::timestepSetup()
         _console << "*** inserting new event at time " << new_event_time << std::endl;
     }
   }
-}
 
-void
-EventInserter::execute()
-{
-  // print out events for debugging
-  if (_verbose)
+  // expire entries from old list
+  if (_track_old_events)
   {
-    _console << " *** time: " << _t << " list size: " << _global_event_list.size() << std::endl;
-    for (unsigned int i=0; i<_global_event_list.size(); i++)
-      _console << " *** i: " << i << " first: " << _global_event_list[i].first << " second: " << _global_event_list[i].second << std::endl;
+    _old_event_removed = false;
+    for (unsigned int i=0; i<_old_event_list.size(); i++)
+    {
+      if (_removal_method == "time")
+      {
+        if (_old_event_list[i].first < _fe_problem.time() - _removal_time) // check if event is old enough
+        {
+          _old_event_removed = true;
+          if (_verbose)
+            _console << "event needs to be coarsened: (old) event time: " << _old_event_list[i].first << " location: " << _old_event_list[i].second << std::endl;
+
+          // remove old event from list as we will signal the marker to coarsen everywhere where events are active
+          _old_event_list[i] = _old_event_list.back();
+          _old_event_list.pop_back();
+          break;
+        }
+      }
+    }
   }
 }
 
