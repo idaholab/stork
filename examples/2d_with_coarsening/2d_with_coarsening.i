@@ -65,6 +65,9 @@
     random_point_user_object = random_point_uo
     seed = 3
     verbose = true
+    track_old_events = true
+    removal_method = time
+    removal_time = 2.0
   [../]
   [./gaussian_uo]
     type = GaussianUserObject
@@ -89,8 +92,6 @@
       gaussian_user_object = gaussian_uo
       marker_radius = 6.0
       coarsen_events = true
-      coarsen_method = time
-      coarsen_time = 2.0
       verbose = true
       periodic_variable = u
     [../]
