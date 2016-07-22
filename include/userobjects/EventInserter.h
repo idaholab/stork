@@ -128,6 +128,9 @@ protected:
 
   /// List of old events
   EventList _old_event_list;
+
+  /// List of old events from previous time step
+  EventList _older_event_list;
 };
 
 #endif //EVENTINSERTER_H
