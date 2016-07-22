@@ -62,7 +62,8 @@ EventInserter::EventInserter(const InputParameters & parameters) :
     _insert_first(true),
     _insert_second(true),
     _global_event_list(0),
-    _old_event_list(0)
+    _old_event_list(0),
+    _older_event_list(0)
 {
   setRandomResetFrequency(EXEC_INITIAL);
   if (parameters.isParamSetByUser("seed"))
@@ -173,26 +174,40 @@ EventInserter::execute()
       if (_verbose)
         _console << "*** inserting new event at time " << new_event_time << std::endl;
     }
-  }
 
-  // expire entries from old list
-  if (_track_old_events)
-  {
-    _old_event_removed = false;
-    for (unsigned int i=0; i<_old_event_list.size(); i++)
+    // expire entries from old list
+    if (_track_old_events)
     {
-      if (_removal_method == "time")
+      // if an Event is active *now* and an old event was removed on the previous step
+      // then EventMarker would be triggered to both REFINE and COARSEN, but REFINE takes
+      // precedence so we revert the old event list so COARSEN will take place on
+      // the next step
+      if ((isEventActive(_t - _time_tol, _t + _time_tol)) && (_old_event_removed))
       {
-        if (_old_event_list[i].first < _fe_problem.time() - _removal_time) // check if event is old enough
-        {
-          _old_event_removed = true;
-          if (_verbose)
-            _console << "event needs to be coarsened: (old) event time: " << _old_event_list[i].first << " location: " << _old_event_list[i].second << std::endl;
+        if (_verbose)
+          _console << "Coarsening was requested on the previous step but was delayed due to an Event, reverting old list..." << std::endl;
+        _old_event_list = _older_event_list;
+      }
 
-          // remove old event from list as we will signal the marker to coarsen everywhere where events are active
-          _old_event_list[i] = _old_event_list.back();
-          _old_event_list.pop_back();
-          break;
+      // save old event list
+      _older_event_list = _old_event_list;
+
+      _old_event_removed = false;
+      for (unsigned int i=0; i<_old_event_list.size(); i++)
+      {
+        if (_removal_method == "time")
+        {
+          if (_old_event_list[i].first < _fe_problem.time() - _removal_time) // check if event is old enough
+          {
+            _old_event_removed = true;
+            if (_verbose)
+              _console << "event needs to be coarsened: (old) event time: " << _old_event_list[i].first << " location: " << _old_event_list[i].second << std::endl;
+
+            // remove old event from list as we will signal the marker to coarsen everywhere where events are active
+            _old_event_list[i] = _old_event_list.back();
+            _old_event_list.pop_back();
+            break;
+          }
         }
       }
     }

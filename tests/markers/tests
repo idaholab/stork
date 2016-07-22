@@ -19,4 +19,9 @@
     input = 'event_marker_coarsening.i'
     exodiff = 'event_marker_coarsening_out.e-s002'
   [../]
+  [./event_marker_coarsening_conflict]
+    type = 'Exodiff'
+    input = 'event_marker_coarsening_conflict.i'
+    exodiff = 'event_marker_coarsening_conflict_out.e-s003'
+  [../]
 []

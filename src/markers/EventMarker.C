@@ -66,14 +66,31 @@ EventMarker::timestepSetup()
 
   // get old event list if coarsening requested
   _coarsening_needed = false;
-  if ((_coarsen_events) && (_inserter.wasOldEventRemoved()))
+
+  // coarsen if requested, and if old event was removed, and there is no refinement needed
+  if ((_coarsen_events) && (_inserter.wasOldEventRemoved()) && (!_event_incoming))
   {
     _old_event_list = _inserter.getOldEventList();
     _coarsening_needed = true;
     _adaptivity.setCyclesPerStep(_input_cycles_per_step);  // turn adaptivity on
     if (_verbose)
       _console << "EventMarker detected an old event was removed, coarsening mesh (at the end of timestep)..." << std::endl;
+
+    // if an event just occured on the last step, need to add the recent Event to the old list once since UserObjects haven't been executed yet
+    if (_inserter.isEventActive(_fe_problem.timeOld() - _inserter.getTimeTolerance(), _fe_problem.timeOld() + _inserter.getTimeTolerance()))
+    {
+      if (_verbose)
+        _console << "EventMarker detecting coarsening immediately after an active Event, adding Event manually..." << std::endl;
+      Point recent_event_location = _inserter.getActiveEventPoint(_fe_problem.timeOld() - _inserter.getTimeTolerance(), _fe_problem.timeOld() + _inserter.getTimeTolerance());
+      _old_event_list.push_back(Event(_fe_problem.timeOld(), recent_event_location));
+    }
   }
+
+  // if both an event is incoming and an old event was removed, then Marker will be asked to both REFINE and COARSEN in some places
+  // let REFINE take precedence and skip the coarsening for this step
+  if ((_coarsen_events) && (_inserter.wasOldEventRemoved()) && (_event_incoming))
+    if (_verbose)
+      _console << "EventMarker detected both refinement and coarsening are needed, so coarsening was skipped..." << std::endl;
 }
 
 Marker::MarkerValue
