@@ -137,6 +137,9 @@
     type = ElementIntegralVariablePostprocessor
     variable = u
   [../]
+  [./num_elems]
+    type = NumElems
+  [../]
 []
 
 [Outputs]
