@@ -15,6 +15,7 @@
 #include "CircleAverageMaterialProperty.h"
 #include "CircleAverageMaterialPropertyPPS.h"
 #include "MaterialDiffusion.h"
+#include "MaterialSinkKernel.h"
 
 template<>
 InputParameters validParams<PrariedogApp>()
@@ -61,6 +62,7 @@ PrariedogApp::registerObjects(Factory & factory)
 
   registerKernel(EventInserterSource);
   registerKernel(MaterialDiffusion);
+  registerKernel(MaterialSinkKernel);
 
   registerMarker(EventMarker);
 
