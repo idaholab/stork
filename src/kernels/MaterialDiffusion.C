@@ -11,41 +11,46 @@
 /*                                                              */
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
+
 #include "MaterialDiffusion.h"
 
+/**
+ * This function defines the valid parameters for
+ * this Kernel and their default values
+ */
 template<>
 InputParameters validParams<MaterialDiffusion>()
 {
-  InputParameters params = validParams<Kernel>();
-  params.addRequiredParam<MaterialPropertyName>("prop_name", "the name of the material property we are going to use");
-
-  MooseEnum prop_state("current old older", "current");
-  params.addParam<MooseEnum>("prop_state", prop_state, "Declares which property state we should retrieve");
+  InputParameters params = validParams<Diffusion>();
   return params;
 }
 
 
 MaterialDiffusion::MaterialDiffusion(const InputParameters & parameters) :
-    Kernel(parameters)
-{
-  MooseEnum prop_state = getParam<MooseEnum>("prop_state");
-
-  if (prop_state == "current")
-    _diff = &getMaterialProperty<Real>("prop_name");
-  else if (prop_state == "old")
-    _diff = &getMaterialPropertyOld<Real>("prop_name");
-  else if (prop_state == "older")
-    _diff = &getMaterialPropertyOlder<Real>("prop_name");
-}
+    Diffusion(parameters),
+    _diffusivity(getMaterialProperty<Real>("diffusivity"))
+{}
 
 Real
 MaterialDiffusion::computeQpResidual()
 {
-  return (*_diff)[_qp] * _grad_test[_i][_qp] * _grad_u[_qp];
+  // We're dereferencing the _diffusivity pointer to get to the
+  // material properties vector... which gives us one property
+  // value per quadrature point.
+
+  // Also... we're reusing the Diffusion Kernel's residual
+  // so that we don't have to recode that.
+  return _diffusivity[_qp]*Diffusion::computeQpResidual();
 }
 
 Real
 MaterialDiffusion::computeQpJacobian()
 {
-  return (*_diff)[_qp] * _grad_test[_i][_qp] * _grad_phi[_j][_qp];
+  // We're dereferencing the _diffusivity pointer to get to the
+  // material properties vector... which gives us one property
+  // value per quadrature point.
+
+  // Also... we're reusing the Diffusion Kernel's residual
+  // so that we don't have to recode that.
+  return _diffusivity[_qp]*Diffusion::computeQpJacobian();
 }
