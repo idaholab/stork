@@ -33,11 +33,18 @@
   [../]
 []
 
+[Functions]
+  [./one_plus_x]
+    type = ParsedFunction
+    value = '1+x'
+  [../]
+[]
+
 [Materials]
   [./gfm]
-    type = GenericConstantMaterial
+    type = GenericFunctionMaterial
     prop_names = diffusivity
-    prop_values = 2.0
+    prop_values = one_plus_x
     block = 0
   [../]
 []
