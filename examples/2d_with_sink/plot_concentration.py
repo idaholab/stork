@@ -16,7 +16,7 @@ plt.xlabel('time')
 plt.ylabel('average concentration')
 
 analytic = scale/diffusivity/sink_strength/mean/Lx/Ly*(1.0 - np.exp(-sink_strength*diffusivity*data[:,0]))
-plt.plot(data[:,0], analytic, 'k-', label='analytic') 
+plt.plot(data[:,0], analytic, 'k-', label='analytic')
 
 plt.legend(loc="lower right")
 
