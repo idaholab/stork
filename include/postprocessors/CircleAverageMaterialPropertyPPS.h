@@ -38,8 +38,10 @@ public:
 
 protected:
   const CircleAverageMaterialProperty & _uo;
+  const MooseEnum _method;
   const Point _p;
   const Real _radius;
+  const unsigned int _entry;
   Real _value;
 };
 

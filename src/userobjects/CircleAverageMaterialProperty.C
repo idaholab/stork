@@ -34,7 +34,7 @@ CircleAverageMaterialProperty::CircleAverageMaterialProperty(const InputParamete
     _periodic_var(isCoupled("periodic_variable") ? (int) coupled("periodic_variable") : -1),
     _use_inserter_points((parameters.isParamSetByUser("inserter")) ? true : false),
     _inserter((parameters.isParamSetByUser("inserter")) ? &getUserObject<EventInserter>("inserter") : NULL),
-    _radius((parameters.isParamSetByUser("inserter")) ? getParam<Real>("radius") : 0.0),
+    _radius((parameters.isParamSetByUser("inserter") && (parameters.isParamSetByUser("radius"))) ? getParam<Real>("radius") : 0.0),
     _mesh(_fe_problem.mesh())
 {
   if ((_use_inserter_points) && (!_inserter->areOldEventsBeingTracked()))
@@ -47,10 +47,11 @@ CircleAverageMaterialProperty::CircleAverageMaterialProperty(const InputParamete
 Real
 CircleAverageMaterialProperty::averageValue(const unsigned int i) const
 {
-  if (i >= _old_event_list.size())
-    mooseError("In CircleAverageMaterialProperty, requested index higher than number of old events.");
+  if (i < _old_event_list.size())
+    if (_volume_sum[i] > 0.0)
+      return _integral_sum[i]/_volume_sum[i];
 
-  return _integral_sum[i];
+  return 0.0;
 }
 
 Real
@@ -96,7 +97,7 @@ CircleAverageMaterialProperty::initialize()
   if (_use_inserter_points)
   {
     // get old event list to see how many points we are averaging
-    EventList _old_event_list = _inserter->getOldEventList();
+    _old_event_list = _inserter->getOldEventList();
     _Npoints = _old_event_list.size();
 
     // resize vectors to number of points
@@ -122,9 +123,6 @@ CircleAverageMaterialProperty::initialize()
 void
 CircleAverageMaterialProperty::execute()
 {
-  // Compute the integral on this element
-  Real integral_value = computeIntegral();
-
   if (_use_inserter_points)
   {
     for (unsigned int i=0; i < _Npoints; i++)
@@ -135,7 +133,7 @@ CircleAverageMaterialProperty::execute()
       // check if distance between points is less than supplied radius
       if (r < _radius)
       {
-        _integral_sum[i] += _integral_value;
+        _integral_sum[i] += computeIntegral();
         _volume_sum[i] += _current_elem_volume;
       }
     }
@@ -143,7 +141,7 @@ CircleAverageMaterialProperty::execute()
   else
   {
     // Store that value
-    _integral_values[_current_elem->id()] = integral_value;
+    _integral_values[_current_elem->id()] = computeIntegral();
 
     // Keep track of the volume of this element
     _volume_values[_current_elem->id()] = _current_elem_volume;
