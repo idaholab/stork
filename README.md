@@ -20,7 +20,7 @@ In terms of upscaling this to something with a spatial extent and randomly inser
 mean = (VP/eta)^-1
 
 where:
-- mean is mean of EventInserter distribution
+- mean is the mean time between events and set in EventInserter
 - V is "volume" material being modeled. Use 1.0 for "unmodeled" dimensions (e.g. z direction on a 2d mesh)
 - P is the source term above
 - eta is the scale of the source term (integral of Gaussian source over domain)
