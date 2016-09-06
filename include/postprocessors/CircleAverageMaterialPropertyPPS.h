@@ -32,8 +32,8 @@ public:
   CircleAverageMaterialPropertyPPS(const InputParameters & parameters);
   virtual ~CircleAverageMaterialPropertyPPS();
 
-  virtual void initialize();
-  virtual void execute();
+  virtual void initialize() {};  // not used
+  virtual void execute() {};  // not used
   virtual Real getValue();
 
 protected:
@@ -42,7 +42,6 @@ protected:
   const Point _p;
   const Real _radius;
   const unsigned int _entry;
-  Real _value;
 };
 
 #endif /* CIRCLEAVERAGEMATERIALPROPERTYPPS_H */

@@ -13,6 +13,7 @@
 /****************************************************************/
 
 #include "CircleAverageMaterialProperty.h"
+#include "EventInserter.h"
 
 #include "libmesh/parallel_algebra.h"
 
@@ -32,16 +33,31 @@ CircleAverageMaterialProperty::CircleAverageMaterialProperty(const InputParamete
     ElementIntegralUserObject(parameters),
     _mat_prop(getMaterialProperty<Real>("mat_prop")),
     _periodic_var(isCoupled("periodic_variable") ? (int) coupled("periodic_variable") : -1),
-    _use_inserter_points((parameters.isParamSetByUser("inserter")) ? true : false),
-    _inserter((parameters.isParamSetByUser("inserter")) ? &getUserObject<EventInserter>("inserter") : NULL),
+    _use_inserter_points(parameters.isParamSetByUser("inserter")),
+    _inserter(NULL),
     _radius((parameters.isParamSetByUser("inserter") && (parameters.isParamSetByUser("radius"))) ? getParam<Real>("radius") : 0.0),
-    _mesh(_fe_problem.mesh())
+    _mesh(_fe_problem.mesh()),
+    _integral_sum(0),
+    _volume_sum(0),
+    _old_event_list(0),
+    _Npoints(0)
 {
-  if ((_use_inserter_points) && (!_inserter->areOldEventsBeingTracked()))
-    mooseError("CircleAverageMaterialProperty cannot be used on inserter points unless old events are being tracked. Set 'track_old_events = true' in EventInserter block.");
 
   if ((_use_inserter_points) && (!parameters.isParamSetByUser("radius")))
     mooseError("In CircleAverageMaterialProperty, when using points supplied by EventInserter, a radius must be set. Set 'radius = <value>'.");
+}
+
+void
+CircleAverageMaterialProperty::initialSetup()
+{
+  // Doing this here because all UserObjects will be constructed and order won't matter in the input file
+  if (_use_inserter_points)
+  {
+    _inserter = &getUserObject<EventInserter>("inserter");
+
+    if (!_inserter->areOldEventsBeingTracked())
+      mooseError("CircleAverageMaterialProperty cannot be used on inserter points unless old events are being tracked. Set 'track_old_events = true' in EventInserter block.");
+  }
 }
 
 Real
@@ -50,6 +66,8 @@ CircleAverageMaterialProperty::averageValue(const unsigned int i) const
   if (i < _old_event_list.size())
     if (_volume_sum[i] > 0.0)
       return _integral_sum[i]/_volume_sum[i];
+  //else
+    //mooseError("entry " << i << " not found in old event list");
 
   return 0.0;
 }

@@ -54,6 +54,8 @@
   [./one_plus_x]
     type = ParsedFunction
     value = '1+x'
+  [../]
+[]
 
 [Materials]
   [./gfm]
@@ -130,6 +132,7 @@
     type = CircleAverageMaterialPropertyPPS
     method = inserter
     user_object = circle_average
+    entry = 0
   [../]
 []
 

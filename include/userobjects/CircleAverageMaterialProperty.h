@@ -17,10 +17,10 @@
 
 #include "ElementIntegralUserObject.h"
 #include "MooseMesh.h"
-#include "EventInserter.h"
 
 //Forward Declarations
 class CircleAverageMaterialProperty;
+class EventInserter;
 
 template<>
 InputParameters validParams<CircleAverageMaterialProperty>();
@@ -49,6 +49,11 @@ public:
    * Compute the material property at the quadrature point for the integral
    */
   virtual Real computeQpIntegral();
+
+  /**
+   * This is called at the beginning of the simulation.
+   */
+  virtual void initialSetup();
 
   /**
    * This is called before execute so you can reset any internal data.

@@ -36,8 +36,7 @@ CircleAverageMaterialPropertyPPS::CircleAverageMaterialPropertyPPS(const InputPa
     _method(getParam<MooseEnum>("method")),
     _p((_method == "point") && (parameters.isParamSetByUser("location")) ? getParam<Point>("location") : 0.0),
     _radius((_method == "point") && (parameters.isParamSetByUser("radius")) ? getParam<Real>("radius") : 0.0),
-    _entry(getParam<unsigned int>("entry")),
-    _value(0.)
+    _entry((_method == "inserter") && (parameters.isParamSetByUser("entry")) ? getParam<unsigned int>("entry") : 0)
 {
   // check input logic
   if (_method == "point")
@@ -47,29 +46,22 @@ CircleAverageMaterialPropertyPPS::CircleAverageMaterialPropertyPPS(const InputPa
     if (!parameters.isParamSetByUser("radius"))
       mooseError("In CircleAverageMaterialPropertyPPS, user requested to use a point but did not specify a radius. Set the 'radius' parameter.");
   }
+
+  if (_method == "inserter")
+    if (!parameters.isParamSetByUser("entry"))
+      mooseError("In CircleAverageMaterialPropertyPPS, user requested to use inserter points but did not specify which entry. Set the 'entry' parameter.");
 }
 
 CircleAverageMaterialPropertyPPS::~CircleAverageMaterialPropertyPPS()
 {
 }
 
-void
-CircleAverageMaterialPropertyPPS::initialize()
-{
-  _value = 0;
-}
-
-void
-CircleAverageMaterialPropertyPPS::execute()
-{
-  if (_method == "point")
-    _value = _uo.averageValue(_p, _radius);
-  else // use inserter points
-    _value = _uo.averageValue(_entry);
-}
-
 Real
 CircleAverageMaterialPropertyPPS::getValue()
 {
-  return _value;
+  if (_method == "point")
+    return _uo.averageValue(_p, _radius);
+
+  // use inserter points
+  return _uo.averageValue(_entry);
 }
