@@ -20,6 +20,7 @@
 
 //Forward Declarations
 class CircleAverageMaterialProperty;
+class EventInserter;
 
 template<>
 InputParameters validParams<CircleAverageMaterialProperty>();
@@ -42,11 +43,17 @@ public:
    * @return The average value of a material property in that circle
    */
   Real averageValue(const Point & p, const Real & radius) const;
+  Real averageValue(const unsigned int i) const;
 
   /**
    * Compute the material property at the quadrature point for the integral
    */
   virtual Real computeQpIntegral();
+
+  /**
+   * This is called at the beginning of the simulation.
+   */
+  virtual void initialSetup();
 
   /**
    * This is called before execute so you can reset any internal data.
@@ -71,6 +78,33 @@ public:
   virtual void finalize();
 
 protected:
+  /// Calculate periodic distance between points
+  Real distance(Point p1, Point p2) const;
+
+  /// This will hold the material property of interest
+  const MaterialProperty<Real> & _mat_prop;
+
+  /// Variable number for checking periodicity
+  const int _periodic_var;
+
+  /// Flag that we're getting a list of points from EventInserter
+  const bool _use_inserter_points;
+
+  /// Reference to EventInserter UserObject
+  const EventInserter * _inserter;
+
+  /// Distance to search around inserter points
+  const Real _radius;
+
+  /// Reference to the mesh
+  const MooseMesh & _mesh;
+
+  /// An event has an start time and a location
+  typedef std::pair<Real, Point> Event;
+
+  /// A list of future time/location pairs
+  typedef std::vector<Event> EventList;
+
   /// This map will hold the integral of each element
   std::map<dof_id_type, Real> _integral_values;
 
@@ -80,14 +114,18 @@ protected:
   /// This map will hold the centroid of each element
   std::map<dof_id_type, Point> _centroids;
 
-  /// This will hold the material property of interest
-  const MaterialProperty<Real> & _mat_prop;
+  /// This vector will hold integral around inserter points
+  std::vector<Real> _integral_sum;
 
-  /// Variable number for checking periodicity
-  const int _periodic_var;
+  /// This vector will hold volume around inserter points
+  std::vector<Real> _volume_sum;
 
-  /// Reference to the mesh
-  const MooseMesh & _mesh;
+  /// List of old events
+  EventList _old_event_list;
+
+  /// Length of old events
+  unsigned int _Npoints;
+
 };
 
 #endif

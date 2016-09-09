@@ -5,7 +5,10 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 #include "EventInserter.h"
+#include "GaussianUserObject.h"
+#include "CircleAverageMaterialProperty.h"
 #include "MooseRandom.h"
+
 
 #include <time.h> // for time function to seed random number generator
 
@@ -30,9 +33,12 @@ InputParameters validParams<EventInserter>()
   params.addParam<bool>("verbose", false, "Print out extra information about when events are inserted and deleted.");
   params.addParam<Real>("time_tolerance", 1.0e-12, "Tolerance when comparing times.");
   params.addParam<bool>("track_old_events", false, "Enable this to allow mesh from previous events to be coarsened. If true, choose removal method with 'removal_method'.");
-  params.addParam<MooseEnum>("removal_method", removal_method, "How to decide when to remove old cascade events. Choices are 'time' or 'target_sigma'.");
+  params.addParam<MooseEnum>("removal_method", removal_method, "How to decide when to remove old cascade events. Choices are 'time' or 'sigma'.");
   params.addParam<Real>("removal_time", "Time to wait after an event to remove from the list.");
   params.addParam<Real>("removal_sigma", "Target (approx.) sigma value at which to remove the event from the list.");
+  params.addParam<UserObjectName>("gaussian_user_object", "Name of the GaussianUserObject for initial sigma value when coarsening by sigma values.");
+  params.addParam<UserObjectName>("circle_average_material_property_user_object", "Name of the CircleAverageMaterialProperty UserObject for arbitrary circles and radii.");
+  params.addParam<UserObjectName>("inserter_circle_average_material_property_user_object", "Name of the CircleAverageMaterialProperty UserObject that gets points from EventInserter.");
 
   MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
   setup_options = "timestep_begin";
@@ -56,14 +62,18 @@ EventInserter::EventInserter(const InputParameters & parameters) :
     _time_tol(getParam<Real>("time_tolerance")),
     _track_old_events(getParam<bool>("track_old_events")),
     _removal_method(getParam<MooseEnum>("removal_method")),
-    _removal_time(((_track_old_events) && (_removal_method == "time")) ? getParam<Real>("removal_time") : std::numeric_limits<Real>::max()),
-    _removal_sigma(((_track_old_events) && (_removal_method == "sigma")) ? getParam<Real>("removal_sigma") : std::numeric_limits<Real>::max()),
+    _removal_time(((_track_old_events) && (_removal_method == "time") && (parameters.isParamSetByUser("removal_time"))) ? getParam<Real>("removal_time") : std::numeric_limits<Real>::max()),
+    _removal_sigma(((_track_old_events) && (_removal_method == "sigma") && (parameters.isParamSetByUser("removal_sigma"))) ? getParam<Real>("removal_sigma") : std::numeric_limits<Real>::max()),
+    _circle_average_mat_prop_uo_ptr((parameters.isParamSetByUser("circle_average_material_property_user_object") && _removal_method == "sigma") ? &getUserObject<CircleAverageMaterialProperty>("circle_average_material_property_user_object") : NULL),
+    _inserter_circle_average_mat_prop_uo_ptr((parameters.isParamSetByUser("inserter_circle_average_material_property_user_object") && _removal_method == "sigma") ? &getUserObject<CircleAverageMaterialProperty>("inserter_circle_average_material_property_user_object") : NULL),
     _old_event_removed(false),
     _insert_first(true),
     _insert_second(true),
     _global_event_list(0),
     _old_event_list(0),
-    _older_event_list(0)
+    _older_event_list(0),
+    _old_sigma_list(0),
+    _older_sigma_list(0)
 {
   setRandomResetFrequency(EXEC_INITIAL);
   if (parameters.isParamSetByUser("seed"))
@@ -81,8 +91,21 @@ EventInserter::EventInserter(const InputParameters & parameters) :
   {
     if ((_removal_method == "time") && (!parameters.isParamSetByUser("removal_time")))
       mooseError("User requested to remove old events by time but 'removal_time' was not set.");
-    if ((_removal_method == "target_sigma") && (!parameters.isParamSetByUser("sigma")))
+    if ((_removal_method == "sigma") && (!parameters.isParamSetByUser("removal_sigma")))
       mooseError("User requested to remove old events by sigma but 'removal_sigma' was not set.");
+    if ((_removal_method == "sigma") && (!parameters.isParamSetByUser("gaussian_user_object")))
+      mooseError("User requested to remove old events by sigma but 'gaussian_user_object' was not set.");
+    if ((_removal_method == "sigma") && (!parameters.isParamSetByUser("circle_average_material_property_user_object")))
+      mooseError("User requested to remove old events by sigma but 'circle_average_material_property_user_object' was not set.");
+    if ((_removal_method == "sigma") && (!parameters.isParamSetByUser("inserter_circle_average_material_property_user_object")))
+      mooseError("User requested to remove old events by sigma but 'inserter_circle_average_material_property_user_object' was not set.");
+  }
+
+  // get initial sigma for initializing old event sigmas
+  if (_removal_method == "sigma")
+  {
+    const GaussianUserObject & gaussian_user_object = getUserObject<GaussianUserObject>("gaussian_user_object");
+    _initial_sigma = gaussian_user_object.getSigma();
   }
 
   // populate global_event_list so TimeStepper can access it immediately
@@ -139,11 +162,43 @@ EventInserter::execute()
     if (_track_old_events)
       for (unsigned int i=0; i<_old_event_list.size(); i++)
         _console << "old list " << i << ": time: " << _old_event_list[i].first << " location: " << _old_event_list[i].second << std::endl;
+
+    if ((_track_old_events) && (_removal_method == "sigma"))
+    {
+      _console << "printing sigma list..." << std::endl;
+      for (unsigned int i=0; i<_old_sigma_list.size(); i++)
+        _console << "old sigma list " << i << ": sigma: " << _old_sigma_list[i] << std::endl;
+      _console << "printing CircleAverageMaterialProperty values for old events..." << std::endl;
+      for (unsigned int i=0; i<_old_event_list.size(); i++)
+        _console << "old event list " << i << ": location: " << _old_event_list[i].second << " average value: " << _inserter_circle_average_mat_prop_uo_ptr->averageValue(i) << std::endl;
+    }
   }
 
   // expire entries from the list (if the current timestep converged) then add the next one
   if (_fe_problem.converged())
   {
+    // update sigma list before adding any entries to it
+    if (_removal_method == "sigma")
+    {
+      if (_verbose)
+        _console << "updating sigma list values..." << std::endl;
+      for (unsigned int i=0; i<_old_sigma_list.size(); i++)
+      {
+        // get average diffusion coefficient around the old event point
+        Real D = _inserter_circle_average_mat_prop_uo_ptr->averageValue(i);
+
+        // in case D changed from the previous step, calculate new t_star (described below) based on
+        // last time step (which when is when sigma would have been affected by the change)
+        Real t_star = (_t - _dt) - _old_sigma_list[i]*_old_sigma_list[i]/2.0/D;
+
+        // calculate increase in sigma over this step
+        Real dsigma = std::sqrt(2.0*D*(_t - t_star)) - std::sqrt(2.0*D*(_t - _dt - t_star));
+
+        // update sigma
+        _old_sigma_list[i] += dsigma;
+      }
+    }
+
     bool add_event = false;
     unsigned int i = 0;
     while (i < _global_event_list.size())
@@ -152,7 +207,23 @@ EventInserter::execute()
       {
         // add Event to old list if requested
         if (_track_old_events)
+        {
           _old_event_list.push_back(_global_event_list[i]);
+
+          // initialize entry in sigma array
+          if (_removal_method == "sigma")
+          {
+            // assume D has been constant from when event occured until now (have to assume something!)
+            Real D = _circle_average_mat_prop_uo_ptr->averageValue(_global_event_list[i].second, _initial_sigma);
+
+            // calculate fictitious time that event with sigma=0 (dirac delta) would need to occur to grow to
+            // be initial sigma when actually inserted, measure time relative to this
+            Real t_star = _global_event_list[i].first - _initial_sigma*_initial_sigma/2.0/D;
+
+            // estimate current value of sigma because the old events are not updated right away
+            _old_sigma_list.push_back(std::sqrt(2.0*D*(_t - t_star)));
+         }
+        }
 
         // remove Event (by replacing with last element and shrinking size by one)
         if (_verbose)
@@ -187,11 +258,20 @@ EventInserter::execute()
         if (_verbose)
           _console << "Coarsening was requested on the previous step but was delayed due to an Event, reverting old list..." << std::endl;
         _old_event_list = _older_event_list;
+
+        // also revert the sigma list
+        if (_removal_method == "sigma")
+          _old_sigma_list = _older_sigma_list;
       }
 
       // save old event list
       _older_event_list = _old_event_list;
 
+      // save old sigma list
+      if (_removal_method == "sigma")
+        _older_sigma_list = _old_sigma_list;
+
+      // check if old events need to be removed
       _old_event_removed = false;
       for (unsigned int i=0; i<_old_event_list.size(); i++)
       {
@@ -202,12 +282,32 @@ EventInserter::execute()
             _old_event_removed = true;
             if (_verbose)
               _console << "event needs to be coarsened: (old) event time: " << _old_event_list[i].first << " location: " << _old_event_list[i].second << std::endl;
-
-            // remove old event from list as we will signal the marker to coarsen everywhere where events are active
-            _old_event_list[i] = _old_event_list.back();
-            _old_event_list.pop_back();
-            break;
           }
+        }
+        else // sigma removal method
+        {
+          if (_old_sigma_list[i] > _removal_sigma) // check if sigma has widened enough
+          {
+            _old_event_removed = true;
+            if (_verbose)
+              _console << "event needs to be coarsened: (old) event time: " << _old_event_list[i].first << " location: " << _old_event_list[i].second << " estimated sigma: " << _old_sigma_list[i] << std::endl;
+          }
+        }
+
+        if (_old_event_removed)
+        {
+          // remove old event from list as we will signal the marker to coarsen everywhere where events are active
+          _old_event_list[i] = _old_event_list.back();
+          _old_event_list.pop_back();
+
+          if (_removal_method == "sigma")
+          {
+            _old_sigma_list[i] = _old_sigma_list.back();
+            _old_sigma_list.pop_back();
+          }
+
+          break;
+
         }
       }
     }

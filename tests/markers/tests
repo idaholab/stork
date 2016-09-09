@@ -19,6 +19,11 @@
     input = 'event_marker_coarsening.i'
     exodiff = 'event_marker_coarsening_out.e-s002'
   [../]
+  [./event_marker_sigma_coarsening]
+    type = 'Exodiff'
+    input = 'event_marker_sigma_coarsening.i'
+    exodiff = 'event_marker_sigma_coarsening_out.e-s002'
+  [../]
   [./event_marker_coarsening_conflict]
     type = 'Exodiff'
     input = 'event_marker_coarsening_conflict.i'

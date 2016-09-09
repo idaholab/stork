@@ -13,6 +13,7 @@
 /****************************************************************/
 
 #include "CircleAverageMaterialProperty.h"
+#include "EventInserter.h"
 
 #include "libmesh/parallel_algebra.h"
 
@@ -22,6 +23,8 @@ InputParameters validParams<CircleAverageMaterialProperty>()
   InputParameters params = validParams<ElementIntegralUserObject>();
   params.addRequiredParam<MaterialPropertyName>("mat_prop", "the name of the material property we are going to use");
   params.addCoupledVar("periodic_variable", "Use perodic boundary conditions of this variable to determine the distance to the function peak location");
+  params.addParam<UserObjectName>("inserter", "Name of the EventInserter UserObject.");
+  params.addParam<Real>("radius", "Radius of circle to average material property in.");
 
   return params;
 }
@@ -30,8 +33,43 @@ CircleAverageMaterialProperty::CircleAverageMaterialProperty(const InputParamete
     ElementIntegralUserObject(parameters),
     _mat_prop(getMaterialProperty<Real>("mat_prop")),
     _periodic_var(isCoupled("periodic_variable") ? (int) coupled("periodic_variable") : -1),
-    _mesh(_fe_problem.mesh())
+    _use_inserter_points(parameters.isParamSetByUser("inserter")),
+    _inserter(NULL),
+    _radius((parameters.isParamSetByUser("inserter") && (parameters.isParamSetByUser("radius"))) ? getParam<Real>("radius") : 0.0),
+    _mesh(_fe_problem.mesh()),
+    _integral_sum(0),
+    _volume_sum(0),
+    _old_event_list(0),
+    _Npoints(0)
 {
+
+  if ((_use_inserter_points) && (!parameters.isParamSetByUser("radius")))
+    mooseError("In CircleAverageMaterialProperty, when using points supplied by EventInserter, a radius must be set. Set 'radius = <value>'.");
+}
+
+void
+CircleAverageMaterialProperty::initialSetup()
+{
+  // Doing this here because all UserObjects will be constructed and order won't matter in the input file
+  if (_use_inserter_points)
+  {
+    _inserter = &getUserObject<EventInserter>("inserter");
+
+    if (!_inserter->areOldEventsBeingTracked())
+      mooseError("CircleAverageMaterialProperty cannot be used on inserter points unless old events are being tracked. Set 'track_old_events = true' in EventInserter block.");
+  }
+}
+
+Real
+CircleAverageMaterialProperty::averageValue(const unsigned int i) const
+{
+  if (i < _old_event_list.size())
+    if (_volume_sum[i] > 0.0)
+      return _integral_sum[i]/_volume_sum[i];
+  //else
+    //mooseError("entry " << i << " not found in old event list");
+
+  return 0.0;
 }
 
 Real
@@ -49,12 +87,7 @@ CircleAverageMaterialProperty::averageValue(const Point & p, const Real & radius
     dof_id_type id = it->first;
     Point centroid = it->second;
 
-    // distance between supplied point and element centroid depends on perodicity
-    Real r;
-    if (_periodic_var < 0)
-      r = (p-centroid).norm();
-    else
-      r = _mesh.minPeriodicDistance(_periodic_var, p, centroid);
+    Real r = distance(p, centroid);
 
     // check if distance between points is less than supplied radius
     if (r < radius)
@@ -79,26 +112,61 @@ CircleAverageMaterialProperty::computeQpIntegral()
 void
 CircleAverageMaterialProperty::initialize()
 {
-  // clear maps of values
-  _integral_values.clear();
-  _volume_values.clear();
-  _centroids.clear();
+  if (_use_inserter_points)
+  {
+    // get old event list to see how many points we are averaging
+    _old_event_list = _inserter->getOldEventList();
+    _Npoints = _old_event_list.size();
+
+    // resize vectors to number of points
+    _integral_sum.resize(_Npoints);
+    _volume_sum.resize(_Npoints);
+
+    // initialize values
+    for (unsigned int i=0; i < _Npoints; i++)
+    {
+      _integral_sum[i] = 0.0;
+      _volume_sum[i] = 0.0;
+    }
+  }
+  else
+  {
+    // clear maps of values
+    _integral_values.clear();
+    _volume_values.clear();
+    _centroids.clear();
+  }
 }
 
 void
 CircleAverageMaterialProperty::execute()
 {
-  // Compute the integral on this element
-  Real integral_value = computeIntegral();
+  if (_use_inserter_points)
+  {
+    for (unsigned int i=0; i < _Npoints; i++)
+    {
+      // get distance from event point to element centroid
+      Real r = distance(_current_elem->centroid(), _old_event_list[i].second);
 
-  // Store that value
-  _integral_values[_current_elem->id()] = integral_value;
+      // check if distance between points is less than supplied radius
+      if (r < _radius)
+      {
+        _integral_sum[i] += computeIntegral();
+        _volume_sum[i] += _current_elem_volume;
+      }
+    }
+  }
+  else
+  {
+    // Store that value
+    _integral_values[_current_elem->id()] = computeIntegral();
 
-  // Keep track of the volume of this element
-  _volume_values[_current_elem->id()] = _current_elem_volume;
+    // Keep track of the volume of this element
+    _volume_values[_current_elem->id()] = _current_elem_volume;
 
-  // Keep track of the centroid of this element
-  _centroids[_current_elem->id()] = _current_elem->centroid();
+    // Keep track of the centroid of this element
+    _centroids[_current_elem->id()] = _current_elem->centroid();
+  }
 }
 
 void
@@ -107,34 +175,66 @@ CircleAverageMaterialProperty::threadJoin(const UserObject & y)
   // We are joining with another class like this one so do a cast so we can get to it's data
   const CircleAverageMaterialProperty & uo = dynamic_cast<const CircleAverageMaterialProperty &>(y);
 
-  for (std::map<dof_id_type, Real>::const_iterator it = uo._integral_values.begin();
-      it != uo._integral_values.end();
-      ++it)
-    _integral_values[it->first] += it->second;
+  if (_use_inserter_points)
+  {
+    for (unsigned int i=0; i < _Npoints; i++)
+    {
+      _integral_sum[i] += uo._integral_sum[i];
+      _volume_sum[i] += uo._volume_sum[i];
+    }
+  }
+  else
+  {
+    for (std::map<dof_id_type, Real>::const_iterator it = uo._integral_values.begin();
+        it != uo._integral_values.end();
+        ++it)
+      _integral_values[it->first] += it->second;
 
-  for (std::map<dof_id_type, Real>::const_iterator it = uo._volume_values.begin();
-      it != uo._volume_values.end();
-      ++it)
-    _volume_values[it->first] += it->second;
+    for (std::map<dof_id_type, Real>::const_iterator it = uo._volume_values.begin();
+        it != uo._volume_values.end();
+        ++it)
+      _volume_values[it->first] += it->second;
 
-  _centroids.insert(uo._centroids.begin(), uo._centroids.end());
+    _centroids.insert(uo._centroids.begin(), uo._centroids.end());
+  }
 }
 
 void
 CircleAverageMaterialProperty::finalize()
 {
-  // Loop over the integral values and sum them up over the processors
-  for (std::map<dof_id_type, Real>::iterator it = _integral_values.begin();
-      it != _integral_values.end();
-      ++it)
-    gatherSum(it->second);
+  if (_use_inserter_points)
+  {
+    for (unsigned int i=0; i < _Npoints; i++)
+    {
+      gatherSum(_integral_sum[i]);
+      gatherSum(_volume_sum[i]);
+    }
+  }
+  else
+  {
+    // Loop over the integral values and sum them up over the processors
+    for (std::map<dof_id_type, Real>::iterator it = _integral_values.begin();
+        it != _integral_values.end();
+        ++it)
+      gatherSum(it->second);
 
-  // Loop over the volume_values and sum them up over the processors
-  for (std::map<dof_id_type, Real>::iterator it = _volume_values.begin();
-      it != _volume_values.end();
-      ++it)
-    gatherSum(it->second);
+    // Loop over the volume_values and sum them up over the processors
+    for (std::map<dof_id_type, Real>::iterator it = _volume_values.begin();
+        it != _volume_values.end();
+        ++it)
+      gatherSum(it->second);
 
-  // Join up centroid values over processors
-  _communicator.set_union(_centroids);
+    // Join up centroid values over processors
+    _communicator.set_union(_centroids);
+  }
+}
+
+Real
+CircleAverageMaterialProperty::distance(Point p1, Point p2) const
+{
+  // distance between supplied point and element centroid depends on perodicity
+  if (_periodic_var < 0)
+    return (p1 - p2).norm();
+
+  return _mesh.minPeriodicDistance(_periodic_var, p1, p2);
 }

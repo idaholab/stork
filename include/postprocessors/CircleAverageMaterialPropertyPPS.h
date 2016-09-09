@@ -32,15 +32,16 @@ public:
   CircleAverageMaterialPropertyPPS(const InputParameters & parameters);
   virtual ~CircleAverageMaterialPropertyPPS();
 
-  virtual void initialize();
-  virtual void execute();
+  virtual void initialize() {};  // not used
+  virtual void execute() {};  // not used
   virtual Real getValue();
 
 protected:
   const CircleAverageMaterialProperty & _uo;
+  const MooseEnum _method;
   const Point _p;
   const Real _radius;
-  Real _value;
+  const unsigned int _entry;
 };
 
 #endif /* CIRCLEAVERAGEMATERIALPROPERTYPPS_H */

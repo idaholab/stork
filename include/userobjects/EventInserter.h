@@ -12,6 +12,7 @@
 #include "RandomPointUserObject.h"
 
 class EventInserter;
+class CircleAverageMaterialProperty;
 
 template<>
 InputParameters validParams<EventInserter>();
@@ -114,6 +115,15 @@ protected:
   /// Target Event sigma value to remove old event
   const Real _removal_sigma;
 
+  /// Pointer to GaussianUserObject
+  //const GaussianUserObject * _gaussian_user_object_ptr;
+
+  /// Pointer to CircleAverageMaterialProperty UserObject
+  const CircleAverageMaterialProperty * _circle_average_mat_prop_uo_ptr;
+
+  /// Pointer to another CircleAverageMaterialProperty UserObject
+  const CircleAverageMaterialProperty * _inserter_circle_average_mat_prop_uo_ptr;
+
   /// Flag when Event has been removed from old list
   bool _old_event_removed;
 
@@ -131,6 +141,14 @@ protected:
 
   /// List of old events from previous time step
   EventList _older_event_list;
+
+  /// List of sigma estimates for old events
+  std::vector<Real> _old_sigma_list;
+
+  /// List of sigma estimates for old events from previous time step
+  std::vector<Real> _older_sigma_list;
+
+  Real _initial_sigma;
 };
 
 #endif //EVENTINSERTER_H

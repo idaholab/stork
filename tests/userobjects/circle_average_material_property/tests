@@ -5,4 +5,9 @@
     csvdiff = 'circle_average_material_property_out.csv'
     max_parallel = 2
   [../]
+  [./points_from_inserter]
+    type = 'CSVDiff'
+    input = 'points_from_inserter.i'
+    csvdiff = 'points_from_inserter_out.csv'
+  [../]  
 []
