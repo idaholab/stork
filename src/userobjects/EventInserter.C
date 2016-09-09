@@ -220,7 +220,7 @@ EventInserter::execute()
             // be initial sigma when actually inserted, measure time relative to this
             Real t_star = _global_event_list[i].first - _initial_sigma*_initial_sigma/2.0/D;
 
-            // estimate current value of sigme because the old events are not updated right away
+            // estimate current value of sigma because the old events are not updated right away
             _old_sigma_list.push_back(std::sqrt(2.0*D*(_t - t_star)));
          }
         }
