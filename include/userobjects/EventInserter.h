@@ -143,10 +143,10 @@ protected:
   EventList _older_event_list;
 
   /// List of sigma estimates for old events
-  std::vector< std::pair<Real, Real> > _old_sigma_list;
+  std::vector<Real> _old_sigma_list;
 
   /// List of sigma estimates for old events from previous time step
-  std::vector< std::pair<Real, Real> > _older_sigma_list;
+  std::vector<Real> _older_sigma_list;
 
   Real _initial_sigma;
 };

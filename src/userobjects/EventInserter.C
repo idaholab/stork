@@ -167,7 +167,7 @@ EventInserter::execute()
     {
       _console << "printing sigma list..." << std::endl;
       for (unsigned int i=0; i<_old_sigma_list.size(); i++)
-        _console << "old sigma list " << i << ": sigma: " << _old_sigma_list[i].first << std::endl;
+        _console << "old sigma list " << i << ": sigma: " << _old_sigma_list[i] << std::endl;
       _console << "printing CircleAverageMaterialProperty values for old events..." << std::endl;
       for (unsigned int i=0; i<_old_event_list.size(); i++)
         _console << "old event list " << i << ": location: " << _old_event_list[i].second << " average value: " << _inserter_circle_average_mat_prop_uo_ptr->averageValue(i) << std::endl;
@@ -180,18 +180,22 @@ EventInserter::execute()
     // update sigma list before adding any entries to it
     if (_removal_method == "sigma")
     {
-      _console << "updating sigma list values..." << std::endl;
+      if (_verbose)
+        _console << "updating sigma list values..." << std::endl;
       for (unsigned int i=0; i<_old_sigma_list.size(); i++)
       {
         // get average diffusion coefficient around the old event point
         Real D = _inserter_circle_average_mat_prop_uo_ptr->averageValue(i);
 
-        // calculate increase sigma over this step and add to old
-        // TODO: what ARE we updating here?
-        Real dsigma = std::sqrt(2.0*D*_t) - std::sqrt(2.0*D*(_t - _dt));
+        // in case D changed from the previous step, calculate new t_star (described below) based on
+        // last time step (which when is when sigma would have been affected by the change)
+        Real t_star = (_t - _dt) - _old_sigma_list[i]*_old_sigma_list[i]/2.0/D;
 
-        // update list from CircleAverageMaterialProperty
-        _old_sigma_list[i].first += dsigma;
+        // calculate increase in sigma over this step
+        Real dsigma = std::sqrt(2.0*D*(_t - t_star)) - std::sqrt(2.0*D*(_t - _dt - t_star));
+
+        // update sigma
+        _old_sigma_list[i] += dsigma;
       }
     }
 
@@ -209,9 +213,15 @@ EventInserter::execute()
           // initialize entry in sigma array
           if (_removal_method == "sigma")
           {
-            Real D = _circle_average_mat_prop_uo_ptr->averageValue(_global_event_list[i].second,_initial_sigma);
-            Real tstar = _initial_sigma*_initial_sigma/2.0/D;
-            _old_sigma_list.push_back(std::make_pair(_initial_sigma, tstar));
+            // assume D has been constant from when event occured until now (have to assume something!)
+            Real D = _circle_average_mat_prop_uo_ptr->averageValue(_global_event_list[i].second, _initial_sigma);
+
+            // calculate fictitious time that event with sigma=0 (dirac delta) would need to occur to grow to
+            // be initial sigma when actually inserted, measure time relative to this
+            Real t_star = _global_event_list[i].first - _initial_sigma*_initial_sigma/2.0/D;
+
+            // estimate current value of sigme because the old events are not updated right away
+            _old_sigma_list.push_back(std::sqrt(2.0*D*(_t - t_star)));
          }
         }
 
@@ -276,11 +286,11 @@ EventInserter::execute()
         }
         else // sigma removal method
         {
-          if (_old_sigma_list[i].first > _removal_sigma) // check if sigma has widened enough
+          if (_old_sigma_list[i] > _removal_sigma) // check if sigma has widened enough
           {
             _old_event_removed = true;
             if (_verbose)
-              _console << "event needs to be coarsened: (old) event time: " << _old_event_list[i].first << " location: " << _old_event_list[i].second << " estimated sigma: " << _old_sigma_list[i].first << std::endl;
+              _console << "event needs to be coarsened: (old) event time: " << _old_event_list[i].first << " location: " << _old_event_list[i].second << " estimated sigma: " << _old_sigma_list[i] << std::endl;
           }
         }
 

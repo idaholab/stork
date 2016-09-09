@@ -129,7 +129,7 @@
     seed = 3
     track_old_events = true
     removal_method = sigma
-    removal_sigma = 0.3
+    removal_sigma = 0.8
     gaussian_user_object = gaussian_uo
     circle_average_material_property_user_object = circle_average
     inserter_circle_average_material_property_user_object = inserter_circle_average
@@ -166,7 +166,7 @@
   petsc_options_value = 'hypre boomeramg'
 
   start_time = 0.0
-  end_time = 0.6
+  end_time = 0.5
 
   verbose = true
   [./TimeStepper]
