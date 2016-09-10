@@ -66,8 +66,6 @@ CircleAverageMaterialProperty::averageValue(const unsigned int i) const
   if (i < _old_event_list.size())
     if (_volume_sum[i] > 0.0)
       return _integral_sum[i]/_volume_sum[i];
-  //else
-    //mooseError("entry " << i << " not found in old event list");
 
   return 0.0;
 }
@@ -92,8 +90,14 @@ CircleAverageMaterialProperty::averageValue(const Point & p, const Real & radius
     // check if distance between points is less than supplied radius
     if (r < radius)
     {
-      integral_sum += _integral_values.find(id)->second;
-      volume_sum += _volume_values.find(id)->second;
+      if ((_integral_values.find(id) == _integral_values.end()) || (_volume_values.find(id) == _volume_values.end()))
+        mooseError("In CircleAverageMaterialProperty, element id " << id << " not found.");
+      else
+      {
+        // c++11!!
+        integral_sum += _integral_values.at(id);
+        volume_sum += _volume_values.at(id);
+      }
     }
   }
 
@@ -175,6 +179,7 @@ CircleAverageMaterialProperty::threadJoin(const UserObject & y)
   // We are joining with another class like this one so do a cast so we can get to it's data
   const CircleAverageMaterialProperty & uo = dynamic_cast<const CircleAverageMaterialProperty &>(y);
 
+  // put together values from threads
   if (_use_inserter_points)
   {
     for (unsigned int i=0; i < _Npoints; i++)
@@ -185,16 +190,8 @@ CircleAverageMaterialProperty::threadJoin(const UserObject & y)
   }
   else
   {
-    for (std::map<dof_id_type, Real>::const_iterator it = uo._integral_values.begin();
-        it != uo._integral_values.end();
-        ++it)
-      _integral_values[it->first] += it->second;
-
-    for (std::map<dof_id_type, Real>::const_iterator it = uo._volume_values.begin();
-        it != uo._volume_values.end();
-        ++it)
-      _volume_values[it->first] += it->second;
-
+    _integral_values.insert(uo._integral_values.begin(), uo._integral_values.end());
+    _volume_values.insert(uo._volume_values.begin(), uo._volume_values.end());
     _centroids.insert(uo._centroids.begin(), uo._centroids.end());
   }
 }
@@ -202,6 +199,7 @@ CircleAverageMaterialProperty::threadJoin(const UserObject & y)
 void
 CircleAverageMaterialProperty::finalize()
 {
+  // put together values from processors
   if (_use_inserter_points)
   {
     for (unsigned int i=0; i < _Npoints; i++)
@@ -212,19 +210,8 @@ CircleAverageMaterialProperty::finalize()
   }
   else
   {
-    // Loop over the integral values and sum them up over the processors
-    for (std::map<dof_id_type, Real>::iterator it = _integral_values.begin();
-        it != _integral_values.end();
-        ++it)
-      gatherSum(it->second);
-
-    // Loop over the volume_values and sum them up over the processors
-    for (std::map<dof_id_type, Real>::iterator it = _volume_values.begin();
-        it != _volume_values.end();
-        ++it)
-      gatherSum(it->second);
-
-    // Join up centroid values over processors
+    _communicator.set_union(_integral_values);
+    _communicator.set_union(_volume_values);
     _communicator.set_union(_centroids);
   }
 }

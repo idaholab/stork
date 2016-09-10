@@ -3,7 +3,13 @@
     type = 'CSVDiff'
     input = 'circle_average_material_property.i'
     csvdiff = 'circle_average_material_property_out.csv'
-    max_parallel = 2
+  [../]
+  [./circle_average_material_property_parallel]
+    type = 'CSVDiff'
+    input = 'circle_average_material_property.i'
+    csvdiff = 'circle_average_material_property_out.csv'
+    prereq = circle_average_material_property
+    min_parallel = 2
   [../]
   [./points_from_inserter]
     type = 'CSVDiff'
