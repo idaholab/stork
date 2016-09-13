@@ -13,6 +13,7 @@
 
 class EventInserter;
 class CircleAverageMaterialProperty;
+class CircleMaxOriginalElementSize;
 
 template<>
 InputParameters validParams<EventInserter>();
@@ -115,6 +116,12 @@ protected:
   /// Target Event sigma value to remove old event
   const Real _removal_sigma;
 
+  /// Target Event sigma to original element size ratio to remove old event
+  const Real _removal_ratio;
+
+  /// Distance, in multiples of the Event sigma, around an old event, to sample the original mesh
+  const Real _radius;
+
   /// Pointer to GaussianUserObject
   //const GaussianUserObject * _gaussian_user_object_ptr;
 
@@ -123,6 +130,9 @@ protected:
 
   /// Pointer to another CircleAverageMaterialProperty UserObject
   const CircleAverageMaterialProperty * _inserter_circle_average_mat_prop_uo_ptr;
+
+  /// Pointer to CircleMaxOriginalElementSize UserObject
+  const CircleMaxOriginalElementSize * _circle_max_elem_size_uo_ptr;
 
   /// Flag when Event has been removed from old list
   bool _old_event_removed;
