@@ -116,7 +116,7 @@ EventMarker::computeElementMarker()
     if (r < _refine_distance)  // we are near the event
       if (!_refine_by_ratio)  // refine if the distance is the only critereon
         return REFINE;
-      else if (_current_elem->hmax() > _minimum_element_size) // or if screening my element size, check the element size
+      else if (_current_elem->hmax() > _minimum_element_size) // or if screening by element size, check the element size
         return REFINE;
 
     return DO_NOTHING; // default

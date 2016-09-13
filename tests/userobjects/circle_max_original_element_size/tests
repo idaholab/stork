@@ -1,0 +1,14 @@
+[Tests]
+  [./circle_max_original_element_size]
+    type = 'CSVDiff'
+    input = 'circle_max_original_element_size.i'
+    csvdiff = 'circle_max_original_element_size_out.csv'
+  [../]
+  [./circle_max_original_element_size_parallel]
+    type = 'CSVDiff'
+    input = 'circle_max_original_element_size.i'
+    csvdiff = 'circle_max_original_element_size_out.csv'
+    prereq = circle_max_original_element_size
+    min_parallel = 2
+  [../]
+[]
