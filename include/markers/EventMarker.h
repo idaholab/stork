@@ -63,7 +63,13 @@ protected:
 
   const bool _coarsen_events;
 
+  const Real _sigma_mesh_ratio;
+
   const Real _refine_distance;
+
+  const Real _minimum_element_size;
+
+  const bool _refine_by_ratio;
 
   bool _event_incoming;
 

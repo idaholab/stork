@@ -16,6 +16,8 @@
 #include "CircleAverageMaterialPropertyPPS.h"
 #include "MaterialDiffusion.h"
 #include "MaterialSinkKernel.h"
+#include "CircleMaxOriginalElementSize.h"
+#include "CircleMaxOriginalElementSizePPS.h"
 
 template<>
 InputParameters validParams<PrariedogApp>()
@@ -67,6 +69,7 @@ PrariedogApp::registerObjects(Factory & factory)
   registerMarker(EventMarker);
 
   registerPostprocessor(CircleAverageMaterialPropertyPPS);
+  registerPostprocessor(CircleMaxOriginalElementSizePPS);
 
   registerTimeStepper(EventTimeStepper);
 
@@ -74,6 +77,7 @@ PrariedogApp::registerObjects(Factory & factory)
   registerUserObject(EventInserter);
   registerUserObject(GaussianUserObject);
   registerUserObject(CircleAverageMaterialProperty);
+  registerUserObject(CircleMaxOriginalElementSize);
 }
 
 // External entry point for dynamic syntax association

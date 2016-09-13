@@ -7,6 +7,7 @@
 #include "EventInserter.h"
 #include "GaussianUserObject.h"
 #include "CircleAverageMaterialProperty.h"
+#include "CircleMaxOriginalElementSize.h"
 #include "MooseRandom.h"
 
 
@@ -19,7 +20,7 @@ InputParameters validParams<EventInserter>()
   params += validParams<RandomInterface>();
 
   MooseEnum distribution("uniform exponential", "uniform");
-  MooseEnum removal_method("time sigma", "time");
+  MooseEnum removal_method("time sigma sigma_element_size_ratio", "time");
 
   params.addRequiredParam<Real>("mean", "Mean (time) of probability distribution");
   params.addRequiredParam<UserObjectName>("random_point_user_object", "Name of RandomPointUserObject to get random points on the mesh.");
@@ -36,9 +37,12 @@ InputParameters validParams<EventInserter>()
   params.addParam<MooseEnum>("removal_method", removal_method, "How to decide when to remove old cascade events. Choices are 'time' or 'sigma'.");
   params.addParam<Real>("removal_time", "Time to wait after an event to remove from the list.");
   params.addParam<Real>("removal_sigma", "Target (approx.) sigma value at which to remove the event from the list.");
+  params.addParam<Real>("removal_sigma_element_size_ratio", "Target sigma to original element size ratio at which to remove the event from the list.");
+  params.addParam<Real>("radius", "Distance, in multiples of the Event sigma, around an old event, to sample the original mesh.");
   params.addParam<UserObjectName>("gaussian_user_object", "Name of the GaussianUserObject for initial sigma value when coarsening by sigma values.");
   params.addParam<UserObjectName>("circle_average_material_property_user_object", "Name of the CircleAverageMaterialProperty UserObject for arbitrary circles and radii.");
   params.addParam<UserObjectName>("inserter_circle_average_material_property_user_object", "Name of the CircleAverageMaterialProperty UserObject that gets points from EventInserter.");
+  params.addParam<UserObjectName>("circle_max_original_element_size_user_object", "Name of the CircleMaxOriginalElementSize UserObject for arbitrary circles and radii.");
 
   MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
   setup_options = "timestep_begin";
@@ -64,8 +68,11 @@ EventInserter::EventInserter(const InputParameters & parameters) :
     _removal_method(getParam<MooseEnum>("removal_method")),
     _removal_time(((_track_old_events) && (_removal_method == "time") && (parameters.isParamSetByUser("removal_time"))) ? getParam<Real>("removal_time") : std::numeric_limits<Real>::max()),
     _removal_sigma(((_track_old_events) && (_removal_method == "sigma") && (parameters.isParamSetByUser("removal_sigma"))) ? getParam<Real>("removal_sigma") : std::numeric_limits<Real>::max()),
-    _circle_average_mat_prop_uo_ptr((parameters.isParamSetByUser("circle_average_material_property_user_object") && _removal_method == "sigma") ? &getUserObject<CircleAverageMaterialProperty>("circle_average_material_property_user_object") : NULL),
-    _inserter_circle_average_mat_prop_uo_ptr((parameters.isParamSetByUser("inserter_circle_average_material_property_user_object") && _removal_method == "sigma") ? &getUserObject<CircleAverageMaterialProperty>("inserter_circle_average_material_property_user_object") : NULL),
+    _removal_ratio(((_track_old_events) && (_removal_method == "sigma_element_size_ratio") && (parameters.isParamSetByUser("removal_sigma_element_size_ratio"))) ? getParam<Real>("removal_sigma_element_size_ratio") : std::numeric_limits<Real>::max()),
+    _radius(((_track_old_events) && (_removal_method == "sigma_element_size_ratio") && (parameters.isParamSetByUser("radius"))) ? getParam<Real>("radius") : std::numeric_limits<Real>::max()),
+    _circle_average_mat_prop_uo_ptr((parameters.isParamSetByUser("circle_average_material_property_user_object") && (_removal_method == "sigma" || _removal_method == "sigma_element_size_ratio")) ? &getUserObject<CircleAverageMaterialProperty>("circle_average_material_property_user_object") : NULL),
+    _inserter_circle_average_mat_prop_uo_ptr((parameters.isParamSetByUser("inserter_circle_average_material_property_user_object") && (_removal_method == "sigma" || _removal_method == "sigma_element_size_ratio")) ? &getUserObject<CircleAverageMaterialProperty>("inserter_circle_average_material_property_user_object") : NULL),
+    _circle_max_elem_size_uo_ptr((parameters.isParamSetByUser("circle_max_original_element_size_user_object") && (_removal_method == "sigma" || _removal_method == "sigma_element_size_ratio")) ? &getUserObject<CircleMaxOriginalElementSize>("circle_max_original_element_size_user_object") : NULL),
     _old_event_removed(false),
     _insert_first(true),
     _insert_second(true),
@@ -93,16 +100,22 @@ EventInserter::EventInserter(const InputParameters & parameters) :
       mooseError("User requested to remove old events by time but 'removal_time' was not set.");
     if ((_removal_method == "sigma") && (!parameters.isParamSetByUser("removal_sigma")))
       mooseError("User requested to remove old events by sigma but 'removal_sigma' was not set.");
-    if ((_removal_method == "sigma") && (!parameters.isParamSetByUser("gaussian_user_object")))
-      mooseError("User requested to remove old events by sigma but 'gaussian_user_object' was not set.");
-    if ((_removal_method == "sigma") && (!parameters.isParamSetByUser("circle_average_material_property_user_object")))
-      mooseError("User requested to remove old events by sigma but 'circle_average_material_property_user_object' was not set.");
-    if ((_removal_method == "sigma") && (!parameters.isParamSetByUser("inserter_circle_average_material_property_user_object")))
-      mooseError("User requested to remove old events by sigma but 'inserter_circle_average_material_property_user_object' was not set.");
+    if ((_removal_method == "sigma_element_size_ratio") && (!parameters.isParamSetByUser("removal_sigma_element_size_ratio")))
+      mooseError("User requested to remove old events by sigma ratio but 'removal_sigma_element_size_ratio' was not set.");
+    if ((_removal_method == "sigma_element_size_ratio") && (!parameters.isParamSetByUser("radius")))
+      mooseError("User requested to remove old events by sigma ratio but 'radius' was not set.");
+    if (((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio")) && (!parameters.isParamSetByUser("gaussian_user_object")))
+      mooseError("User requested to remove old events by a sigma method but 'gaussian_user_object' was not set.");
+    if (((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio")) && (!parameters.isParamSetByUser("circle_average_material_property_user_object")))
+      mooseError("User requested to remove old events by a sigma method but 'circle_average_material_property_user_object' was not set.");
+    if (((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio")) && (!parameters.isParamSetByUser("inserter_circle_average_material_property_user_object")))
+      mooseError("User requested to remove old events by a sigma method but 'inserter_circle_average_material_property_user_object' was not set.");
+    if ((_removal_method == "sigma_element_size_ratio") && (!parameters.isParamSetByUser("circle_max_original_element_size_user_object")))
+      mooseError("User requested to remove old events by sigma ratio but 'circle_max_original_element_size_user_object' was not set.");
   }
 
   // get initial sigma for initializing old event sigmas
-  if (_removal_method == "sigma")
+  if ((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio"))
   {
     const GaussianUserObject & gaussian_user_object = getUserObject<GaussianUserObject>("gaussian_user_object");
     _initial_sigma = gaussian_user_object.getSigma();
@@ -163,7 +176,7 @@ EventInserter::execute()
       for (unsigned int i=0; i<_old_event_list.size(); i++)
         _console << "old list " << i << ": time: " << _old_event_list[i].first << " location: " << _old_event_list[i].second << std::endl;
 
-    if ((_track_old_events) && (_removal_method == "sigma"))
+    if ((_track_old_events) && ((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio")))
     {
       _console << "printing sigma list..." << std::endl;
       for (unsigned int i=0; i<_old_sigma_list.size(); i++)
@@ -178,7 +191,7 @@ EventInserter::execute()
   if (_fe_problem.converged())
   {
     // update sigma list before adding any entries to it
-    if (_removal_method == "sigma")
+    if ((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio"))
     {
       if (_verbose)
         _console << "updating sigma list values..." << std::endl;
@@ -211,7 +224,7 @@ EventInserter::execute()
           _old_event_list.push_back(_global_event_list[i]);
 
           // initialize entry in sigma array
-          if (_removal_method == "sigma")
+          if ((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio"))
           {
             // assume D has been constant from when event occured until now (have to assume something!)
             Real D = _circle_average_mat_prop_uo_ptr->averageValue(_global_event_list[i].second, _initial_sigma);
@@ -260,7 +273,7 @@ EventInserter::execute()
         _old_event_list = _older_event_list;
 
         // also revert the sigma list
-        if (_removal_method == "sigma")
+        if ((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio"))
           _old_sigma_list = _older_sigma_list;
       }
 
@@ -268,7 +281,7 @@ EventInserter::execute()
       _older_event_list = _old_event_list;
 
       // save old sigma list
-      if (_removal_method == "sigma")
+      if ((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio"))
         _older_sigma_list = _old_sigma_list;
 
       // check if old events need to be removed
@@ -284,13 +297,25 @@ EventInserter::execute()
               _console << "event needs to be coarsened: (old) event time: " << _old_event_list[i].first << " location: " << _old_event_list[i].second << std::endl;
           }
         }
-        else // sigma removal method
+        else if (_removal_method == "sigma") // sigma removal method
         {
           if (_old_sigma_list[i] > _removal_sigma) // check if sigma has widened enough
           {
             _old_event_removed = true;
             if (_verbose)
               _console << "event needs to be coarsened: (old) event time: " << _old_event_list[i].first << " location: " << _old_event_list[i].second << " estimated sigma: " << _old_sigma_list[i] << std::endl;
+          }
+        }
+        else // sigma ratio removal method
+        {
+          // get max element size from the original mesh in the vicinity of the old event
+          Real max_element_size = _circle_max_elem_size_uo_ptr->value(_old_event_list[i].second, _radius);
+
+          if (_old_sigma_list[i]/max_element_size > _removal_ratio) // check if sigma on the *original* mesh is sampled enough
+          {
+            _old_event_removed = true;
+            if (_verbose)
+              _console << "event needs to be coarsened: (old) event time: " << _old_event_list[i].first << " location: " << _old_event_list[i].second << " estimated sigma: " << _old_sigma_list[i] << " local max original element size: " << max_element_size << " ratio: " << _old_sigma_list[i]/max_element_size << std::endl;
           }
         }
 
@@ -300,7 +325,7 @@ EventInserter::execute()
           _old_event_list[i] = _old_event_list.back();
           _old_event_list.pop_back();
 
-          if (_removal_method == "sigma")
+          if ((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio"))
           {
             _old_sigma_list[i] = _old_sigma_list.back();
             _old_sigma_list.pop_back();

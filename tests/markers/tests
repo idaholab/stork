@@ -29,4 +29,14 @@
     input = 'event_marker_coarsening_conflict.i'
     exodiff = 'event_marker_coarsening_conflict_out.e-s003'
   [../]
+  [./event_marker_sigma_ratio_refinement]
+    type = 'Exodiff'
+    input = 'event_marker_sigma_ratio_refinement.i'
+    exodiff = 'event_marker_sigma_ratio_refinement_out.e'
+  [../]
+  [./event_marker_sigma_ratio_coarsening]
+    type = 'Exodiff'
+    input = 'event_marker_sigma_ratio_coarsening.i'
+    exodiff = 'event_marker_sigma_ratio_coarsening_out.e-s002'
+  [../]
 []

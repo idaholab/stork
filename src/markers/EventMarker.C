@@ -25,6 +25,7 @@ InputParameters validParams<EventMarker>()
   params.addParam<bool>("verbose", false, "Print out extra information when marker is active.");
   params.addCoupledVar("periodic_variable", "Use perodic boundary conditions of this variable to determine the distance to the function peak location");
   params.addParam<bool>("coarsen_events", false, "Coarsen events at some later time. If true, set 'track_old_events=true' in EventInserter.");
+  params.addParam<Real>("event_sigma_mesh_ratio", 2.0, "Refine elements until ratio of event sigma to element size is equal to or greater than this value.");
 
   return params;
 }
@@ -39,7 +40,10 @@ EventMarker::EventMarker(const InputParameters & parameters) :
     _verbose(getParam<bool>("verbose")),
     _periodic_var(isCoupled("periodic_variable") ? (int) coupled("periodic_variable") : -1),
     _coarsen_events(getParam<bool>("coarsen_events")),
+    _sigma_mesh_ratio(getParam<Real>("event_sigma_mesh_ratio")),
     _refine_distance(_marker_radius * _gaussian_uo.getSigma()),
+    _minimum_element_size(_gaussian_uo.getSigma() / _sigma_mesh_ratio),
+    _refine_by_ratio(parameters.isParamSetByUser("event_sigma_mesh_ratio")),
     _event_incoming(false),
     _event_location(0),
     _input_cycles_per_step(_adaptivity.getCyclesPerStep()),
@@ -109,8 +113,11 @@ EventMarker::computeElementMarker()
     else
       r = _mesh.minPeriodicDistance(_periodic_var, _event_location, centroid);
 
-    if (r < _refine_distance)
-      return REFINE;
+    if (r < _refine_distance)  // we are near the event
+      if (!_refine_by_ratio)  // refine if the distance is the only critereon
+        return REFINE;
+      else if (_current_elem->hmax() > _minimum_element_size) // or if screening by element size, check the element size
+        return REFINE;
 
     return DO_NOTHING; // default
   }
