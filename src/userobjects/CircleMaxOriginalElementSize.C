@@ -35,6 +35,8 @@ CircleMaxOriginalElementSize::CircleMaxOriginalElementSize(const InputParameters
 Real
 CircleMaxOriginalElementSize::value(const Point & p, const Real & radius) const
 {
+  Real max_element_size = 0.0;
+
   // Loop over elements
   for (std::map<dof_id_type, Point>::const_iterator it = _centroids.begin();
       it != _centroids.end();
@@ -47,12 +49,18 @@ CircleMaxOriginalElementSize::value(const Point & p, const Real & radius) const
 
     // check if distance between points is less than supplied radius
     if (r < radius)
+    {
       if (_original_element_sizes.find(id) == _original_element_sizes.end())
         mooseError("In CircleMaxOriginalElementSize, element id " << id << " not found.");
       else
-        return _original_element_sizes.at(id);
+      {
+        Real element_size = _original_element_sizes.at(id);
+        if (element_size > max_element_size)
+          max_element_size = element_size;
+      }
+    }
   }
-  return 0.0;
+  return max_element_size;
 }
 
 void
