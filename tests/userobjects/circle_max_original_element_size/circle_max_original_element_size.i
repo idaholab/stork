@@ -156,7 +156,6 @@
     user_object = circle_max_original_element_size_uo
     location = '0.0 0.0 0.0'
     radius = 1.0
-    execute_on = 'initial timestep_end'
   [../]
 []
 
