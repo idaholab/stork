@@ -37,6 +37,10 @@ CircleMaxOriginalElementSize::value(const Point & p, const Real & radius) const
 {
   Real max_element_size = 0.0;
 
+  Real min_distance = std::numeric_limits<Real>::max();
+  dof_id_type closest_element;
+  bool found_max = false;
+
   // Loop over elements
   for (std::map<dof_id_type, Point>::const_iterator it = _centroids.begin();
       it != _centroids.end();
@@ -46,6 +50,13 @@ CircleMaxOriginalElementSize::value(const Point & p, const Real & radius) const
     Point centroid = it->second;
 
     Real r = distance(p, centroid);
+
+    // save closest element in case mesh too coarse
+    if (r < min_distance)
+    {
+      min_distance = r;
+      closest_element = id;
+    }
 
     // check if distance between points is less than supplied radius
     if (r < radius)
@@ -60,6 +71,10 @@ CircleMaxOriginalElementSize::value(const Point & p, const Real & radius) const
       }
     }
   }
+
+  if (min_distance == std::numeric_limits<Real>::max())
+    return _original_element_sizes.at(closest_element);
+
   return max_element_size;
 }
 

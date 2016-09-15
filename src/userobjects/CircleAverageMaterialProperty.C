@@ -78,6 +78,9 @@ CircleAverageMaterialProperty::averageValue(const Point & p, const Real & radius
   Real integral_sum = 0.0;
   Real volume_sum = 0.0;
 
+  Real min_distance = std::numeric_limits<Real>::max();
+  dof_id_type closest_element;
+
   for (std::map<dof_id_type, Point>::const_iterator it = _centroids.begin();
       it != _centroids.end();
       ++it)
@@ -86,6 +89,13 @@ CircleAverageMaterialProperty::averageValue(const Point & p, const Real & radius
     Point centroid = it->second;
 
     Real r = distance(p, centroid);
+
+    // save closest element in case mesh too coarse
+    if (r < min_distance)
+    {
+      min_distance = r;
+      closest_element = id;
+    }
 
     // check if distance between points is less than supplied radius
     if (r < radius)
@@ -103,6 +113,8 @@ CircleAverageMaterialProperty::averageValue(const Point & p, const Real & radius
 
   if (volume_sum > 0.0)
     return integral_sum/volume_sum;
+  else
+    return _integral_values.at(closest_element)/_volume_values.at(closest_element);  // return at least the information of the closest element
 
   return 0.0;
 }
@@ -153,7 +165,8 @@ CircleAverageMaterialProperty::execute()
       Real r = distance(_current_elem->centroid(), _old_event_list[i].second);
 
       // check if distance between points is less than supplied radius
-      if (r < _radius)
+      // or if point is in element
+      if ((r < _radius) || (_current_elem->contains_point(_old_event_list[i].second)))
       {
         _integral_sum[i] += computeIntegral();
         _volume_sum[i] += _current_elem_volume;
