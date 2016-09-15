@@ -37,6 +37,8 @@ protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
 
+  std::string _diffusivity_name;
+
   /**
    * This MooseArray will hold the reference we need to our
    * material property from the Material class
