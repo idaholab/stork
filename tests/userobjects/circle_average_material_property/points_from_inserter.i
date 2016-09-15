@@ -30,7 +30,7 @@
   [./mat_diff]
     type = MaterialDiffusion
     variable = u
-    prop_name = diffusivity
+    diffusivity_name = diffusivity
   [../]
 
   [./event_inserter_source]

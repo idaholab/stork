@@ -22,14 +22,17 @@ template<>
 InputParameters validParams<MaterialDiffusion>()
 {
   InputParameters params = validParams<Diffusion>();
+  params.addRequiredParam<MaterialPropertyName>("diffusivity_name", "Name of the material property for diffusion coefficient");
   return params;
 }
 
 
 MaterialDiffusion::MaterialDiffusion(const InputParameters & parameters) :
     Diffusion(parameters),
-    _diffusivity(getMaterialProperty<Real>("diffusivity"))
-{}
+    _diffusivity_name(getParam<MaterialPropertyName>("diffusivity_name")),
+    _diffusivity(getMaterialProperty<Real>(_diffusivity_name))
+{
+}
 
 Real
 MaterialDiffusion::computeQpResidual()
