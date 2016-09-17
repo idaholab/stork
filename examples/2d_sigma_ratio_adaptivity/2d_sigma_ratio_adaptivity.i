@@ -1,5 +1,3 @@
-# This is example has both a gain and a loss term, so solution should reach steady state
-
 [Mesh]
   type = GeneratedMesh
   dim = 2
@@ -67,9 +65,33 @@
 []
 
 [UserObjects]
+  [./inserter_circle_average]
+    type = CircleAverageMaterialProperty
+    mat_prop = diffusivity
+    periodic_variable = u
+    inserter = inserter
+    radius = 0.2
+  [../]
+  [./circle_average]
+    type = CircleAverageMaterialProperty
+    mat_prop = diffusivity
+    periodic_variable = u
+  [../]
   [./random_point_uo]
     type = RandomPointUserObject
     seed = 1
+  [../]
+  [./gaussian_uo]
+    type = GaussianUserObject
+    sigma = 0.05
+    use_random_points = true
+    random_point_user_object = random_point_uo
+    periodic_variable = u
+    scale = 3
+  [../]
+  [./circle_max_original_element_size_uo]
+    type = CircleMaxOriginalElementSize
+    periodic_variable = u
   [../]
   [./inserter]
     type = EventInserter
@@ -80,25 +102,22 @@
     seed = 3
     verbose = true
     track_old_events = true
-    removal_method = time
-    removal_time = 3.0
-  [../]
-  [./gaussian_uo]
-    type = GaussianUserObject
-    sigma = 0.05
-    use_random_points = true
-    random_point_user_object = random_point_uo
-    periodic_variable = u
-    scale = 3.0
+    removal_method = sigma_element_size_ratio
+    removal_sigma_element_size_ratio = 2.0
+    radius = 3.0
+    gaussian_user_object = gaussian_uo
+    circle_average_material_property_user_object = circle_average
+    inserter_circle_average_material_property_user_object = inserter_circle_average
+    circle_max_original_element_size_user_object = circle_max_original_element_size_uo
   [../]
 []
 
 [Adaptivity]
   initial_marker = event_marker
-  initial_steps = 4
+  initial_steps = 10
   marker = event_marker
-  cycles_per_step = 4
-  max_h_level = 2
+  cycles_per_step = 10
+  max_h_level = 0
   recompute_markers_during_cycles = true
   [./Markers]
     [./event_marker]
@@ -109,6 +128,7 @@
       coarsen_events = true
       verbose = true
       periodic_variable = u
+      event_sigma_mesh_ratio = 2.0
     [../]
   [../]
 []
