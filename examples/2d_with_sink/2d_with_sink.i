@@ -32,6 +32,7 @@
   [./diff]
     type = MaterialDiffusion
     variable = u
+    diffusivity_name = diffusivity
   [../]
 
   [./sink]
@@ -147,7 +148,7 @@
   [./dt]
     type = TimestepSize
   [../]
-  [./integral]
+  [./average]
     type = ElementAverageValue
     variable = u
   [../]

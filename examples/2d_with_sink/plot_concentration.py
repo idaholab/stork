@@ -11,7 +11,7 @@ scale = 3.0 # scale of Gaussian source term
 
 data=np.loadtxt('2d_with_sink_out.csv', delimiter=',', skiprows=1)
 
-plt.plot(data[:,0], data[:,2], 'r-', label='solution')
+plt.plot(data[:,0], data[:,1], 'r-', label='solution')
 plt.xlabel('time')
 plt.ylabel('average concentration')
 
