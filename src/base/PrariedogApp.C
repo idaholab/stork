@@ -18,6 +18,8 @@
 #include "MaterialSinkKernel.h"
 #include "CircleMaxOriginalElementSize.h"
 #include "CircleMaxOriginalElementSizePPS.h"
+#include "SinkMapUserObject.h"
+#include "SinkMapAux.h"
 
 template<>
 InputParameters validParams<PrariedogApp>()
@@ -60,6 +62,8 @@ extern "C" void PrariedogApp__registerObjects(Factory & factory) { PrariedogApp:
 void
 PrariedogApp::registerObjects(Factory & factory)
 {
+  registerAuxKernel(SinkMapAux);
+
   registerFunction(GaussianFunction);
 
   registerKernel(EventInserterSource);
@@ -78,6 +82,7 @@ PrariedogApp::registerObjects(Factory & factory)
   registerUserObject(GaussianUserObject);
   registerUserObject(CircleAverageMaterialProperty);
   registerUserObject(CircleMaxOriginalElementSize);
+  registerUserObject(SinkMapUserObject);
 }
 
 // External entry point for dynamic syntax association
