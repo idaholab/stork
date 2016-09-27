@@ -39,4 +39,14 @@
     input = 'event_marker_sigma_ratio_coarsening.i'
     exodiff = 'event_marker_sigma_ratio_coarsening_out.e-s002'
   [../]
+  [./sink_marker]
+    type = 'Exodiff'
+    input = 'sink_marker.i'
+    exodiff = 'sink_marker_out.e'
+  [../]
+  [./sink_marker_inside_placement]
+    type = 'Exodiff'
+    input = 'sink_marker_inside.i'
+    exodiff = 'sink_marker_inside_out.e'
+  [../]
 []

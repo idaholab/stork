@@ -18,6 +18,7 @@
 #include "Marker.h"
 #include "EventInserter.h"
 #include "GaussianUserObject.h"
+#include "SinkMapUserObject.h"
 #include "Coupleable.h"
 
 // libmesh includes
@@ -71,6 +72,14 @@ protected:
 
   const bool _refine_by_ratio;
 
+  const bool _refine_sinks;
+
+  const Real _sink_radius;
+
+  const SinkMapUserObject * _sink_map_user_object_ptr;
+
+  const GaussianUserObject * _sink_gaussian_user_object_ptr;
+
   bool _event_incoming;
 
   Point _event_location;
@@ -80,6 +89,8 @@ protected:
   bool _coarsening_needed;
 
   EventList _old_event_list;
+
+  Real _sink_refine_distance;
 };
 
 #endif /* EVENTMARKER_H */

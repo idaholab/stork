@@ -26,6 +26,10 @@ InputParameters validParams<EventMarker>()
   params.addCoupledVar("periodic_variable", "Use perodic boundary conditions of this variable to determine the distance to the function peak location");
   params.addParam<bool>("coarsen_events", false, "Coarsen events at some later time. If true, set 'track_old_events=true' in EventInserter.");
   params.addParam<Real>("event_sigma_mesh_ratio", 2.0, "Refine elements until ratio of event sigma to element size is equal to or greater than this value.");
+  params.addParam<bool>("refine_sinks", false, "Refine the area around sinks from SinkMapUserObject.");
+  params.addParam<Real>("sink_radius", 3.0, "How many sigmas to mark away from sink center.");
+  params.addParam<UserObjectName>("sink_map_user_object", "The name of the SinkMapUserObject.");
+  params.addParam<UserObjectName>("sink_gaussian_user_object", "The name of the GaussianUserObject to use for sink size.");
 
   return params;
 }
@@ -44,6 +48,10 @@ EventMarker::EventMarker(const InputParameters & parameters) :
     _refine_distance(_marker_radius * _gaussian_uo.getSigma()),
     _minimum_element_size(_gaussian_uo.getSigma() / _sigma_mesh_ratio),
     _refine_by_ratio(parameters.isParamSetByUser("event_sigma_mesh_ratio")),
+    _refine_sinks(getParam<bool>("refine_sinks")),
+    _sink_radius(getParam<Real>("sink_radius")),
+    _sink_map_user_object_ptr(NULL),
+    _sink_gaussian_user_object_ptr(NULL),
     _event_incoming(false),
     _event_location(0),
     _input_cycles_per_step(_adaptivity.getCyclesPerStep()),
@@ -53,6 +61,21 @@ EventMarker::EventMarker(const InputParameters & parameters) :
   // Check input logic for coarsening events
   if ((_coarsen_events) && (!_inserter.areOldEventsBeingTracked())) // need to tell EventInserter to track old events
     mooseError("When coarsening old events ('coarsen_events = true'), EventInserter object needs to track old events. Please set 'track_old_events = true' in EventInserter block.");
+
+  // Check input logic for refining around sinks
+  if (_refine_sinks)
+  {
+    if ((parameters.isParamSetByUser("sink_map_user_object")) && (parameters.isParamSetByUser("sink_gaussian_user_object")))
+    {
+      _sink_map_user_object_ptr = &getUserObject<SinkMapUserObject>("sink_map_user_object");
+      _sink_gaussian_user_object_ptr = &getUserObject<GaussianUserObject>("sink_gaussian_user_object");
+      _sink_refine_distance = _sink_radius * _sink_gaussian_user_object_ptr->getSigma();
+    }
+    else if (!parameters.isParamSetByUser("sink_map_user_object"))
+      mooseError("To refine around sinks, need to set 'sink_map_user_object' to the name of the SinkMapUserObject.");
+    else
+      mooseError("To refine around sinks, need to set 'sink_gaussian_user_object' to the name of the GaussianUserObject for sinks.");
+  }
 }
 
 void
@@ -141,6 +164,14 @@ EventMarker::computeElementMarker()
     }
 
     return COARSEN;
+  }
+
+  if (_refine_sinks)
+  {
+    // refine if we are near a sink
+    Real r = _sink_map_user_object_ptr->getDistanceToNearestSink(centroid);
+    if (r < _sink_refine_distance)
+      return REFINE;
   }
 
   return DO_NOTHING; // satisfy compiler
