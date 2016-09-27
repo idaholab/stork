@@ -33,6 +33,8 @@ public:
 
   const std::vector<Real> & getLocalSinkMap(const Elem *) const;
 
+  Real getDistanceToNearestSink(const Point & p) const;
+
 protected:
   /// Distance between sink centers
   const Real _spacing;
@@ -48,6 +50,9 @@ protected:
 
   /// variable number to use for minPeriodicDistance calls (i.e. use the periodicity of this variable)
   int _periodic_var;
+
+  /// holds the dimension of the mesh
+  const unsigned int _dim;
 
   /// Did the mesh change since the last execution of this PP?
   bool _mesh_changed;

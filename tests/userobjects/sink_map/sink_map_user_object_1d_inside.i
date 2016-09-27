@@ -1,12 +1,12 @@
 [Mesh]
   type = GeneratedMesh
-  dim = 2
+  dim = 1
   xmin = -2
   xmax = 2
-  ymin = -1
-  ymax = 1
+  #ymin = -1
+  #ymax = 1
   nx = 100
-  ny = 50
+  #ny = 50
 []
 
 [Variables]
@@ -33,7 +33,7 @@
   [./Periodic]
     [./all]
       variable = u
-      auto_direction = 'x y'
+      auto_direction = 'x'
     [../]
   [../]
 []
@@ -43,7 +43,7 @@
     type = GaussianFunction
     sigma = 0.05
     scale = 2.0
-    peak_location = '0.05 0.95 0.0'
+    peak_location = '0.05 0.0 0.0'
     periodic_variable = u
   [../]
 []
@@ -79,7 +79,7 @@
     strength = 3.0
     gaussian_user_object = sink_gaussian_uo
     periodic_variable = u
-    sink_placement = corner
+    sink_placement = inside
   [../]
 []
 

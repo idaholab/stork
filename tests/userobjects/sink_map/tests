@@ -1,0 +1,22 @@
+[Tests]
+  [./sink_map_1d_corner_placement]
+    type = 'Exodiff'
+    input = 'sink_map_user_object_1d.i'
+    exodiff = 'sink_map_user_object_1d_out.e'
+  [../]
+  [./sink_map_1d_inside_placement]
+    type = 'Exodiff'
+    input = 'sink_map_user_object_1d_inside.i'
+    exodiff = 'sink_map_user_object_1d_inside_out.e'
+  [../]
+  [./sink_map_2d_corner_placement]
+    type = 'Exodiff'
+    input = 'sink_map_user_object_2d.i'
+    exodiff = 'sink_map_user_object_2d_out.e'
+  [../]
+  [./sink_map_2d_inside_placement]
+    type = 'Exodiff'
+    input = 'sink_map_user_object_2d_inside.i'
+    exodiff = 'sink_map_user_object_2d_inside_out.e'
+  [../]
+[]

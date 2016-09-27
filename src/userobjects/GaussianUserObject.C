@@ -43,6 +43,9 @@ GaussianUserObject::GaussianUserObject(const InputParameters & parameters) :
     _periodic_var(isCoupled("periodic_variable") ? (int) coupled("periodic_variable") : -1),
     _mesh(_fe_problem.mesh())
 {
+  // normalization constant so integral over domain (theoretically) equals 1
+  unsigned int dim = _mesh.dimension();
+  _norm = 1.0/(pow(_sigma,dim)*pow(pow(2.0*pi,dim),0.5));
 }
 
 GaussianUserObject::~GaussianUserObject()
@@ -52,10 +55,6 @@ GaussianUserObject::~GaussianUserObject()
 Real
 GaussianUserObject::value(const Point & p, const Point & center) const
 {
-  // normalization constant so integral over domain (theoretically) equals 1
-  unsigned int dim = _mesh.dimension();
-  Real norm = 1.0/(pow(_sigma,dim)*pow(pow(2.0*pi,dim),0.5));
-
   // distance to center depends on perodicity
   Real r;
   if (_periodic_var < 0)
@@ -65,5 +64,13 @@ GaussianUserObject::value(const Point & p, const Point & center) const
 
   Real f = exp(-r*r/2.0/_sigma/_sigma);
 
-  return f*norm*_scale;
+  return f*_norm*_scale;
+}
+
+Real
+GaussianUserObject::value(const Real r) const
+{
+  Real f = exp(-r*r/2.0/_sigma/_sigma);
+
+  return f*_norm*_scale;
 }

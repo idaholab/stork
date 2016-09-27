@@ -58,6 +58,12 @@ public:
    */
   Real value(const Point & p, const Point & center) const;
 
+  /**
+   * Return the function value for the given distance to center
+   * @param r The distance to the function center
+   */
+  Real value(const Real r) const;
+
   const Real getSigma() const { return _sigma; }
 
 protected:
@@ -72,6 +78,9 @@ protected:
 
   /// Reference to mesh
   const MooseMesh & _mesh;
+
+  /// Normalization constant
+  Real _norm;
 };
 
 #endif // GAUSSIANUSEROBJECT_H

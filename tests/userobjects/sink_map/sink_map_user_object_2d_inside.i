@@ -79,7 +79,7 @@
     strength = 3.0
     gaussian_user_object = sink_gaussian_uo
     periodic_variable = u
-    sink_placement = corner
+    sink_placement = inside
   [../]
 []
 

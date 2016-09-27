@@ -39,6 +39,7 @@ SinkMapUserObject::SinkMapUserObject(const InputParameters & parameters) :
     _gaussian_user_object_ptr(NULL),
     _sink_placement(getParam<MooseEnum>("sink_placement")),
     _periodic_var(isCoupled("periodic_variable") ? coupled("periodic_variable") : -1),
+    _dim(_mesh.dimension()),
     _mesh_changed(true)
 {
   _zero_map.assign(_fe_problem.getMaxQps(), 0.0);
@@ -58,10 +59,29 @@ SinkMapUserObject::initialSetup()
     for (Real x_center = _mesh.getMinInDimension(0); x_center <= _mesh.getMinInDimension(0) + _mesh.dimensionWidth(0); x_center += _spacing)
        for (Real y_center = _mesh.getMinInDimension(1); y_center <= _mesh.getMinInDimension(1) + _mesh.dimensionWidth(1); y_center += _spacing)
         _sink_location_list.push_back(Point(x_center, y_center, 0.0));
-
-    for (unsigned int i=0; i<_sink_location_list.size(); i++)
-      _console << _sink_location_list[i] << std::endl;
+        // TODO: 3D
   }
+  else  // centered sink placement
+  {
+    if (_dim == 1)
+    {
+      for (Real x_center = _mesh.getMinInDimension(0) + _spacing/2.0; x_center <= _mesh.getMinInDimension(0) + _mesh.dimensionWidth(0) - _spacing/2.0; x_center += _spacing)
+        _sink_location_list.push_back(Point(x_center, 0.0, 0.0));
+    }
+    else if (_dim == 2)
+    {
+      for (Real x_center = _mesh.getMinInDimension(0) + _spacing/2.0; x_center <= _mesh.getMinInDimension(0) + _mesh.dimensionWidth(0) - _spacing/2.0; x_center += _spacing)
+        for (Real y_center = _mesh.getMinInDimension(1) + _spacing/2.0; y_center <= _mesh.getMinInDimension(1) + _mesh.dimensionWidth(1) - _spacing/2.0; y_center += _spacing)
+          _sink_location_list.push_back(Point(x_center, y_center, 0.0));
+    }
+    else // 3D
+    {
+      // TODO
+    }
+  }
+
+  for (unsigned int i=0; i<_sink_location_list.size(); i++)
+    _console << _sink_location_list[i] << std::endl;
 }
 
 void
@@ -86,26 +106,14 @@ SinkMapUserObject::execute()
     // reserve space for each quadrature point in the element
     _elem_map.assign(_qrule->n_points(), 0);
 
-    // store a random number for each quadrature point
-    unsigned int active_nuclei = 0;
+    // loop over quadrature points in this element
     for (unsigned int qp = 0; qp < _qrule->n_points(); ++qp)
     {
-      Real r, rmin = std::numeric_limits<Real>::max();
-
-      // find the distance to the closest sink location
-      for (unsigned i = 0; i < _sink_location_list.size(); ++i)
-      {
-        // use a non-periodic or periodic distance
-        r = _periodic_var < 0 ?
-              (_q_point[qp] - _sink_location_list[i]).norm() :
-              _mesh.minPeriodicDistance(_periodic_var, _q_point[qp], _sink_location_list[i]);
-        if (r < rmin)
-          rmin = r;
-      }
+      // find distance to nearest sink from this point
+      Real rmin = getDistanceToNearestSink(_q_point[qp]);
 
       // compute sink strength at this location
-      _elem_map[qp] = _gaussian_user_object_ptr->value(rmin, _q_point[qp]);
-      _console << _elem_map[qp] << std::endl;
+      _elem_map[qp] = _strength*std::pow(_spacing, (double) _dim)*_gaussian_user_object_ptr->value(rmin);
     }
 
     // insert vector into map
@@ -140,4 +148,22 @@ SinkMapUserObject::getLocalSinkMap(const Elem * elem) const
     mooseError("no sinks found in element " << elem->id());
 
   return i->second;
+}
+
+Real
+SinkMapUserObject::getDistanceToNearestSink(const Point & p) const
+{
+  Real r, rmin = std::numeric_limits<Real>::max();
+
+  // find the distance to the closest sink location
+  for (unsigned i = 0; i < _sink_location_list.size(); ++i)
+  {
+    // use a non-periodic or periodic distance
+    r = _periodic_var < 0 ?
+          (p - _sink_location_list[i]).norm() :
+          _mesh.minPeriodicDistance(_periodic_var, p, _sink_location_list[i]);
+    if (r < rmin)
+      rmin = r;
+  }
+  return rmin;
 }
