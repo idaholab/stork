@@ -56,6 +56,7 @@ EventMarker::EventMarker(const InputParameters & parameters) :
     _event_location(0),
     _input_cycles_per_step(_adaptivity.getCyclesPerStep()),
     _coarsening_needed(false),
+    _sink_refinement_needed(false),
     _old_event_list(0)
 {
   // Check input logic for coarsening events
@@ -83,6 +84,10 @@ EventMarker::initialSetup()
 {
   // need to check for initial events
   checkForEvent();
+
+  // refine around sinks
+  if (_refine_sinks)
+    _sink_refinement_needed = true;
 }
 
 void
@@ -118,17 +123,27 @@ EventMarker::timestepSetup()
   if ((_coarsen_events) && (_inserter.wasOldEventRemoved()) && (_event_incoming))
     if (_verbose)
       _console << "EventMarker detected both refinement and coarsening are needed, so coarsening was skipped..." << std::endl;
+
+  // might need to re-refine around sinks if coarsening is happening to a nearby event
+  if ((_refine_sinks) && (_coarsening_needed))
+    _sink_refinement_needed = true;
+  else
+    _sink_refinement_needed = false;
 }
 
 Marker::MarkerValue
 EventMarker::computeElementMarker()
 {
+  // default marker value
+  MarkerValue marker_value = DO_NOTHING;
+
+  // get centroid for this element
+  // optionally do qp's
   Point centroid = _current_elem->centroid();
 
   // refine mesh if event is incoming
   if (_event_incoming)
   {
-
     // distance to center depends on perodicity
     Real r;
     if (_periodic_var < 0)
@@ -138,43 +153,42 @@ EventMarker::computeElementMarker()
 
     if (r < _refine_distance)  // we are near the event
       if (!_refine_by_ratio)  // refine if the distance is the only critereon
-        return REFINE;
+        marker_value = REFINE;
       else if (_current_elem->hmax() > _minimum_element_size) // or if screening by element size, check the element size
-        return REFINE;
-
-    return DO_NOTHING; // default
+        marker_value = REFINE;
   }
 
   if (_coarsening_needed)
   {
+    // default to coarsen
+    marker_value = COARSEN;
+
     // coarsen everywhere except inside old events
     for (unsigned int i=0; i<_old_event_list.size(); i++)
     {
-      _event_location = _old_event_list[i].second;
+      Point old_event_location = _old_event_list[i].second;
       // TODO: remove code duplication
       // distance to center depends on perodicity
       Real r;
       if (_periodic_var < 0)
-        r = (_event_location - centroid).norm();
+        r = (old_event_location - centroid).norm();
       else
-        r = _mesh.minPeriodicDistance(_periodic_var, _event_location, centroid);
+        r = _mesh.minPeriodicDistance(_periodic_var, old_event_location, centroid);
 
       if (r < _refine_distance)
-        return DO_NOTHING;
+        marker_value = DO_NOTHING;
     }
-
-    return COARSEN;
   }
 
-  if (_refine_sinks)
+  if (_sink_refinement_needed)
   {
     // refine if we are near a sink
     Real r = _sink_map_user_object_ptr->getDistanceToNearestSink(centroid);
     if (r < _sink_refine_distance)
-      return REFINE;
+      marker_value = REFINE;
   }
 
-  return DO_NOTHING; // satisfy compiler
+  return marker_value;
 }
 
 void

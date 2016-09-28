@@ -88,9 +88,12 @@ protected:
 
   bool _coarsening_needed;
 
+  bool _sink_refinement_needed;
+
   EventList _old_event_list;
 
   Real _sink_refine_distance;
+
 };
 
 #endif /* EVENTMARKER_H */
