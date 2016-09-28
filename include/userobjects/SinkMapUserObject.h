@@ -48,6 +48,9 @@ protected:
   /// How to place sinks on domain, either "corner" or "inside"
   const MooseEnum _sink_placement;
 
+  /// Shape to use for sinks when running a 3D problem, either "spheres" or "lines"
+  const MooseEnum _sink_shape_3d;
+
   /// variable number to use for minPeriodicDistance calls (i.e. use the periodicity of this variable)
   int _periodic_var;
 

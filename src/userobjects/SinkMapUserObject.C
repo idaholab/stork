@@ -16,12 +16,14 @@ template<>
 InputParameters validParams<SinkMapUserObject>()
 {
   MooseEnum sink_placement("corner inside", "corner");
+  MooseEnum sink_shape_3d("spheres lines", "lines");
 
   InputParameters params = validParams<ElementUserObject>();
   params.addRequiredParam<Real>("spacing", "Distance to space sink centers");
   params.addRequiredParam<Real>("strength", "Average strength of the overall sink map.");
   params.addRequiredParam<UserObjectName>("gaussian_user_object", "Name of the GaussianUserObject to use for sink shapes.");
   params.addParam<MooseEnum>("sink_placement", sink_placement, "How to place sinks on domain, choices are 'corner' to place them in the corners (and wrap around), and 'inside' to keep them away from edges.");
+  params.addParam<MooseEnum>("sink_shape_3d", sink_shape_3d, "Shape to use for sinks in 3D, choices are 'spheres' or 'lines'.");
   params.addCoupledVar("periodic_variable", "Use the periodicity settings of this variable to populate the grain map");
 
   MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
@@ -38,6 +40,7 @@ SinkMapUserObject::SinkMapUserObject(const InputParameters & parameters) :
     _strength(getParam<Real>("strength")),
     _gaussian_user_object_ptr(NULL),
     _sink_placement(getParam<MooseEnum>("sink_placement")),
+    _sink_shape_3d(getParam<MooseEnum>("sink_shape_3d")),
     _periodic_var(isCoupled("periodic_variable") ? coupled("periodic_variable") : -1),
     _dim(_mesh.dimension()),
     _mesh_changed(true)
@@ -57,27 +60,26 @@ SinkMapUserObject::initialSetup()
   {
     // yes this is dumb, but it works
     for (Real x_center = _mesh.getMinInDimension(0); x_center <= _mesh.getMinInDimension(0) + _mesh.dimensionWidth(0); x_center += _spacing)
-       for (Real y_center = _mesh.getMinInDimension(1); y_center <= _mesh.getMinInDimension(1) + _mesh.dimensionWidth(1); y_center += _spacing)
-        _sink_location_list.push_back(Point(x_center, y_center, 0.0));
-        // TODO: 3D
+      for (Real y_center = _mesh.getMinInDimension(1); y_center <= _mesh.getMinInDimension(1) + _mesh.dimensionWidth(1); y_center += _spacing)
+        if ((_dim == 3) && (_sink_shape_3d == "spheres"))
+          for (Real z_center = _mesh.getMinInDimension(2); z_center <= _mesh.getMinInDimension(2) + _mesh.dimensionWidth(2); z_center += _spacing)
+            _sink_location_list.push_back(Point(x_center, y_center, z_center));
+        else
+          _sink_location_list.push_back(Point(x_center, y_center, 0.0));
   }
   else  // centered sink placement
   {
     if (_dim == 1)
-    {
       for (Real x_center = _mesh.getMinInDimension(0) + _spacing/2.0; x_center <= _mesh.getMinInDimension(0) + _mesh.dimensionWidth(0) - _spacing/2.0; x_center += _spacing)
         _sink_location_list.push_back(Point(x_center, 0.0, 0.0));
-    }
-    else if (_dim == 2)
-    {
+    else
       for (Real x_center = _mesh.getMinInDimension(0) + _spacing/2.0; x_center <= _mesh.getMinInDimension(0) + _mesh.dimensionWidth(0) - _spacing/2.0; x_center += _spacing)
         for (Real y_center = _mesh.getMinInDimension(1) + _spacing/2.0; y_center <= _mesh.getMinInDimension(1) + _mesh.dimensionWidth(1) - _spacing/2.0; y_center += _spacing)
-          _sink_location_list.push_back(Point(x_center, y_center, 0.0));
-    }
-    else // 3D
-    {
-      // TODO
-    }
+          if ((_dim == 3) && (_sink_shape_3d == "spheres"))
+            for (Real z_center = _mesh.getMinInDimension(2) + _spacing/2.0; z_center <= _mesh.getMinInDimension(2) + _mesh.dimensionWidth(2) - _spacing/2.0; z_center += _spacing)
+              _sink_location_list.push_back(Point(x_center, y_center, z_center));
+          else
+            _sink_location_list.push_back(Point(x_center, y_center, 0.0));
   }
 
   for (unsigned int i=0; i<_sink_location_list.size(); i++)
@@ -155,13 +157,21 @@ SinkMapUserObject::getDistanceToNearestSink(const Point & p) const
 {
   Real r, rmin = std::numeric_limits<Real>::max();
 
+  // to do 3D lines, need to change z-component of point to that of a sink
+  // so the distance to the line is based on the xy-plane distance
+  Point new_p;
+  if ((_dim == 3) && (_sink_shape_3d == "lines"))
+    new_p = Point(p(0), p(1), 0.0);
+  else
+    new_p = Point(p(0), p(1), p(2));
+
   // find the distance to the closest sink location
   for (unsigned i = 0; i < _sink_location_list.size(); ++i)
   {
     // use a non-periodic or periodic distance
     r = _periodic_var < 0 ?
-          (p - _sink_location_list[i]).norm() :
-          _mesh.minPeriodicDistance(_periodic_var, p, _sink_location_list[i]);
+          (new_p - _sink_location_list[i]).norm() :
+          _mesh.minPeriodicDistance(_periodic_var, new_p, _sink_location_list[i]);
     if (r < rmin)
       rmin = r;
   }
