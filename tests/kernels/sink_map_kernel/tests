@@ -1,0 +1,7 @@
+[Tests]
+  [./sink_map_kernel]
+    type = 'Exodiff'
+    input = 'sink_map_kernel.i'
+    exodiff = 'sink_map_kernel_out.e'
+  [../]
+[]

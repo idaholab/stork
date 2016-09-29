@@ -20,6 +20,7 @@
 #include "CircleMaxOriginalElementSizePPS.h"
 #include "SinkMapUserObject.h"
 #include "SinkMapAux.h"
+#include "SinkMapKernel.h"
 
 template<>
 InputParameters validParams<PrariedogApp>()
@@ -69,6 +70,7 @@ PrariedogApp::registerObjects(Factory & factory)
   registerKernel(EventInserterSource);
   registerKernel(MaterialDiffusion);
   registerKernel(MaterialSinkKernel);
+  registerKernel(SinkMapKernel);
 
   registerMarker(EventMarker);
 
