@@ -153,7 +153,7 @@
       marker_radius = 3.0
       verbose = true
       refine_sinks = true
-      sink_radius = 6.0
+      sink_marker_radius = 6.0
       sink_map_user_object = sink_map_user_object
       sink_gaussian_user_object = sink_gaussian_uo
     [../]

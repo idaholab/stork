@@ -142,7 +142,7 @@
 [Adaptivity]
   initial_marker = event_marker
   initial_steps = 10
-  max_h_level = 2
+  max_h_level = 0
   recompute_markers_during_cycles = true
   [./Markers]
     [./event_marker]
@@ -155,6 +155,7 @@
       sink_marker_radius = 6.0
       sink_map_user_object = sink_map_user_object
       sink_gaussian_user_object = sink_gaussian_uo
+      sink_sigma_mesh_ratio = 1.0
     [../]
   [../]
 []

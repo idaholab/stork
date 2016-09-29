@@ -49,4 +49,9 @@
     input = 'sink_marker_inside.i'
     exodiff = 'sink_marker_inside_out.e'
   [../]
+  [./sink_marker_sigma_ratio_refinement]
+    type = 'Exodiff'
+    input = 'sink_marker_sigma_ratio_refinement.i'
+    exodiff = 'sink_marker_sigma_ratio_refinement_out.e'
+  [../]
 []

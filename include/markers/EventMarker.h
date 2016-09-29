@@ -74,7 +74,11 @@ protected:
 
   const bool _refine_sinks;
 
-  const Real _sink_radius;
+  const Real _sink_marker_radius;
+
+  const bool  _refine_sinks_by_ratio;
+
+  const Real  _sink_sigma_mesh_ratio;
 
   const SinkMapUserObject * _sink_map_user_object_ptr;
 
@@ -94,6 +98,7 @@ protected:
 
   Real _sink_refine_distance;
 
+  Real _minimum_sink_element_size;
 };
 
 #endif /* EVENTMARKER_H */
