@@ -58,5 +58,6 @@
     type = 'Exodiff'
     input = 'sink_marker_3d.i'
     exodiff = 'sink_marker_3d_out.e'
+    heavy = true
   [../]
 []
