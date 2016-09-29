@@ -80,6 +80,9 @@ protected:
 
   /// Sigma of sink Gaussian
   Real _sigma;
+
+  /// Normalization constant for spaced sinks
+  Real _norm;
 };
 
 #endif //SINKMAPUSEROBJECT_H

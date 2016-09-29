@@ -82,6 +82,13 @@ SinkMapUserObject::initialSetup()
             _sink_location_list.push_back(Point(x_center, y_center, 0.0));
   }
 
+  // compute normalization constant
+  _norm = _strength*std::pow(_spacing, (double) _dim);
+
+  // normalization constant from GaussianUserObject has an additional 1/(sigma*sqrt(2*pi)) since mesh is in 3D but lines are in 2D
+  if ((_dim == 3) && (_sink_shape_3d == "lines"))
+    _norm *= _sigma*std::sqrt(2.0*libMesh::pi);
+
   for (unsigned int i=0; i<_sink_location_list.size(); i++)
     _console << _sink_location_list[i] << std::endl;
 }
@@ -115,7 +122,7 @@ SinkMapUserObject::execute()
       Real rmin = getDistanceToNearestSink(_q_point[qp]);
 
       // compute sink strength at this location
-      _elem_map[qp] = _strength*std::pow(_spacing, (double) _dim)*_gaussian_user_object_ptr->value(rmin);
+      _elem_map[qp] = _norm*_gaussian_user_object_ptr->value(rmin);
     }
 
     // insert vector into map
