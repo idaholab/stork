@@ -89,6 +89,7 @@ SinkMapUserObject::initialSetup()
   if ((_dim == 3) && (_sink_shape_3d == "lines"))
     _norm *= _sigma*std::sqrt(2.0*libMesh::pi);
 
+  // print sink centers
   for (unsigned int i=0; i<_sink_location_list.size(); i++)
     _console << _sink_location_list[i] << std::endl;
 }
@@ -170,7 +171,7 @@ SinkMapUserObject::getDistanceToNearestSink(const Point & p) const
   if ((_dim == 3) && (_sink_shape_3d == "lines"))
     new_p = Point(p(0), p(1), 0.0);
   else
-    new_p = Point(p(0), p(1), p(2));
+    new_p = p;
 
   // find the distance to the closest sink location
   for (unsigned i = 0; i < _sink_location_list.size(); ++i)
