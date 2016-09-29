@@ -25,13 +25,19 @@ InputParameters validParams<SinkMapAux>()
 
 SinkMapAux::SinkMapAux(const InputParameters & parameters) :
     AuxKernel(parameters),
-    _sink_map_uo(getUserObject<SinkMapUserObject>("sink_map_user_object"))
+    _sink_map_uo(getUserObject<SinkMapUserObject>("sink_map_user_object")),
+    _element_sink_map(0)
 {
+}
+
+void
+SinkMapAux::precalculateValue()
+{
+  _element_sink_map = _sink_map_uo.getLocalSinkMap(_current_elem);
 }
 
 Real
 SinkMapAux::computeValue()
 {
-  std::vector<Real> local_sink_map = _sink_map_uo.getLocalSinkMap(_current_elem);
-  return local_sink_map[_qp];
+  return _element_sink_map[_qp];
 }

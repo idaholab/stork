@@ -32,9 +32,11 @@ public:
   virtual ~SinkMapAux() {}
 
 protected:
+  virtual void precalculateValue();
   virtual Real computeValue();
 
   const SinkMapUserObject & _sink_map_uo;
+  std::vector<Real> _element_sink_map;
 };
 
 #endif // SINKMAPAUX_H
