@@ -33,15 +33,29 @@ SinkMapKernel::SinkMapKernel(const InputParameters & parameters) :
 }
 
 void
-SinkMapKernel::precalculateResidual()
+SinkMapKernel::computeResidual()
 {
+  // get the current element's sink strength vector
   _element_sink_map = _sink_map_uo.getLocalSinkMap(_current_elem);
+
+  // now call the base class's function
+  Reaction::computeResidual();
 }
 
 Real
 SinkMapKernel::computeQpResidual()
 {
   return _diffusivity[_qp] * _element_sink_map[_qp] * Reaction::computeQpResidual();
+}
+
+void
+SinkMapKernel::computeJacobian()
+{
+  // get the current element's sink strength vector
+  _element_sink_map = _sink_map_uo.getLocalSinkMap(_current_elem);
+
+  // now call the base class's function
+  Reaction::computeJacobian();
 }
 
 Real

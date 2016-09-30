@@ -29,9 +29,10 @@ public:
   SinkMapKernel(const InputParameters & parameters);
 
 protected:
-  virtual void precalculateResidual();
-  virtual Real computeQpResidual();
-  virtual Real computeQpJacobian();
+  virtual void computeResidual() override;
+  virtual Real computeQpResidual() override;
+  virtual void computeJacobian() override;
+  virtual Real computeQpJacobian() override;
 
   const SinkMapUserObject & _sink_map_uo;
   const MaterialProperty<Real> & _diffusivity;
