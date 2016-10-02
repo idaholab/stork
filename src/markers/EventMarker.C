@@ -196,6 +196,8 @@ EventMarker::computeElementMarker()
         marker_value = REFINE;
       else if (_current_elem->hmax() > _minimum_sink_element_size) // or if screening by element size, check the element size
         marker_value = REFINE;
+      else if (marker_value == COARSEN) // negate coarsening of nearby event
+        marker_value = DO_NOTHING;
   }
 
   return marker_value;
