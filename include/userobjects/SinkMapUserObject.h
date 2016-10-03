@@ -57,7 +57,7 @@ protected:
   /// holds the dimension of the mesh
   const unsigned int _dim;
 
-  /// Did the mesh change since the last execution of this PP?
+  /// Did the mesh change since the last execution of this User Object?
   bool _mesh_changed;
 
   /// Do we need to rebuild the map during this timestep?
