@@ -24,7 +24,7 @@ InputParameters validParams<SinkMapUserObject>()
   params.addRequiredParam<UserObjectName>("gaussian_user_object", "Name of the GaussianUserObject to use for sink shapes.");
   params.addParam<MooseEnum>("sink_placement", sink_placement, "How to place sinks on domain, choices are 'corner' to place them in the corners (and wrap around), and 'inside' to keep them away from edges.");
   params.addParam<MooseEnum>("sink_shape_3d", sink_shape_3d, "Shape to use for sinks in 3D, choices are 'spheres' or 'lines'.");
-  params.addCoupledVar("periodic_variable", "Use the periodicity settings of this variable to populate the grain map");
+  params.addCoupledVar("periodic_variable", "Use the periodicity settings of this variable to populate the sink map");
 
   MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
   // the mapping needs to run at timestep begin, which is after the adaptivity
