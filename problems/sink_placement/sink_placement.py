@@ -33,7 +33,7 @@ y_centers = np.linspace(ymin+spacing/2.0, ymax-spacing/2.0, num=Ly/spacing,endpo
 
 Q=np.zeros((np.size(x_array),np.size(y_array)))
 
-# centered sinks in 1D can screw up in the y dimension 
+# centered sinks in 1D can screw up in the y dimension
 if np.size(y_centers) == 0:
   y_centers = np.array([0.0]);
 
