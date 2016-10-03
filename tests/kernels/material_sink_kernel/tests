@@ -1,0 +1,7 @@
+[Tests]
+  [./material_sink_kernel]
+    type = 'Exodiff'
+    input = 'material_sink_kernel.i'
+    exodiff = 'material_sink_kernel_out.e'
+  [../]
+[]

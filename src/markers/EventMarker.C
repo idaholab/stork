@@ -26,6 +26,11 @@ InputParameters validParams<EventMarker>()
   params.addCoupledVar("periodic_variable", "Use perodic boundary conditions of this variable to determine the distance to the function peak location");
   params.addParam<bool>("coarsen_events", false, "Coarsen events at some later time. If true, set 'track_old_events=true' in EventInserter.");
   params.addParam<Real>("event_sigma_mesh_ratio", 2.0, "Refine elements until ratio of event sigma to element size is equal to or greater than this value.");
+  params.addParam<bool>("refine_sinks", false, "Refine the area around sinks from SinkMapUserObject.");
+  params.addParam<Real>("sink_marker_radius", 3.0, "How many sigmas to mark away from sink center.");
+  params.addParam<Real>("sink_sigma_mesh_ratio", 2.0, "Refine elements until ratio of sink sigma to element size is equal to or greater than this value.");
+  params.addParam<UserObjectName>("sink_map_user_object", "The name of the SinkMapUserObject.");
+  params.addParam<UserObjectName>("sink_gaussian_user_object", "The name of the GaussianUserObject to use for sink size.");
 
   return params;
 }
@@ -44,15 +49,39 @@ EventMarker::EventMarker(const InputParameters & parameters) :
     _refine_distance(_marker_radius * _gaussian_uo.getSigma()),
     _minimum_element_size(_gaussian_uo.getSigma() / _sigma_mesh_ratio),
     _refine_by_ratio(parameters.isParamSetByUser("event_sigma_mesh_ratio")),
+    _refine_sinks(getParam<bool>("refine_sinks")),
+    _sink_marker_radius(getParam<Real>("sink_marker_radius")),
+    _refine_sinks_by_ratio(parameters.isParamSetByUser("sink_sigma_mesh_ratio")),
+    _sink_sigma_mesh_ratio(getParam<Real>("sink_sigma_mesh_ratio")),
+    _sink_map_user_object_ptr(NULL),
+    _sink_gaussian_user_object_ptr(NULL),
     _event_incoming(false),
     _event_location(0),
     _input_cycles_per_step(_adaptivity.getCyclesPerStep()),
     _coarsening_needed(false),
+    _sink_refinement_needed(false),
     _old_event_list(0)
 {
   // Check input logic for coarsening events
   if ((_coarsen_events) && (!_inserter.areOldEventsBeingTracked())) // need to tell EventInserter to track old events
     mooseError("When coarsening old events ('coarsen_events = true'), EventInserter object needs to track old events. Please set 'track_old_events = true' in EventInserter block.");
+
+  // Check input logic for refining around sinks
+  if (_refine_sinks)
+  {
+    if ((parameters.isParamSetByUser("sink_map_user_object")) && (parameters.isParamSetByUser("sink_gaussian_user_object")))
+    {
+      _sink_map_user_object_ptr = &getUserObject<SinkMapUserObject>("sink_map_user_object");
+      _sink_gaussian_user_object_ptr = &getUserObject<GaussianUserObject>("sink_gaussian_user_object");
+      _sink_refine_distance = _sink_marker_radius * _sink_gaussian_user_object_ptr->getSigma();
+      if (_refine_sinks_by_ratio)
+        _minimum_sink_element_size = _sink_gaussian_user_object_ptr->getSigma() / _sink_sigma_mesh_ratio;
+    }
+    else if (!parameters.isParamSetByUser("sink_map_user_object"))
+      mooseError("To refine around sinks, need to set 'sink_map_user_object' to the name of the SinkMapUserObject.");
+    else
+      mooseError("To refine around sinks, need to set 'sink_gaussian_user_object' to the name of the GaussianUserObject for sinks.");
+  }
 }
 
 void
@@ -60,6 +89,10 @@ EventMarker::initialSetup()
 {
   // need to check for initial events
   checkForEvent();
+
+  // refine around sinks
+  if (_refine_sinks)
+    _sink_refinement_needed = true;
 }
 
 void
@@ -95,17 +128,27 @@ EventMarker::timestepSetup()
   if ((_coarsen_events) && (_inserter.wasOldEventRemoved()) && (_event_incoming))
     if (_verbose)
       _console << "EventMarker detected both refinement and coarsening are needed, so coarsening was skipped..." << std::endl;
+
+  // might need to re-refine around sinks if coarsening is happening to a nearby event
+  if ((_refine_sinks) && (_coarsening_needed))
+    _sink_refinement_needed = true;
+  else
+    _sink_refinement_needed = false;
 }
 
 Marker::MarkerValue
 EventMarker::computeElementMarker()
 {
+  // default marker value
+  MarkerValue marker_value = DO_NOTHING;
+
+  // get centroid for this element
+  // optionally do qp's
   Point centroid = _current_elem->centroid();
 
   // refine mesh if event is incoming
   if (_event_incoming)
   {
-
     // distance to center depends on perodicity
     Real r;
     if (_periodic_var < 0)
@@ -114,36 +157,50 @@ EventMarker::computeElementMarker()
       r = _mesh.minPeriodicDistance(_periodic_var, _event_location, centroid);
 
     if (r < _refine_distance)  // we are near the event
-      if (!_refine_by_ratio)  // refine if the distance is the only critereon
-        return REFINE;
+      if (!_refine_by_ratio)  // refine if distance is the only critereon
+        marker_value = REFINE;
       else if (_current_elem->hmax() > _minimum_element_size) // or if screening by element size, check the element size
-        return REFINE;
-
-    return DO_NOTHING; // default
+        marker_value = REFINE;
   }
 
   if (_coarsening_needed)
   {
+    // default to coarsen
+    marker_value = COARSEN;
+
     // coarsen everywhere except inside old events
     for (unsigned int i=0; i<_old_event_list.size(); i++)
     {
-      _event_location = _old_event_list[i].second;
+      Point old_event_location = _old_event_list[i].second;
       // TODO: remove code duplication
       // distance to center depends on perodicity
       Real r;
       if (_periodic_var < 0)
-        r = (_event_location - centroid).norm();
+        r = (old_event_location - centroid).norm();
       else
-        r = _mesh.minPeriodicDistance(_periodic_var, _event_location, centroid);
+        r = _mesh.minPeriodicDistance(_periodic_var, old_event_location, centroid);
 
       if (r < _refine_distance)
-        return DO_NOTHING;
+        marker_value = DO_NOTHING;
     }
-
-    return COARSEN;
   }
 
-  return DO_NOTHING; // satisfy compiler
+  if (_sink_refinement_needed)
+  {
+    // get distance to nearest sink
+    Real r = _sink_map_user_object_ptr->getDistanceToNearestSink(centroid);
+
+    // refine if close enough
+    if (r < _sink_refine_distance) // we are near a sink
+      if (marker_value == COARSEN) // no coarsening occurs during initial refinement, so sinks are already refined and we need to negate coarsening of nearby event
+        marker_value = DO_NOTHING;
+      else if (!_refine_sinks_by_ratio)  // refine if distance is the only critereon
+        marker_value = REFINE;
+      else if (_current_elem->hmax() > _minimum_sink_element_size) // or if screening by element size, check the element size
+        marker_value = REFINE;
+  }
+
+  return marker_value;
 }
 
 void

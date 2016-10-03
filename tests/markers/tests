@@ -39,4 +39,30 @@
     input = 'event_marker_sigma_ratio_coarsening.i'
     exodiff = 'event_marker_sigma_ratio_coarsening_out.e-s002'
   [../]
+  [./sink_marker]
+    type = 'Exodiff'
+    input = 'sink_marker.i'
+    exodiff = 'sink_marker_out.e'
+  [../]
+  [./sink_marker_inside_placement]
+    type = 'Exodiff'
+    input = 'sink_marker_inside.i'
+    exodiff = 'sink_marker_inside_out.e'
+  [../]
+  [./sink_marker_sigma_ratio_refinement]
+    type = 'Exodiff'
+    input = 'sink_marker_sigma_ratio_refinement.i'
+    exodiff = 'sink_marker_sigma_ratio_refinement_out.e'
+  [../]
+  [./sink_marker_3d]
+    type = 'Exodiff'
+    input = 'sink_marker_3d.i'
+    exodiff = 'sink_marker_3d_out.e'
+    heavy = true
+  [../]
+  [./event_marker_sigma_coarsening_near_refined_sink]
+    type = 'Exodiff'
+    input = 'event_marker_sigma_coarsening_near_refined_sink.i'
+    exodiff = 'event_marker_sigma_coarsening_near_refined_sink_out.e-s002'
+  [../]
 []
