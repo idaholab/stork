@@ -45,7 +45,7 @@ GaussianUserObject::GaussianUserObject(const InputParameters & parameters) :
 {
   // normalization constant so integral over domain (theoretically) equals 1
   unsigned int dim = _mesh.dimension();
-  _norm = 1.0/(pow(_sigma,dim)*pow(pow(2.0*pi,dim),0.5));
+  _norm = 1.0/std::pow(_sigma*std::sqrt(2.0*libMesh::pi), Real(dim));
 }
 
 GaussianUserObject::~GaussianUserObject()
