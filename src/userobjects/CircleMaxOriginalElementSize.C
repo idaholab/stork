@@ -39,7 +39,6 @@ CircleMaxOriginalElementSize::value(const Point & p, const Real & radius) const
 
   Real min_distance = std::numeric_limits<Real>::max();
   dof_id_type closest_element;
-  bool found_max = false;
 
   // Loop over elements
   for (std::map<dof_id_type, Point>::const_iterator it = _centroids.begin();

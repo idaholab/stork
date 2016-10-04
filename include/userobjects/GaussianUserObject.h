@@ -64,7 +64,10 @@ public:
    */
   Real value(const Real r) const;
 
-  const Real getSigma() const { return _sigma; }
+  /**
+   * Return the sigma value associated with this object
+   */
+  Real getSigma() const { return _sigma; }
 
 protected:
   /// Value to multiply function by
