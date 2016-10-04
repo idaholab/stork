@@ -60,7 +60,7 @@ protected:
 
   const bool _verbose;
 
-  const unsigned int _periodic_var;
+  const int _periodic_var;
 
   const bool _coarsen_events;
 
