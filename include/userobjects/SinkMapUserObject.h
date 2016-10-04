@@ -33,7 +33,13 @@ public:
 
   const std::vector<Real> & getLocalSinkMap(const Elem *) const;
 
+  std::vector<Point> getSinkLocationList () const { return _sink_location_list; }
+
   Real getDistanceToNearestSink(const Point & p) const;
+
+  Real getStrength() const { return _strength; }
+
+  const MooseEnum & getPlacement() const { return _sink_placement; }
 
 protected:
   /// Distance between sink centers

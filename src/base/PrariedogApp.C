@@ -21,6 +21,7 @@
 #include "SinkMapUserObject.h"
 #include "SinkMapAux.h"
 #include "SinkMapKernel.h"
+#include "DiracSinkMapKernel.h"
 
 template<>
 InputParameters validParams<PrariedogApp>()
@@ -64,6 +65,8 @@ void
 PrariedogApp::registerObjects(Factory & factory)
 {
   registerAuxKernel(SinkMapAux);
+
+  registerDiracKernel(DiracSinkMapKernel);
 
   registerFunction(GaussianFunction);
 
