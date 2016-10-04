@@ -1,0 +1,12 @@
+[Tests]
+  [./dirac_sink_map_kernel]
+    type = 'Exodiff'
+    input = 'dirac_sink_map_kernel.i'
+    exodiff = 'dirac_sink_map_kernel_out.e'
+  [../]
+  [./dirac_sink_map_kernel_error]
+    type = 'RunException'
+    input = 'dirac_sink_map_kernel_error.i'
+    expect_err = 'Dirac sinks do not work at the corners'
+  [../]
+[]
