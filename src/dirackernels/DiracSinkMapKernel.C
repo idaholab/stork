@@ -65,3 +65,9 @@ DiracSinkMapKernel::computeQpResidual()
 {
   return _volume*_sink_strength*_diffusivity[_qp]*_test[_i][_qp]*_u[_qp]/_num_points;
 }
+
+Real
+DiracSinkMapKernel::computeQpJacobian()
+{
+  return _volume*_sink_strength*_diffusivity[_qp]*_test[_i][_qp]*_phi[_j][_qp]/_num_points;
+}

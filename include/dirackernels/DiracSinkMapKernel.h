@@ -32,6 +32,7 @@ public:
 
   virtual void addPoints();
   virtual Real computeQpResidual();
+  virtual Real computeQpJacobian();
 
 protected:
   const SinkMapUserObject & _sink_map_uo;
