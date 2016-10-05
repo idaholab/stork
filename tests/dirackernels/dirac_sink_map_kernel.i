@@ -47,6 +47,7 @@
   [./sinkmap]
     type = DiracSinkMapKernel
     variable = u
+    diffusivity_name = diffusivity
     sink_map_user_object = sink_map_uo
   [../]
 []

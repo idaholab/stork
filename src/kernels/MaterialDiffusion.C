@@ -29,8 +29,7 @@ InputParameters validParams<MaterialDiffusion>()
 
 MaterialDiffusion::MaterialDiffusion(const InputParameters & parameters) :
     Diffusion(parameters),
-    _diffusivity_name(getParam<MaterialPropertyName>("diffusivity_name")),
-    _diffusivity(getMaterialProperty<Real>(_diffusivity_name))
+    _diffusivity(getMaterialProperty<Real>("diffusivity_name"))
 {
 }
 

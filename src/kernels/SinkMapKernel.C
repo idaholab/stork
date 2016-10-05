@@ -20,6 +20,7 @@ InputParameters validParams<SinkMapKernel>()
   InputParameters params = validParams<Reaction>();
 
   params.addRequiredParam<UserObjectName>("sink_map_user_object", "The name of the SinkMapUserObject.");
+  params.addRequiredParam<MaterialPropertyName>("diffusivity_name", "Name of the material property for diffusion coefficient");
 
   return params;
 }
@@ -27,7 +28,7 @@ InputParameters validParams<SinkMapKernel>()
 SinkMapKernel::SinkMapKernel(const InputParameters & parameters) :
     Reaction(parameters),
     _sink_map_uo(getUserObject<SinkMapUserObject>("sink_map_user_object")),
-    _diffusivity(getMaterialProperty<Real>("diffusivity")),
+    _diffusivity(getMaterialProperty<Real>("diffusivity_name")),
     _element_sink_map(0)
 {
 }
