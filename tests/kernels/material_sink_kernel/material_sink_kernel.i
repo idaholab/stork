@@ -41,9 +41,11 @@
     variable = u
     diffusivity_name = diffusivity
   [../]
-  [./sinkmap]
+  [./sink]
     type = MaterialSinkKernel
     variable = u
+    diffusivity_name = diffusivity
+    sink_strength_name = sink_strength
   [../]
 []
 

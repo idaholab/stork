@@ -17,13 +17,17 @@ template<>
 InputParameters validParams<MaterialSinkKernel>()
 {
   InputParameters params = validParams<Reaction>();
+
+  params.addRequiredParam<MaterialPropertyName>("diffusivity_name", "Name of the material property for diffusion coefficient.");
+  params.addRequiredParam<MaterialPropertyName>("sink_strength_name", "Name of the material property for sink strength.");
+
   return params;
 }
 
 MaterialSinkKernel::MaterialSinkKernel(const InputParameters & parameters) :
     Reaction(parameters),
-    _diffusivity(getMaterialProperty<Real>("diffusivity")),
-    _sink_strength(getMaterialProperty<Real>("sink_strength"))
+    _diffusivity(getMaterialProperty<Real>("diffusivity_name")),
+    _sink_strength(getMaterialProperty<Real>("sink_strength_name"))
 {
 }
 
