@@ -36,6 +36,8 @@
   [./sink]
     type = MaterialSinkKernel
     variable = u
+    diffusivity_name = diffusivity
+    sink_strength_name = sink_strength
   [../]
 
   [./event_inserter_source]

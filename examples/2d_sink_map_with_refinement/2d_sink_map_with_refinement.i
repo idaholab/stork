@@ -44,6 +44,7 @@
     type = SinkMapKernel
     variable = u
     sink_map_user_object = sink_map_uo
+    diffusivity_name = diffusivity
   [../]
 
   [./event_inserter_source]
@@ -124,7 +125,7 @@
     verbose = true
     track_old_events = true
     removal_method = sigma_element_size_ratio
-    removal_sigma_element_size_ratio = 2.0
+    removal_sigma_element_size_ratio = 1.0
     radius = 3.0
     gaussian_user_object = gaussian_uo
     circle_average_material_property_user_object = circle_average
@@ -156,12 +157,12 @@
       coarsen_events = true
       verbose = true
       periodic_variable = u
-      event_sigma_mesh_ratio = 2.0
+      event_sigma_mesh_ratio = 1.0
       refine_sinks = true
       sink_marker_radius = 6.0
       sink_map_user_object = sink_map_uo
       sink_gaussian_user_object = sink_gaussian_uo
-      sink_sigma_mesh_ratio = 2.0
+      sink_sigma_mesh_ratio = 1.0
     [../]
   [../]
 []
