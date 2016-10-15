@@ -37,11 +37,16 @@ public:
 
   Real getDistanceToNearestSink(const Point & p) const;
 
+  Point getNearestSinkLocation(const Point & p) const;
+
   Real getStrength() const { return _strength; }
 
   const MooseEnum & getPlacement() const { return _sink_placement; }
 
 protected:
+  /// Get info on neatest sink to a Point
+  std::pair<Real, Point> getNearestSink(const Point & p) const;
+
   /// Distance between sink centers
   const Real _spacing;
 

@@ -163,7 +163,22 @@ SinkMapUserObject::getLocalSinkMap(const Elem * elem) const
 Real
 SinkMapUserObject::getDistanceToNearestSink(const Point & p) const
 {
+  std::pair<Real, Point> sink = getNearestSink(p);
+  return sink.first;
+}
+
+Point
+SinkMapUserObject::getNearestSinkLocation(const Point & p) const
+{
+  std::pair<Real, Point> sink = getNearestSink(p);
+  return sink.second;
+}
+
+std::pair<Real, Point>
+SinkMapUserObject::getNearestSink(const Point & p) const
+{
   Real r, rmin = std::numeric_limits<Real>::max();
+  Point nearest_sink_location;
 
   // to do 3D lines, need to change z-component of point to that of a sink
   // so the distance to the line is based on the xy-plane distance
@@ -181,7 +196,10 @@ SinkMapUserObject::getDistanceToNearestSink(const Point & p) const
           (new_p - _sink_location_list[i]).norm() :
           _mesh.minPeriodicDistance(_periodic_var, new_p, _sink_location_list[i]);
     if (r < rmin)
+    {
       rmin = r;
+      nearest_sink_location = _sink_location_list[i];
+    }
   }
-  return rmin;
+  return std::make_pair(rmin, nearest_sink_location);
 }
