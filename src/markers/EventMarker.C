@@ -192,8 +192,11 @@ EventMarker::computeElementMarker()
     // get distance to nearest sink
     Real r = _sink_map_user_object_ptr->getDistanceToNearestSink(centroid);
 
+    // get location of nearest sink
+    Point nearest_sink = _sink_map_user_object_ptr->getNearestSinkLocation(centroid);
+
     // refine if close enough
-    if (r < _sink_refine_distance) // we are near a sink
+    if ((r < _sink_refine_distance) || (_current_elem->contains_point(nearest_sink))) // we are near a sink or element contains the nearest sink
     {
       if (marker_value == COARSEN) // no coarsening occurs during initial refinement, so sinks are already refined and we need to negate coarsening of nearby event
         marker_value = DO_NOTHING;
