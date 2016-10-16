@@ -156,7 +156,7 @@ EventMarker::computeElementMarker()
     else
       r = _mesh.minPeriodicDistance(_periodic_var, _event_location, centroid);
 
-    if (r < _refine_distance)  // we are near the event
+    if ((r < _refine_distance) || (_current_elem->contains_point(_event_location))) // we are near the event or element contains event
     {
       if (!_refine_by_ratio)  // refine if distance is the only critereon
         marker_value = REFINE;
