@@ -29,11 +29,11 @@ for dt in dt_list:
 
   # run simulation
   call([
-    "../../../PRARIEDOG-opt", 
-    "-i", 
-    "1d_uniform_IC.i", 
-    "Executioner/end_time="+str(end_time), 
-    "Executioner/dt="+str(dt), 
+    "../../../PRARIEDOG-opt",
+    "-i",
+    "1d_uniform_IC.i",
+    "Executioner/end_time="+str(end_time),
+    "Executioner/dt="+str(dt),
     "Materials/simple/prop_values="+str(D)+" "+str(Q)
   ], stdout=FNULL)
 

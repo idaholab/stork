@@ -29,11 +29,11 @@ for dt in dt_list:
 
   # run simulation
   call([
-    "../../../PRARIEDOG-opt", 
-    "-i", 
-    "1d_gaussian_diffusion.i", 
-    "Executioner/end_time="+str(end_time), 
-    "Executioner/dt="+str(dt), 
+    "../../../PRARIEDOG-opt",
+    "-i",
+    "1d_gaussian_diffusion.i",
+    "Executioner/end_time="+str(end_time),
+    "Executioner/dt="+str(dt),
     "Functions/gaussian/vals="+str(sigma),
     "Materials/simple/prop_values="+str(D)
   ], stdout=FNULL)
