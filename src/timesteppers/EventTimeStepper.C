@@ -34,6 +34,7 @@ EventTimeStepper::EventTimeStepper(const InputParameters & parameters) :
     _growth_factor(getParam<Real>("growth_factor")),
     _verbose(getParam<bool>("verbose")),
     _was_dt_cut(false),
+    _new_dt(_input_dt),
     _inserter_ptr(NULL)
 {
 
@@ -68,27 +69,34 @@ EventTimeStepper::computeInitialDT()
 Real
 EventTimeStepper::computeDT()
 {
+  if (_dt < _new_dt)
+  {
+    _was_dt_cut = false; // technicaly dt _was_ cut, but not by this TimeStepper
+    if (_verbose)
+      _console << "EventTimeStepper detected dt was cut elsewhere, still waiting for event..." << std::endl;
+  }
+
   // default is to apply growth factor to current DT
-  Real new_dt = getCurrentDT() * _growth_factor;
+  _new_dt = _dt * _growth_factor;
 
   if (_was_dt_cut)
   {
     // reduce timestep to initial after event has been inserted
     if (_verbose)
       _console << "Reducing dt to " << _input_dt << " following alignment with event." << std::endl;
-    new_dt = _input_dt;
+    _new_dt = _input_dt;
     _was_dt_cut = false;
   }
 
   Real next_event_time = _inserter_ptr->getNextEventTime();
-  if ((new_dt + _time) > next_event_time)
+  if ((_new_dt + _time) > next_event_time)
   {
     // if proposed timestep will step over next event,
     // cut dt to line up with next event time
     if (_verbose)
-      _console << "Next time step of " << new_dt << " will overstep next event at " << next_event_time << ", cutting dt to " << next_event_time - _time << std::endl;
+      _console << "Next time step of " << _new_dt << " will overstep next event at " << next_event_time << ", cutting dt to " << next_event_time - _time << std::endl;
     if (std::abs(_time - next_event_time) > _inserter_ptr->getTimeTolerance())  // check to make sure we're not really close to an event
-      new_dt = next_event_time - _time;
+      _new_dt = next_event_time - _time;
     else if (_verbose)
       _console << "Nevermind, we're actually at an event" << std::endl;
     _was_dt_cut = true;
@@ -97,5 +105,5 @@ EventTimeStepper::computeDT()
   if (_verbose)
     _console << "*** next event: " << _inserter_ptr->getNextEventTime() << std::endl;
 
-  return new_dt;
+  return _new_dt;
 }
