@@ -28,6 +28,8 @@ SinkMapAux::SinkMapAux(const InputParameters & parameters) :
     _sink_map_uo(getUserObject<SinkMapUserObject>("sink_map_user_object")),
     _element_sink_map(0)
 {
+  if (isNodal())
+    mooseError("Cannot use SinkMapAux with Nodal variables");
 }
 
 void

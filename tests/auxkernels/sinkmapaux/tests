@@ -1,0 +1,12 @@
+[Tests]
+  [./sink_map_aux]
+    type = 'Exodiff'
+    input = 'sink_map_aux.i'
+    exodiff = 'sink_map_aux_out.e'
+  [../]
+  [./sink_map_aux_nodal]
+    type = 'RunException'
+    input = 'sink_map_aux_nodal.i'
+    expect_err = 'Cannot use SinkMapAux with Nodal variables'
+  [../]
+[]
