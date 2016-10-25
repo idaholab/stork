@@ -16,11 +16,11 @@
 #define EVENTINSERTERSOURCE_H
 
 #include "Kernel.h"
-#include "EventInserter.h"
-#include "GaussianUserObject.h"
 
 //Forward Declarations
 class EventInserterSource;
+class EventInserter;
+class GaussianUserObject;
 
 template<>
 InputParameters validParams<EventInserterSource>();
@@ -49,7 +49,13 @@ protected:
 
   const EventInserter & _inserter;
 
-  const GaussianUserObject & _gaussian_user_object;
+  const GaussianUserObject * _gaussian_user_object_ptr;
+
+  const bool _use_uniform_source;
+
+  const Real _magnitude;
+
+  const PostprocessorValue & _volume;
 
   bool _is_event_active;
 
