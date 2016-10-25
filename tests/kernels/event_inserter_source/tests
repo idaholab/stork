@@ -4,4 +4,9 @@
     input = 'event_inserter_source.i'
     exodiff = 'event_inserter_source_out.e'
   [../]
+  [./event_inserter_uniform_source]
+    type = 'Exodiff'
+    input = 'event_inserter_uniform_source.i'
+    exodiff = 'event_inserter_uniform_source_out.e'
+  [../]
 []
