@@ -22,6 +22,8 @@
 #include "SinkMapAux.h"
 #include "SinkMapKernel.h"
 #include "DiracSinkMapKernel.h"
+#include "MaterialSinkRateAux.h"
+#include "SinkMapRateAux.h"
 
 template<>
 InputParameters validParams<PrariedogApp>()
@@ -65,6 +67,8 @@ void
 PrariedogApp::registerObjects(Factory & factory)
 {
   registerAuxKernel(SinkMapAux);
+  registerAuxKernel(MaterialSinkRateAux);
+  registerAuxKernel(SinkMapRateAux);
 
   registerDiracKernel(DiracSinkMapKernel);
 
