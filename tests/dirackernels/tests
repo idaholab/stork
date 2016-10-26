@@ -9,4 +9,9 @@
     input = 'dirac_sink_map_kernel_error.i'
     expect_err = 'Dirac sinks do not work at the corners'
   [../]
+  [./material_dirac_sink_kernel]
+    type = 'Exodiff'
+    input = 'material_dirac_sink_kernel.i'
+    exodiff = 'material_dirac_sink_kernel_out.e'
+  [../]
 []

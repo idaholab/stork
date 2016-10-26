@@ -24,6 +24,7 @@
 #include "DiracSinkMapKernel.h"
 #include "MaterialSinkRateAux.h"
 #include "SinkMapRateAux.h"
+#include "MaterialDiracSinkKernel.h"
 
 template<>
 InputParameters validParams<PrariedogApp>()
@@ -71,6 +72,7 @@ PrariedogApp::registerObjects(Factory & factory)
   registerAuxKernel(SinkMapRateAux);
 
   registerDiracKernel(DiracSinkMapKernel);
+  registerDiracKernel(MaterialDiracSinkKernel);
 
   registerFunction(GaussianFunction);
 
