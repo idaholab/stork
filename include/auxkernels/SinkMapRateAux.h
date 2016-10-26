@@ -34,7 +34,7 @@ protected:
   virtual Real computeValue();
 
   const MaterialProperty<Real> & _diffusivity;
-  const VariableValue & _u;
+  const VariableValue & _v;
 };
 
 #endif // SINKMAPRATEAUX_H

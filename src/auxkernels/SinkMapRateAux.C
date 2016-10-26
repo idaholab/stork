@@ -26,7 +26,7 @@ InputParameters validParams<SinkMapRateAux>()
 SinkMapRateAux::SinkMapRateAux(const InputParameters & parameters) :
     SinkMapAux(parameters),
     _diffusivity(getMaterialProperty<Real>("diffusivity_name")),
-    _u(coupledValue("solution_variable"))
+    _v(coupledValue("solution_variable"))
 {
   if (isNodal())
     mooseError("Cannot use SinkMapRateAux with Nodal variables");
@@ -35,5 +35,5 @@ SinkMapRateAux::SinkMapRateAux(const InputParameters & parameters) :
 Real
 SinkMapRateAux::computeValue()
 {
-  return _diffusivity[_qp] * _u[_qp] * SinkMapAux::computeValue();
+  return _diffusivity[_qp] * _v[_qp] * SinkMapAux::computeValue();
 }
