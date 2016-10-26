@@ -7,10 +7,10 @@ import os
 from subprocess import call
 
 # set some values
-end_time = 1.0
-sigma = 0.02
-D = 0.001
-dt_list = np.array([0.1, 0.05, 0.02, 0.01, 0.005, 0.002])
+end_time = 0.1
+sigma = 0.01
+D = 0.5
+dt_list = np.array([0.1, 0.05, 0.02, 0.01, 0.005, 0.002, 0.001, 0.0005, 0.0001])
 
 # exact value
 target_value = 1.0/np.sqrt(2*np.pi)/np.sqrt(2*D*(end_time + sigma*sigma/2/D))
@@ -51,9 +51,14 @@ for dt in dt_list:
 
   i = i + 1
 
+# use the smallest time step solution as the apparent target value
+apparent_target_value = values[len(values)-1]
+apparent_errors = np.abs(values - apparent_target_value)/apparent_target_value
 
 # plot errors on log-log plot
-plt.loglog(dt_list, errors, '-o')
+plt.loglog(dt_list, errors, '-o', label = 'theoretical error')
+plt.loglog(dt_list[0:-1], apparent_errors[0:-1], '-o', label = 'apparent error')
+plt.legend()
 plt.xlabel('dt')
 plt.ylabel('error')
 plt.show()
