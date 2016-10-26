@@ -32,7 +32,7 @@ protected:
 
   const MaterialProperty<Real> & _diffusivity;
   const MaterialProperty<Real> & _sink_strength;
-  const VariableValue & _u;
+  const VariableValue & _v;
 };
 
 #endif //MATERIALSINKRATEAUX_H

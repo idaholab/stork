@@ -29,12 +29,12 @@ MaterialSinkRateAux::MaterialSinkRateAux(const InputParameters & parameters) :
     AuxKernel(parameters),
     _diffusivity(getMaterialProperty<Real>("diffusivity_name")),
     _sink_strength(getMaterialProperty<Real>("sink_strength_name")),
-    _u(coupledValue("solution_variable"))
+    _v(coupledValue("solution_variable"))
 {
 }
 
 Real
 MaterialSinkRateAux::computeValue()
 {
-  return _diffusivity[_qp] * _sink_strength[_qp] * _u[_qp];
+  return _diffusivity[_qp] * _sink_strength[_qp] * _v[_qp];
 }
