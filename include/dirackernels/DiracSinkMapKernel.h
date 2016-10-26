@@ -43,7 +43,7 @@ protected:
 
   Real _sink_strength;
 
-  Real _volume;
+  const PostprocessorValue & _volume;
 };
 
 #endif //DIRACSINKMAPKERNEL_H
