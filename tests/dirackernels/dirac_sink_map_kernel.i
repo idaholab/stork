@@ -49,6 +49,7 @@
     variable = u
     diffusivity_name = diffusivity
     sink_map_user_object = sink_map_uo
+    volume_pps = volume
   [../]
 []
 
@@ -99,6 +100,10 @@
     type = ElementAverageValue
     variable = u
     execute_on = 'initial timestep_end'
+  [../]
+  [./volume]
+    type = VolumePostprocessor
+    execute_on = 'initial timestep_begin'
   [../]
 []
 

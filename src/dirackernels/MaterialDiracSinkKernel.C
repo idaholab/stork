@@ -22,6 +22,7 @@ InputParameters validParams<MaterialDiracSinkKernel>()
   params.addRequiredParam<MaterialPropertyName>("diffusivity_name", "Name of the material property for diffusion coefficient.");
   params.addRequiredParam<MaterialPropertyName>("sink_strength_name", "Name of the material property for sink strength.");
   params.addRequiredParam<Point>("point", "Location of the dirac sink.");
+  params.addRequiredParam<PostprocessorName>("volume_pps", "The name of the VolumePostprocessor.");
   return params;
 }
 
@@ -29,17 +30,9 @@ MaterialDiracSinkKernel::MaterialDiracSinkKernel(const InputParameters & paramet
     DiracKernel(parameters),
     _diffusivity(getMaterialProperty<Real>("diffusivity_name")),
     _sink_strength(getMaterialProperty<Real>("sink_strength")),
-    _point(getParam<Point>("point"))
+    _point(getParam<Point>("point")),
+    _volume(getPostprocessorValue("volume_pps"))
 {
-  // get problem dimension to normalize the average strength
-  // this assumes a CONSTANT, RECTANGULAR domain
-  _volume = _mesh.dimensionWidth(0);
-
-  if (_mesh.dimension() > 1)
-    _volume *= _mesh.dimensionWidth(1);
-
-  if (_mesh.dimension() > 2)
-    _volume *= _mesh.dimensionWidth(2);
 }
 
 void

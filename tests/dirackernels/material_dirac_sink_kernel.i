@@ -43,6 +43,7 @@
     diffusivity_name = diffusivity
     sink_strength_name = sink_strength
     point = '0.1 0.2 0.0'
+    volume_pps = volume
   [../]
 []
 
@@ -61,6 +62,13 @@
   solve_type = NEWTON
   petsc_options_iname = '-pc_type -pc_hypre_type'
   petsc_options_value = 'hypre boomeramg'
+[]
+
+[Postprocessors]
+  [./volume]
+    type = VolumePostprocessor
+    execute_on = 'initial timestep_begin'
+  [../]
 []
 
 [Outputs]

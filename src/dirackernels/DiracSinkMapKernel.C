@@ -21,27 +21,19 @@ InputParameters validParams<DiracSinkMapKernel>()
 {
   InputParameters params = validParams<DiracKernel>();
   params.addRequiredParam<UserObjectName>("sink_map_user_object", "The name of the SinkMapUserObject.");
-  params.addRequiredParam<MaterialPropertyName>("diffusivity_name", "Name of the material property for diffusion coefficient");
+  params.addRequiredParam<MaterialPropertyName>("diffusivity_name", "Name of the material property for diffusion coefficient.");
+  params.addRequiredParam<PostprocessorName>("volume_pps", "The name of the VolumePostprocessor.");
   return params;
 }
 
 DiracSinkMapKernel::DiracSinkMapKernel(const InputParameters & parameters) :
     DiracKernel(parameters),
     _sink_map_uo(getUserObject<SinkMapUserObject>("sink_map_user_object")),
-    _diffusivity(getMaterialProperty<Real>("diffusivity_name"))
+    _diffusivity(getMaterialProperty<Real>("diffusivity_name")),
+    _volume(getPostprocessorValue("volume_pps"))
 {
   if (_sink_map_uo.getPlacement() == "corner")
     mooseError("Dirac sinks do not work at the corners, yet... Set 'sink_placement = inside' in SinkMapUserObject.");
-
-  // get problem dimension to normalize the average strength
-  // this assumes a CONSTANT, RECTANGULAR domain
-  _volume = _mesh.dimensionWidth(0);
-
-  if (_mesh.dimension() > 1)
-    _volume *= _mesh.dimensionWidth(1);
-
-  if (_mesh.dimension() > 2)
-    _volume *= _mesh.dimensionWidth(2);
 }
 
 void

@@ -40,7 +40,7 @@ protected:
 
   const Point _point;
 
-  Real _volume;
+  const PostprocessorValue & _volume;
 };
 
 #endif //MATERIALDIRACSINKKERNEL_H
