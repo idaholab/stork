@@ -198,8 +198,16 @@ EventMarker::computeElementMarker()
     // refine if close enough
     if ((r < _sink_refine_distance) || (_current_elem->contains_point(nearest_sink))) // we are near a sink or element contains the nearest sink
     {
-      if (marker_value == COARSEN) // no coarsening occurs during initial refinement, so sinks are already refined and we need to negate coarsening of nearby event
+      if (marker_value == COARSEN)
+      {
+        // if we made it here then sinks have already been refined (because events have already come and gone) and
+        // we don't want to coarsen the mesh near a sink
         marker_value = DO_NOTHING;
+        // unless the mesh is *too* dense near the sink, which can happen if the minimum event element size is less than mininum sink element size
+        // here we will assume each level of refinement cuts hmax by 2, so we check if element size is less than that
+        if ((_refine_sinks_by_ratio) && (_current_elem->hmax() < _minimum_sink_element_size/2.0))
+          marker_value = COARSEN;
+      }
       else if (!_refine_sinks_by_ratio)  // refine if distance is the only critereon
         marker_value = REFINE;
       else if (_current_elem->hmax() > _minimum_sink_element_size) // or if screening by element size, check the element size

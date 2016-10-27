@@ -65,4 +65,9 @@
     input = 'event_marker_sigma_coarsening_near_refined_sink.i'
     exodiff = 'event_marker_sigma_coarsening_near_refined_sink_out.e-s002'
   [../]
+  [./event_marker_denser_mesh_near_sink]
+    type = 'Exodiff'
+    input = 'event_marker_denser_mesh_near_sink.i'
+    exodiff = 'event_marker_denser_mesh_near_sink_out.e-s002'
+  [../]
 []
