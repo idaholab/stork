@@ -25,6 +25,7 @@
     exodiff = 'sink_map_user_object_3d_spheres_out.e'
     heavy = true
     max_parallel = 1
+    recover = false
   [../]
   [./sink_map_3d_inside_placement_spheres]
     type = 'Exodiff'
@@ -32,6 +33,7 @@
     exodiff = 'sink_map_user_object_3d_inside_spheres_out.e'
     heavy = true
     max_parallel = 1
+    recover = false
   [../]
   [./sink_map_3d_corner_placement_lines]
     type = 'Exodiff'
@@ -39,6 +41,7 @@
     exodiff = 'sink_map_user_object_3d_lines_out.e'
     heavy = true
     max_parallel = 1
+    recover = false
   [../]
   [./sink_map_3d_inside_placement_lines]
     type = 'Exodiff'
@@ -46,5 +49,6 @@
     exodiff = 'sink_map_user_object_3d_inside_lines_out.e'
     heavy = true
     max_parallel = 1
+    recover = false
   [../]
 []
