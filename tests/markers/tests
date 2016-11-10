@@ -59,6 +59,7 @@
     input = 'sink_marker_3d.i'
     exodiff = 'sink_marker_3d_out.e'
     heavy = true
+    recover = false
   [../]
   [./event_marker_sigma_coarsening_near_refined_sink]
     type = 'Exodiff'

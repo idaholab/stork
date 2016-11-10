@@ -8,5 +8,6 @@
     type = 'RunException'
     input = 'sink_map_aux_nodal.i'
     expect_err = 'Cannot use SinkMapAux with Nodal variables'
+    recover = false
   [../]
 []

@@ -136,7 +136,7 @@
   petsc_options_iname = '-pc_type -pc_hypre_type'
   petsc_options_value = 'hypre boomeramg'
 
-  num_steps = 1
+  num_steps = 2
 
   verbose = true
   [./TimeStepper]

@@ -142,7 +142,7 @@
 [Adaptivity]
   initial_marker = event_marker
   initial_steps = 10
-  max_h_level = 2
+  max_h_level = 1
   recompute_markers_during_cycles = true
   [./Markers]
     [./event_marker]
@@ -167,9 +167,7 @@
   petsc_options_iname = '-pc_type -pc_hypre_type'
   petsc_options_value = 'hypre boomeramg'
 
-  #start_time = 0.0
-  #end_time = 0.39
-  num_steps = 1
+  num_steps = 2
 
   verbose = true
   [./TimeStepper]

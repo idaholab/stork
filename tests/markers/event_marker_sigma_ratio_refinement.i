@@ -83,7 +83,7 @@
       gaussian_user_object = gaussian_uo
       marker_radius = 6.0
       periodic_variable = u
-      event_sigma_mesh_ratio = 2.0
+      event_sigma_mesh_ratio = 1.0
     [../]
   [../]
 []
@@ -94,7 +94,7 @@
 
   solve_type = 'NEWTON'
 
-  num_steps = 1
+  num_steps = 2
 
   verbose = true
 
