@@ -42,7 +42,7 @@
   initial_steps = 10
   marker = marker
   cycles_per_step = 10
-  max_h_level = 2
+  max_h_level = 3
   recompute_markers_during_cycles = true
   [./Markers]
     [./marker]
@@ -60,7 +60,6 @@
 []
 
 [Outputs]
-  exodus = true
   [./console]
     type = Console
     print_mesh_changed_info = true
