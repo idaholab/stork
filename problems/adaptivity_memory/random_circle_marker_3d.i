@@ -63,7 +63,6 @@
 []
 
 [Outputs]
-  exodus = true
   [./console]
     type = Console
     print_mesh_changed_info = true
