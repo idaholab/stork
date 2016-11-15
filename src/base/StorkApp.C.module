@@ -40,7 +40,7 @@ StorkApp::registerApps()
 // External entry point for dynamic object registration
 extern "C" void StorkApp__registerObjects(Factory & factory) { StorkApp::registerObjects(factory); }
 void
-StorkApp::registerObjects(Factory & factory)
+StorkApp::registerObjects(Factory & /*factory*/)
 {
 }
 
