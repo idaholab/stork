@@ -20,7 +20,7 @@ InputParameters validParams<GaussianFunction>()
 {
   // Define the general parameters
   InputParameters params = validParams<Function>();
-  params.addClassDescription("Function for generating Gaussian distributions based on the dimensions of the mesh.");
+  params.addClassDescription("UserObject for generating Gaussian distributions based on the dimensions of the mesh.");
 
   params.addParam<Real>("scale", 1.0, "Scaling factor");
   params.addParam<Real>("sigma", 1.0, "Standard deviation of the Gaussian curve");

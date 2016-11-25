@@ -22,6 +22,7 @@
 
 // Forward declarations
 class GaussianUserObject;
+class RandomPointUserObject;
 
 template<>
 InputParameters validParams<GaussianUserObject>();
@@ -76,8 +77,17 @@ protected:
   /// Standard deviation of distribution
   const Real _sigma;
 
+  /// Flag to use random point as Gaussian center
+  const bool _use_random;
+
+  /// Pointer to RandomPointUserObject
+  const RandomPointUserObject * _random_point_user_object_ptr;
+
   /// Variable number for checking periodicity
   const int _periodic_var;
+
+  /// Peak location of Gaussian Function
+  Point _peak_location;
 
   /// Reference to mesh
   const MooseMesh & _mesh;
