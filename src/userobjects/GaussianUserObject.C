@@ -13,10 +13,7 @@
 /****************************************************************/
 
 #include "GaussianUserObject.h"
-
-// LibMesh
-#include "libmesh/point_locator_base.h"
-#include "libmesh/elem.h"
+#include "RandomPointUserObject.h"
 
 template<>
 InputParameters validParams<GaussianUserObject>()
@@ -28,7 +25,7 @@ InputParameters validParams<GaussianUserObject>()
 
   params.addParam<Real>("scale", 1.0, "Scaling factor");
   params.addParam<Real>("sigma", 1.0, "Standard deviation of the Gaussian curve");
-  params.addParam<Point>("peak_location", "Center of Gaussian distribution");
+  params.addParam<Point>("peak_location", 0.0, "Center of Gaussian distribution");
   params.addParam<bool>("use_random_point", false, "Use a random point for the Gaussian peak location");
   params.addParam<UserObjectName>("random_point_user_object", "Name of the RandomPointUserObject to use");
   params.addCoupledVar("periodic_variable", "Use perodic boundary conditions of this variable to determine the distance to the function peak location");
@@ -42,9 +39,8 @@ GaussianUserObject::GaussianUserObject(const InputParameters & parameters) :
     _scale(getParam<Real>("scale")),
     _sigma(getParam<Real>("sigma")),
     _use_random(getParam<bool>("use_random_point")),
-    _random_point_user_object_ptr(NULL),
     _periodic_var(isCoupled("periodic_variable") ? (int) coupled("periodic_variable") : -1),
-    _peak_location(0),
+    _peak_location(getParam<Point>("peak_location")),
     _mesh(_fe_problem.mesh())
 {
   // normalization constant so integral over domain (theoretically) equals 1
@@ -57,13 +53,20 @@ GaussianUserObject::GaussianUserObject(const InputParameters & parameters) :
 
   if ((_use_random) && (!parameters.isParamSetByUser("random_point_user_object")))
     mooseError("In GaussianUserObject, the parameter 'random_point_user_object' needs to be set to use random points.");
-
-  if (parameters.isParamSetByUser("peak_location"))
-    _peak_location = getParam<Point>("peak_location");
 }
 
 GaussianUserObject::~GaussianUserObject()
 {
+}
+
+void
+GaussianUserObject::initialSetup()
+{
+  if (_use_random)
+  {
+    const RandomPointUserObject * _random_point_user_object_ptr = &getUserObject<RandomPointUserObject>("random_point_user_object");
+    _peak_location = _random_point_user_object_ptr->getRandomPoint();
+  }
 }
 
 Real
@@ -87,4 +90,10 @@ GaussianUserObject::value(const Real r) const
   Real f = exp(-r*r/2.0/_sigma/_sigma);
 
   return f*_norm*_scale;
+}
+
+Real
+GaussianUserObject::spatialValue(const Point & p) const
+{
+  return value(p, _peak_location);
 }
