@@ -18,7 +18,6 @@
 template<>
 InputParameters validParams<GaussianUserObject>()
 {
-
   // Define the general parameters
   InputParameters params = validParams<GeneralUserObject>();
   params.addClassDescription("Function for generating Gaussian distributions normalized to the mesh dimension.");
