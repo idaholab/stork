@@ -98,7 +98,6 @@
   [./gaussian_uo]
     type = GaussianUserObject
     sigma = 0.1
-    peak_location = '0.1 0.2 0.0'
     periodic_variable = u
   [../]
   [./circle_max_original_element_size_uo]
