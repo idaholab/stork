@@ -1,0 +1,17 @@
+[Tests]
+  [./gaussian_user_object]
+    type = 'Exodiff'
+    input = 'gaussian_user_object.i'
+    exodiff = 'gaussian_user_object_out.e'
+  [../]
+  [./gaussian_user_object_periodic]
+    type = 'Exodiff'
+    input = 'gaussian_user_object_periodic.i'
+    exodiff = 'gaussian_user_object_periodic_out.e'
+  [../]
+  [./gaussian_user_object_random_point]
+    type = 'Exodiff'
+    input = 'gaussian_user_object_random_point.i'
+    exodiff = 'gaussian_user_object_random_point_out.e'
+  [../]
+[]

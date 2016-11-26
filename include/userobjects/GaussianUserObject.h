@@ -22,6 +22,7 @@
 
 // Forward declarations
 class GaussianUserObject;
+class RandomPointUserObject;
 
 template<>
 InputParameters validParams<GaussianUserObject>();
@@ -47,6 +48,7 @@ public:
    */
   virtual ~GaussianUserObject();
 
+  virtual void initialSetup();
   virtual void initialize(){}  // Not used
   virtual void execute(){}  // Not used
   virtual void finalize(){}  // Not used
@@ -65,6 +67,14 @@ public:
   Real value(const Real r) const;
 
   /**
+   * Return the function value for the given point
+   * and use the peak location set by user. Function value
+   * compatible for use with SpatialUserObjectAux
+   * @param p The point at which to get function value
+   */
+  Real spatialValue(const Point & p) const;
+
+  /**
    * Return the sigma value associated with this object
    */
   Real getSigma() const { return _sigma; }
@@ -76,8 +86,14 @@ protected:
   /// Standard deviation of distribution
   const Real _sigma;
 
+  /// Flag to use random point as Gaussian center
+  const bool _use_random;
+
   /// Variable number for checking periodicity
   const int _periodic_var;
+
+  /// Peak location of Gaussian Function
+  Point _peak_location;
 
   /// Reference to mesh
   const MooseMesh & _mesh;

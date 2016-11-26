@@ -65,8 +65,6 @@
   [./gaussian_uo]
     type = GaussianUserObject
     sigma = 0.05
-    use_random_points = true
-    random_point_user_object = random_point_uo
     periodic_variable = u
   [../]
 []
