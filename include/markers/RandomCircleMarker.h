@@ -18,9 +18,6 @@
 #include "Marker.h"
 #include "MooseRandom.h"
 
-// libmesh includes
-//#include "libmesh/mesh_tools.h"
-
 class RandomCircleMarker;
 
 template<>
