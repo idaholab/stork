@@ -20,7 +20,7 @@ InputParameters validParams<RandomCircleMarker>()
 {
   InputParameters params = validParams<Marker>();
   params.addRequiredParam<Real>("radius", "Distance from the center of the circle to mark elements");
-  params.addParam<unsigned int>("seed", 1, "Seed the random number generator.");
+  params.addParam<unsigned int>("seed", 3, "Seed the random number generator.");
 
   return params;
 }
@@ -32,7 +32,7 @@ RandomCircleMarker::RandomCircleMarker(const InputParameters & parameters) :
     _p(0),
     _marker_value(REFINE)
 {
-  _random.seed(getParam<unsigned int>("seed"));
+  _random.seed(_tid, getParam<unsigned int>("seed"));
 }
 
 void
@@ -71,13 +71,13 @@ RandomCircleMarker::setup()
 
   Real x, y, z = 0.0;
 
-  x = _random.rand();
+  x = _random.rand(_tid);
 
   if (_mesh.dimension() > 1)
-    y = _random.rand();
+    y = _random.rand(_tid);
 
   if (_mesh.dimension() > 2)
-    z = _random.rand();
+    z = _random.rand(_tid);
 
   _p = Point(x, y, z);
 }
