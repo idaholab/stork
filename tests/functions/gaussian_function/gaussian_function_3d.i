@@ -24,6 +24,7 @@
     type = GaussianFunction
     sigma = 0.05
     scale = 3.0
+    peak_location = '0.4 0.6 0.7'
   [../]
 []
 
@@ -56,5 +57,5 @@
 []
 
 [Outputs]
-  csv = true
+  exodus = true
 []
