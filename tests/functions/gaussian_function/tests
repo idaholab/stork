@@ -1,20 +1,20 @@
 [Tests]
   [./gaussian_function_1d]
-    type = 'CSVDiff'
+    type = 'Exodiff'
     input = 'gaussian_function_1d.i'
-    csvdiff = 'gaussian_function_1d_out.csv'
+    exodiff = 'gaussian_function_1d_out.e'
   [../]
 
   [./gaussian_function_2d]
-    type = 'CSVDiff'
+    type = 'Exodiff'
     input = 'gaussian_function_2d.i'
-    csvdiff = 'gaussian_function_2d_out.csv'
+    exodiff = 'gaussian_function_2d_out.e'
   [../]
 
   [./gaussian_function_3d]
-    type = 'CSVDiff'
+    type = 'Exodiff'
     input = 'gaussian_function_3d.i'
-    csvdiff = 'gaussian_function_3d_out.csv'
+    exodiff = 'gaussian_function_3d_out.e'
     heavy = true
   [../]
 

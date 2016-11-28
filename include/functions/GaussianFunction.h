@@ -19,7 +19,6 @@
 #include "Function.h"
 #include "Coupleable.h"
 #include "MooseMesh.h"
-#include "RandomPointUserObject.h"
 
 // Forward declarations
 class GaussianFunction;
@@ -48,8 +47,6 @@ public:
    */
   virtual ~GaussianFunction();
 
-  virtual void initialSetup();
-
   /**
    * Return the function value for the given point
    * @param t Time (unused)
@@ -65,29 +62,20 @@ public:
   virtual Real value(const Point & p, const Point & center);
 
 protected:
+  /// Peak location of Gaussian Function
+  Point _peak_location;
+
   /// Value to multiply function by
   const Real _scale;
 
   /// Standard deviation of distribution
   const Real _sigma;
 
-  /// Flag to use random point as Gaussian center
-  const bool _use_random;
-
-  /// Pointer to RandomPointUserObject
-  const RandomPointUserObject * _random_point_user_object_ptr;
-
   /// Variable number for checking periodicity
   const int _periodic_var;
 
   /// Reference to mesh
   const MooseMesh & _mesh;
-
-  /// Peak location of Gaussian Function
-  Point _peak_location;
-
-  /// Flag to use to Gaussian peak at center of domain
-  bool _use_center;
 };
 
 #endif // GAUSSIANFUNCTION_H
