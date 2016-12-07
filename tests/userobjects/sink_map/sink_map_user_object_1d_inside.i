@@ -21,42 +21,8 @@
   [../]
 []
 
-[ICs]
-  [./gaussianIC]
-    type = FunctionIC
-    variable = u
-    function = gaussian
-  [../]
-[]
-
-[BCs]
-  [./Periodic]
-    [./all]
-      variable = u
-      auto_direction = 'x'
-    [../]
-  [../]
-[]
-
-[Functions]
-  [./gaussian]
-    type = GaussianFunction
-    sigma = 0.05
-    scale = 2.0
-    peak_location = '0.05 0.0 0.0'
-    periodic_variable = u
-  [../]
-[]
-
-[Kernels]
-  [./dt]
-    type = TimeDerivative
-    variable = u
-  [../]
-  [./diffusion]
-    type = Diffusion
-    variable = u
-  [../]
+[Problem]
+  solve = false
 []
 
 [AuxKernels]
