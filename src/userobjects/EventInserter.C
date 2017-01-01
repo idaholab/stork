@@ -16,7 +16,6 @@ template<>
 InputParameters validParams<EventInserter>()
 {
   InputParameters params = validParams<GeneralUserObject>();
-  params += validParams<RandomInterface>();
 
   MooseEnum distribution("uniform exponential", "uniform");
   MooseEnum removal_method("time sigma sigma_element_size_ratio", "time");
@@ -51,7 +50,6 @@ InputParameters validParams<EventInserter>()
 
 EventInserter::EventInserter(const InputParameters & parameters) :
     GeneralUserObject(parameters),
-    RandomInterface(parameters, _fe_problem, _tid, false),
     _use_random_timing(getParam<bool>("random_timing")),
     _distribution(getParam<MooseEnum>("distribution")),
     _mean(getParam<Real>("mean")),
@@ -81,7 +79,6 @@ EventInserter::EventInserter(const InputParameters & parameters) :
     _old_sigma_list(0),
     _older_sigma_list(0)
 {
-  setRandomResetFrequency(EXEC_INITIAL);
   if (parameters.isParamSetByUser("seed"))
     MooseRandom::seed(_seed);
   else

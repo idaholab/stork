@@ -8,7 +8,6 @@
 #define EVENTINSERTER_H
 
 #include "GeneralUserObject.h"
-#include "RandomInterface.h"
 #include "RandomPointUserObject.h"
 
 class EventInserter;
@@ -23,9 +22,7 @@ InputParameters validParams<EventInserter>();
  * domain. It manages a list of events with their insertion times and their center
  * positions.
  */
-class EventInserter :
-  public GeneralUserObject,
-  public RandomInterface
+class EventInserter : public GeneralUserObject
 {
 public:
   EventInserter(const InputParameters & parameters);

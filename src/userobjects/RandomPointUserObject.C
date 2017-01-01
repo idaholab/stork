@@ -21,7 +21,6 @@ template<>
 InputParameters validParams<RandomPointUserObject>()
 {
   InputParameters params = validParams<GeneralUserObject>();
-  params += validParams<RandomInterface>();
 
   params.addParam<unsigned int>("seed", 0, "The seed for the random number generator");
   return params;
@@ -29,10 +28,8 @@ InputParameters validParams<RandomPointUserObject>()
 
 RandomPointUserObject::RandomPointUserObject(const InputParameters & parameters) :
     GeneralUserObject(parameters),
-    RandomInterface(parameters, _fe_problem, _tid, false),
     _mesh(_fe_problem.mesh())
 {
-  setRandomResetFrequency(EXEC_INITIAL);
   if (parameters.isParamSetByUser("seed"))
     MooseRandom::seed(getParam<unsigned int>("seed"));
   else
