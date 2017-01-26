@@ -70,6 +70,9 @@ public:
   /// Returns time of last event in list
   Real getMaxEventTime() const;
 
+  /// Print out event lists
+  void printEventLists() const;
+
 protected:
   /// Timing to use between event
   const bool _use_random_timing;
