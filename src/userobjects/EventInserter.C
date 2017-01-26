@@ -10,7 +10,6 @@
 #include "CircleMaxOriginalElementSize.h"
 #include "MooseRandom.h"
 
-
 #include <time.h> // for time function to seed random number generator
 
 template<>
@@ -168,23 +167,8 @@ EventInserter::execute()
   // print out events for debugging
   if (_verbose)
   {
-    _console << " *** time: " << _t << " list size: " << _global_event_list.size() << std::endl;
-    for (unsigned int i=0; i<_global_event_list.size(); i++)
-      _console << " *** i: " << i << " first: " << _global_event_list[i].first << " second: " << _global_event_list[i].second << std::endl;
-
-    if (_track_old_events)
-      for (unsigned int i=0; i<_old_event_list.size(); i++)
-        _console << "old list " << i << ": time: " << _old_event_list[i].first << " location: " << _old_event_list[i].second << std::endl;
-
-    if ((_track_old_events) && ((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio")))
-    {
-      _console << "printing sigma list..." << std::endl;
-      for (unsigned int i=0; i<_old_sigma_list.size(); i++)
-        _console << "old sigma list " << i << ": sigma: " << _old_sigma_list[i] << std::endl;
-      _console << "printing CircleAverageMaterialProperty values for old events..." << std::endl;
-      for (unsigned int i=0; i<_old_event_list.size(); i++)
-        _console << "old event list " << i << ": location: " << _old_event_list[i].second << " average value: " << _inserter_circle_average_mat_prop_uo_ptr->averageValue(i) << std::endl;
-    }
+    _console << "event lists at beginning of EventInserter::execute() for time step " << _t_step << " and time " << _t << std::endl;
+    printEventLists();
   }
 
   // expire entries from the list (if the current timestep converged) then add the next one
@@ -212,13 +196,13 @@ EventInserter::execute()
       }
     }
 
-    bool add_event = false;
     unsigned int i = 0;
     while (i < _global_event_list.size())
     {
+      // look for past Events
       if (_global_event_list[i].first < _t)
       {
-        // add Event to old list if requested
+        // add past Event to old list if requested
         if (_track_old_events)
         {
           _old_event_list.push_back(_global_event_list[i]);
@@ -235,28 +219,38 @@ EventInserter::execute()
 
             // estimate current value of sigma because the old events are not updated right away
             _old_sigma_list.push_back(std::sqrt(2.0*D*(_t - t_star)));
-         }
+          }
         }
 
-        // remove Event (by replacing with last element and shrinking size by one)
-        if (_verbose)
-          _console << "*** removing entry at time " << _global_event_list[i].first << std::endl;
-        if (_global_event_list[i].first - _test_time > _time_tol) // do not add event when removing test event, messes with statistics
-          add_event = true;
-        _global_event_list[i] = _global_event_list.back();
-        _global_event_list.pop_back();
+        // remove past events and add new ones
+        if (std::abs(_global_event_list[i].first - _test_time) > _time_tol) // do not add event when removing test event, messes with statistics
+        {
+          // doing it this way so information can printed out if requested
+          Real new_event_interval = getNewEventInterval();
+          Real new_event_time = getMaxEventTime() + new_event_interval;
+
+          if (_verbose)
+          {
+            _console << "*** new event interval: " << new_event_interval << std::endl;
+            _console << "*** insertering new event at time " << new_event_time << std::endl;
+            _console << "*** removing event at time " << _global_event_list[i].first << std::endl;
+          }
+
+          // replace old event with new one to maintain a non-empty list
+          _global_event_list[i] = Event(new_event_time, _random_point_user_object.getRandomPoint());
+        }
+        else
+        {
+          // remove test Event by replacing it with the last event and shrinking size of list by one
+          _global_event_list[i] = _global_event_list.back();
+          _global_event_list.pop_back();
+
+          if (_verbose)
+            _console << "*** removing test event at time " << _test_time << std::endl;
+        }
       }
       else
         ++i;
-    }
-
-    // if entries were removed, add a new event
-    if (add_event)
-    {
-      Real new_event_time = getMaxEventTime() + getNewEventInterval(); // for debugging
-      _global_event_list.push_back(Event(new_event_time, _random_point_user_object.getRandomPoint()));
-      if (_verbose)
-        _console << "*** inserting new event at time " << new_event_time << std::endl;
     }
 
     // expire entries from old list
@@ -337,6 +331,13 @@ EventInserter::execute()
       }
     }
   }
+
+  // print out events for debugging
+  if (_verbose)
+  {
+    _console << "event lists at end of EventInserter::execute() for time step " << _t_step << " and time " << _t << std::endl;
+    printEventLists();
+  }
 }
 
 Real
@@ -395,4 +396,30 @@ EventInserter::getMaxEventTime() const
       max_time = _global_event_list[i].first;
 
   return max_time;
+}
+
+void
+EventInserter::printEventLists() const
+{
+  _console << " *** printing event lists at time " << _t << "..." << std::endl;
+  _console << " global event list, size: " << _global_event_list.size() << std::endl;
+  for (unsigned int i=0; i<_global_event_list.size(); i++)
+    _console << " i: " << i << " time: " << _global_event_list[i].first << " location: " << _global_event_list[i].second << std::endl;
+
+  if (_track_old_events)
+  {
+    _console << " old event list, size: " << _old_event_list.size() << std::endl;
+    for (unsigned int i=0; i<_old_event_list.size(); i++)
+      _console << " i: " << i << " time: " << _old_event_list[i].first << " location: " << _old_event_list[i].second << std::endl;
+  }
+
+  if ((_track_old_events) && ((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio")))
+  {
+    _console << " old sigma list, size: " << _old_sigma_list.size() << std::endl;
+    for (unsigned int i=0; i<_old_sigma_list.size(); i++)
+      _console << " i: " << i << ": sigma: " << _old_sigma_list[i] << std::endl;
+    _console << " printing CircleAverageMaterialProperty values for old events..." << std::endl;
+    for (unsigned int i=0; i<_old_event_list.size(); i++)
+      _console << " old event list, i: " << i << ": location: " << _old_event_list[i].second << " average value: " << _inserter_circle_average_mat_prop_uo_ptr->averageValue(i) << std::endl;
+  }
 }
