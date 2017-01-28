@@ -13,7 +13,6 @@
 /****************************************************************/
 
 #include "RandomPointUserObject.h"
-#include "MooseRandom.h"
 
 #include <time.h>  // for time function to seed random number generator
 
@@ -31,9 +30,9 @@ RandomPointUserObject::RandomPointUserObject(const InputParameters & parameters)
     _mesh(_fe_problem.mesh())
 {
   if (parameters.isParamSetByUser("seed"))
-    MooseRandom::seed(getParam<unsigned int>("seed"));
+    _random.seed(0,getParam<unsigned int>("seed"));
   else
-    MooseRandom::seed(time(NULL));
+    _random.seed(0,time(NULL));
 
   //MooseRandom::seed(getParam<unsigned int>("seed"));
 }
@@ -55,9 +54,9 @@ RandomPointUserObject::getRandomPoint() const
   Point random_point;
   while (1)
   {
-    Real random_x = x_min + MooseRandom::rand()*x_length;
-    Real random_y = y_min + MooseRandom::rand()*y_length;
-    Real random_z = z_min + MooseRandom::rand()*z_length;
+    Real random_x = x_min + _random.rand(0)*x_length;
+    Real random_y = y_min + _random.rand(0)*y_length;
+    Real random_z = z_min + _random.rand(0)*z_length;
 
     random_point = Point(random_x, random_y, random_z);
 

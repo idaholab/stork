@@ -18,6 +18,7 @@
 
 #include "GeneralUserObject.h"
 #include "MooseMesh.h"
+#include "MooseRandom.h"
 
 //Forward Declarations
 class RandomPointUserObject;
@@ -45,6 +46,9 @@ public:
 
 protected:
   MooseMesh & _mesh;
+
+  /// Random number generator instance, mutable so it can be used inside const functions
+  mutable MooseRandom _random;
 
 };
 

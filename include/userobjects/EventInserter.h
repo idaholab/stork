@@ -9,6 +9,7 @@
 
 #include "GeneralUserObject.h"
 #include "RandomPointUserObject.h"
+#include "MooseRandom.h"
 
 class EventInserter;
 class CircleAverageMaterialProperty;
@@ -159,6 +160,9 @@ protected:
   std::vector<Real> _older_sigma_list;
 
   Real _initial_sigma;
+
+  /// Random number generator instance, mutable so it can be used inside const functions
+  mutable MooseRandom _random;
 };
 
 #endif //EVENTINSERTER_H

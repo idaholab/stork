@@ -171,7 +171,7 @@
   petsc_options_value = 'hypre boomeramg'
 
   start_time = 0.0
-  end_time = 0.06
+  end_time = 0.07
 
   verbose = true
   [./TimeStepper]

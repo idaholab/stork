@@ -8,7 +8,6 @@
 #include "GaussianUserObject.h"
 #include "CircleAverageMaterialProperty.h"
 #include "CircleMaxOriginalElementSize.h"
-#include "MooseRandom.h"
 
 #include <time.h> // for time function to seed random number generator
 
@@ -80,9 +79,9 @@ EventInserter::EventInserter(const InputParameters & parameters) :
     _older_sigma_list(0)
 {
   if (parameters.isParamSetByUser("seed"))
-    MooseRandom::seed(_seed);
+    _random.seed(0,_seed);
   else
-    MooseRandom::seed(time(NULL));
+    _random.seed(0,time(NULL));
 
   if ((parameters.isParamSetByUser("insert_test")) && (!parameters.isParamSetByUser("test_time")))
     mooseError("'test_time' parameter is required");
@@ -343,9 +342,9 @@ EventInserter::getNewEventInterval()
   if (_use_random_timing)
   {
     if (_distribution == "uniform")
-      return MooseRandom::rand()*_mean*2.0;
+      return _random.rand(0)*_mean*2.0;
     else // exponential distribution
-      return -std::log(MooseRandom::rand())*_mean;
+      return -std::log(_random.rand(0))*_mean;
   }
 
   return _mean;
