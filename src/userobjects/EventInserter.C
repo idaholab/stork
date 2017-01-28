@@ -8,7 +8,6 @@
 #include "GaussianUserObject.h"
 #include "CircleAverageMaterialProperty.h"
 #include "CircleMaxOriginalElementSize.h"
-#include "MooseRandom.h"
 
 #include <time.h> // for time function to seed random number generator
 
@@ -16,7 +15,6 @@ template<>
 InputParameters validParams<EventInserter>()
 {
   InputParameters params = validParams<GeneralUserObject>();
-  params += validParams<RandomInterface>();
 
   MooseEnum distribution("uniform exponential", "uniform");
   MooseEnum removal_method("time sigma sigma_element_size_ratio", "time");
@@ -51,7 +49,6 @@ InputParameters validParams<EventInserter>()
 
 EventInserter::EventInserter(const InputParameters & parameters) :
     GeneralUserObject(parameters),
-    RandomInterface(parameters, _fe_problem, _tid, false),
     _use_random_timing(getParam<bool>("random_timing")),
     _distribution(getParam<MooseEnum>("distribution")),
     _mean(getParam<Real>("mean")),
@@ -81,11 +78,10 @@ EventInserter::EventInserter(const InputParameters & parameters) :
     _old_sigma_list(0),
     _older_sigma_list(0)
 {
-  setRandomResetFrequency(EXEC_INITIAL);
   if (parameters.isParamSetByUser("seed"))
-    MooseRandom::seed(_seed);
+    _random.seed(0,_seed);
   else
-    MooseRandom::seed(time(NULL));
+    _random.seed(0,time(NULL));
 
   if ((parameters.isParamSetByUser("insert_test")) && (!parameters.isParamSetByUser("test_time")))
     mooseError("'test_time' parameter is required");
@@ -346,9 +342,9 @@ EventInserter::getNewEventInterval()
   if (_use_random_timing)
   {
     if (_distribution == "uniform")
-      return MooseRandom::rand()*_mean*2.0;
+      return _random.rand(0)*_mean*2.0;
     else // exponential distribution
-      return -std::log(MooseRandom::rand())*_mean;
+      return -std::log(_random.rand(0))*_mean;
   }
 
   return _mean;

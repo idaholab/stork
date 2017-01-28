@@ -8,8 +8,8 @@
 #define EVENTINSERTER_H
 
 #include "GeneralUserObject.h"
-#include "RandomInterface.h"
 #include "RandomPointUserObject.h"
+#include "MooseRandom.h"
 
 class EventInserter;
 class CircleAverageMaterialProperty;
@@ -23,9 +23,7 @@ InputParameters validParams<EventInserter>();
  * domain. It manages a list of events with their insertion times and their center
  * positions.
  */
-class EventInserter :
-  public GeneralUserObject,
-  public RandomInterface
+class EventInserter : public GeneralUserObject
 {
 public:
   EventInserter(const InputParameters & parameters);
@@ -162,6 +160,9 @@ protected:
   std::vector<Real> _older_sigma_list;
 
   Real _initial_sigma;
+
+  /// Random number generator instance, mutable so it can be used inside const functions
+  mutable MooseRandom _random;
 };
 
 #endif //EVENTINSERTER_H
