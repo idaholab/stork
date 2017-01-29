@@ -24,4 +24,14 @@
     input = 'event_inserter_initial_event.i'
     exodiff = 'event_inserter_initial_event_out.e'
   [../]
+  [./event_inserter_test_event_time_error]
+    type = 'RunException'
+    input = 'event_inserter_test_event_time_error.i'
+    expect_err = "'test_time' parameter is required"
+  [../]
+  [./event_inserter_test_event_location_error]
+    type = 'RunException'
+    input = 'event_inserter_test_event_location_error.i'
+    expect_err = "'test_location' parameter is required"
+  [../]
 []
