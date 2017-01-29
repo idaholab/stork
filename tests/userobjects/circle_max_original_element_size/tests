@@ -11,4 +11,9 @@
     prereq = circle_max_original_element_size
     min_parallel = 2
   [../]
+  [./circle_max_original_element_size_adapt]
+    type = 'CSVDiff'
+    input = 'circle_max_original_element_size_adapt.i'
+    csvdiff = 'circle_max_original_element_size_adapt_out.csv'
+  [../]
 []
