@@ -66,12 +66,20 @@ public:
    */
   virtual void finalize();
 
+  virtual void meshChanged();
+
 protected:
   /// Calculate periodic distance between points
   Real distance(Point p1, Point p2) const;
 
   /// Variable number for checking periodicity
   const int _periodic_var;
+
+  /// Flag for changed mesh
+  bool _mesh_changed;
+
+  /// Flag to re-calculate maps
+  bool _rebuild_map;
 
   /// Reference to the mesh
   const MooseMesh & _mesh;

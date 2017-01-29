@@ -22,12 +22,20 @@ InputParameters validParams<CircleMaxOriginalElementSize>()
   InputParameters params = validParams<ElementUserObject>();
   params.addCoupledVar("periodic_variable", "Use perodic boundary conditions of this variable to determine the distance to the function peak location");
 
+  MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
+  // the mapping needs to run at timestep begin, which is after the adaptivity
+  // run of the previous timestep.
+  setup_options = "timestep_begin";
+  params.set<MultiMooseEnum>("execute_on") = setup_options;
+
   return params;
 }
 
 CircleMaxOriginalElementSize::CircleMaxOriginalElementSize(const InputParameters & parameters) :
     ElementUserObject(parameters),
     _periodic_var(isCoupled("periodic_variable") ? (int) coupled("periodic_variable") : -1),
+    _mesh_changed(true),
+    _rebuild_map(true),
     _mesh(_fe_problem.mesh())
 {
 }
@@ -80,39 +88,56 @@ CircleMaxOriginalElementSize::value(const Point & p, const Real & radius) const
 void
 CircleMaxOriginalElementSize::initialize()
 {
-  // clear maps of values
-  _original_element_sizes.clear();
-  _centroids.clear();
+  if (_mesh_changed)
+  {
+    _rebuild_map = true;
+    // clear maps of values
+    _original_element_sizes.clear();
+    _centroids.clear();
+  }
+  else
+    _rebuild_map = false;
+
+  _mesh_changed = false;
 }
 
 void
 CircleMaxOriginalElementSize::execute()
 {
-  // Get pointer to original element of this (possibly) refined element
-  const Elem * original_element = _current_elem->top_parent();
+  if (_rebuild_map)
+  {
+    // Get pointer to original element of this (possibly) refined element
+    const Elem * original_element = _current_elem->top_parent();
 
-  // Store the parent element size value
-  _original_element_sizes[_current_elem->id()] = original_element->hmax();
+    // Store the parent element size value
+    _original_element_sizes[_current_elem->id()] = original_element->hmax();
 
-  // Store the parent element centroid
-  _centroids[_current_elem->id()] = original_element->centroid();
+    // Store the parent element centroid
+    _centroids[_current_elem->id()] = original_element->centroid();
+  }
 }
 
 void
 CircleMaxOriginalElementSize::threadJoin(const UserObject & y)
 {
-  // We are joining with another class like this one so do a cast so we can get to it's data
-  const CircleMaxOriginalElementSize & uo = dynamic_cast<const CircleMaxOriginalElementSize &>(y);
+  if (_rebuild_map)
+  {
+    // We are joining with another class like this one so do a cast so we can get to it's data
+    const CircleMaxOriginalElementSize & uo = dynamic_cast<const CircleMaxOriginalElementSize &>(y);
 
-  _original_element_sizes.insert(uo._original_element_sizes.begin(), uo._original_element_sizes.end());
-  _centroids.insert(uo._centroids.begin(), uo._centroids.end());
+    _original_element_sizes.insert(uo._original_element_sizes.begin(), uo._original_element_sizes.end());
+    _centroids.insert(uo._centroids.begin(), uo._centroids.end());
+  }
 }
 
 void
 CircleMaxOriginalElementSize::finalize()
 {
-  _communicator.set_union(_original_element_sizes);
-  _communicator.set_union(_centroids);
+  if (_rebuild_map)
+  {
+    _communicator.set_union(_original_element_sizes);
+    _communicator.set_union(_centroids);
+  }
 }
 
 Real
@@ -124,3 +149,10 @@ CircleMaxOriginalElementSize::distance(Point p1, Point p2) const
 
   return _mesh.minPeriodicDistance(_periodic_var, p1, p2);
 }
+
+void
+CircleMaxOriginalElementSize::meshChanged()
+{
+  _mesh_changed = true;
+}
+

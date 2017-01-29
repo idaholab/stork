@@ -31,6 +31,7 @@ InputParameters validParams<SinkMapUserObject>()
   // run of the previous timestep.
   setup_options = "timestep_begin";
   params.set<MultiMooseEnum>("execute_on") = setup_options;
+
   return params;
 }
 
@@ -43,7 +44,8 @@ SinkMapUserObject::SinkMapUserObject(const InputParameters & parameters) :
     _sink_shape_3d(getParam<MooseEnum>("sink_shape_3d")),
     _periodic_var(isCoupled("periodic_variable") ? coupled("periodic_variable") : -1),
     _dim(_mesh.dimension()),
-    _mesh_changed(true)
+    _mesh_changed(true),
+    _rebuild_map(true)
 {
   _zero_map.assign(_fe_problem.getMaxQps(), 0.0);
 }
