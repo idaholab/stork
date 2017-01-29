@@ -54,7 +54,7 @@ EventInserter::EventInserter(const InputParameters & parameters) :
     _mean(getParam<Real>("mean")),
     _insert_initial(getParam<bool>("insert_initial")),
     _insert_test(getParam<bool>("insert_test")),
-    _test_time(((_insert_test) && (parameters.isParamSetByUser("test_time"))) ? getParam<Real>("test_time") : 0),
+    _test_time(((_insert_test) && (parameters.isParamSetByUser("test_time"))) ? getParam<Real>("test_time") : -std::numeric_limits<Real>::max()),
     _test_location(((_insert_test) && (parameters.isParamSetByUser("test_location"))) ? getParam<Point>("test_location") : 0),
     _random_point_user_object(getUserObject<RandomPointUserObject>("random_point_user_object")),
     _seed(getParam<unsigned int>("seed")),
