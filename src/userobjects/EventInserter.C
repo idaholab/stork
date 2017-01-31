@@ -70,14 +70,14 @@ EventInserter::EventInserter(const InputParameters & parameters) :
     _circle_average_mat_prop_uo_ptr((parameters.isParamSetByUser("circle_average_material_property_user_object") && (_removal_method == "sigma" || _removal_method == "sigma_element_size_ratio")) ? &getUserObject<CircleAverageMaterialProperty>("circle_average_material_property_user_object") : NULL),
     _inserter_circle_average_mat_prop_uo_ptr((parameters.isParamSetByUser("inserter_circle_average_material_property_user_object") && (_removal_method == "sigma" || _removal_method == "sigma_element_size_ratio")) ? &getUserObject<CircleAverageMaterialProperty>("inserter_circle_average_material_property_user_object") : NULL),
     _circle_max_elem_size_uo_ptr((parameters.isParamSetByUser("circle_max_original_element_size_user_object") && (_removal_method == "sigma" || _removal_method == "sigma_element_size_ratio")) ? &getUserObject<CircleMaxOriginalElementSize>("circle_max_original_element_size_user_object") : NULL),
-    _old_event_removed(false),
-    _insert_first(true),
-    _insert_second(true),
-    _global_event_list(0),
-    _old_event_list(0),
-    _older_event_list(0),
-    _old_sigma_list(0),
-    _older_sigma_list(0)
+    _old_event_removed(declareRestartableData<bool>("old_event_removed",false)),
+    _global_event_list(declareRestartableData<EventList>("global_event_list")),
+    _old_event_list(declareRestartableData<EventList>("old_event_list")),
+    _older_event_list(declareRestartableData<EventList>("older_event_list")),
+    _old_sigma_list(declareRestartableData<std::vector<Real> >("old_sigma_list")),
+    _older_sigma_list(declareRestartableData<std::vector<Real> >("older_sigma_list")),
+    _random(declareRestartableData<MooseRandom>("event_inserter_generator")),
+    _first_time_after_restart(_app.isRestarting() || _app.isRecovering())
 {
   if (parameters.isParamSetByUser("seed"))
     _random.seed(0,_seed);
@@ -109,7 +109,11 @@ EventInserter::EventInserter(const InputParameters & parameters) :
     if ((_removal_method == "sigma_element_size_ratio") && (!parameters.isParamSetByUser("circle_max_original_element_size_user_object")))
       mooseError("User requested to remove old events by sigma ratio but 'circle_max_original_element_size_user_object' was not set.");
   }
+}
 
+void
+EventInserter::initialSetup()
+{
   // get initial sigma for initializing old event sigmas
   if ((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio"))
   {
@@ -120,39 +124,35 @@ EventInserter::EventInserter(const InputParameters & parameters) :
   // populate global_event_list so TimeStepper can access it immediately
 
   // insert initial event once
-  if (_insert_initial)
+  if ((_insert_initial) && (!_app.isRestarting()) && (!_app.isRecovering()))
   {
     _global_event_list.push_back(Event(_t, _random_point_user_object.getRandomPoint()));
-    _insert_initial = false;
     if (_verbose)
       _console << "*** inserting initial event at time " << _t << std::endl;
   }
 
   // insert test event once
-  if (_insert_test)
+  if ((_insert_test) && (!_app.isRestarting()) && (!_app.isRecovering()))
   {
     _global_event_list.push_back(Event(_test_time, _test_location));
-    _insert_test = false;
     if (_verbose)
       _console << "*** inserting test event at time " << _test_time << std::endl;
   }
 
   // insert first event
-  if (_insert_first)
+  if ((!_app.isRestarting()) && (!_app.isRecovering()))
   {
     Real new_event_time = _t + getNewEventInterval(); // for debugging
     _global_event_list.push_back(Event(new_event_time, _random_point_user_object.getRandomPoint()));
-    _insert_first = false;
     if (_verbose)
       _console << "*** inserting first event at time " << new_event_time << std::endl;
   }
 
   // insert second event so list won't be empty when removing an event
-  if (_insert_second)
+  if ((!_app.isRestarting()) && (!_app.isRecovering()))
   {
     Real new_event_time = getMaxEventTime() + getNewEventInterval(); // for debugging
     _global_event_list.push_back(Event(new_event_time, _random_point_user_object.getRandomPoint()));
-    _insert_second = false;
     if (_verbose)
       _console << "*** inserting second event at time " << new_event_time << std::endl;
   }
@@ -169,7 +169,7 @@ EventInserter::execute()
   }
 
   // expire entries from the list (if the current timestep converged) then add the next one
-  if (_fe_problem.converged())
+  if ((_fe_problem.converged()) || (_first_time_after_restart))
   {
     // update sigma list before adding any entries to it
     if ((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio"))
@@ -183,6 +183,8 @@ EventInserter::execute()
 
         // in case D changed from the previous step, calculate new t_star (described below) based on
         // last time step (which when is when sigma would have been affected by the change)
+        if (D <= 0.0)
+          mooseError("Tried to calculate effective time for sigma evolution but received a diffusion coefficient of " << D);
         Real t_star = (_t - _dt) - _old_sigma_list[i]*_old_sigma_list[i]/2.0/D;
 
         // calculate increase in sigma over this step
@@ -212,6 +214,8 @@ EventInserter::execute()
 
             // calculate fictitious time that event with sigma=0 (dirac delta) would need to occur to grow to
             // be initial sigma when actually inserted, measure time relative to this
+            if (D <= 0.0)
+              mooseError("Tried to calculate effective time for sigma evolution but received a diffusion coefficient of " << D);
             Real t_star = _global_event_list[i].first - _initial_sigma*_initial_sigma/2.0/D;
 
             // estimate current value of sigma because the old events are not updated right away
@@ -229,7 +233,7 @@ EventInserter::execute()
           if (_verbose)
           {
             _console << "*** new event interval: " << new_event_interval << std::endl;
-            _console << "*** insertering new event at time " << new_event_time << std::endl;
+            _console << "*** inserting new event at time " << new_event_time << std::endl;
             _console << "*** removing event at time " << _global_event_list[i].first << std::endl;
           }
 
@@ -313,6 +317,8 @@ EventInserter::execute()
         if (_old_event_removed)
         {
           // remove old event from list as we will signal the marker to coarsen everywhere where events are active
+          if (_verbose)
+            _console << "removing old event at time " << _old_event_list[i].first << std::endl;
           _old_event_list[i] = _old_event_list.back();
           _old_event_list.pop_back();
 
@@ -335,6 +341,9 @@ EventInserter::execute()
     _console << "event lists at end of EventInserter::execute() for time step " << _t_step << " and time " << _t << std::endl;
     printEventLists();
   }
+
+  // done with the first time through
+  _first_time_after_restart = false;
 }
 
 Real

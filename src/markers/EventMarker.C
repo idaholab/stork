@@ -60,7 +60,8 @@ EventMarker::EventMarker(const InputParameters & parameters) :
     _input_cycles_per_step(_adaptivity.getCyclesPerStep()),
     _coarsening_needed(false),
     _sink_refinement_needed(false),
-    _old_event_list(0)
+    _old_event_list(0),
+    _first_time_after_restart(_app.isRestarting() || _app.isRecovering())
 {
   // Check input logic for coarsening events
   if ((_coarsen_events) && (!_inserter.areOldEventsBeingTracked())) // need to tell EventInserter to track old events
@@ -96,8 +97,20 @@ EventMarker::initialSetup()
 }
 
 void
+EventMarker::markerSetup()
+{
+  // if this is the first time we're here and we're restarting, need to do the
+  // event check here because restartable data isn't yet loaded in initialSetup()
+  if (_first_time_after_restart)
+    checkForEvent();
+}
+
+void
 EventMarker::timestepSetup()
 {
+  // if we're here and we're restarting then all the initial adaptivity checks should be done
+  _first_time_after_restart = false;
+
   // check for events at the next timestep
   checkForEvent();
 
@@ -221,8 +234,10 @@ EventMarker::computeElementMarker()
 void
 EventMarker::checkForEvent()
 {
-  // turn adaptivity off by default
-  _adaptivity.setCyclesPerStep(0);
+  // turn adaptivity off by default, unless the first time after restarting
+  _adaptivity.setCyclesPerStep(0);  // turn adaptivity off
+  if (_first_time_after_restart)
+    _adaptivity.setCyclesPerStep(_input_cycles_per_step);  // turn adaptivity on
 
   // Check if event will occur during the NEXT timestep, so we can refine now and be ready for it
   // Event will be active on the next time step if we are at the next event time NOW
@@ -230,9 +245,14 @@ EventMarker::checkForEvent()
   if (_inserter.isEventActive(_fe_problem.time() - _inserter.getTimeTolerance(), _fe_problem.time() + _inserter.getTimeTolerance()))  // fuzzy math comparing floats
   {
     _event_location = _inserter.getActiveEventPoint(_fe_problem.time() - _inserter.getTimeTolerance(), _fe_problem.time() + _inserter.getTimeTolerance());
+    _event_incoming = true;
+  }
+
+  // if an event is incoming, turn on adaptivity
+  if (_event_incoming)
+  {
+    _adaptivity.setCyclesPerStep(_input_cycles_per_step);  // turn adaptivity on
     if (_verbose)
       _console << "Event incoming! location: " << _event_location << std::endl;
-    _adaptivity.setCyclesPerStep(_input_cycles_per_step);  // turn adaptivity on
-    _event_incoming = true;
   }
 }

@@ -27,7 +27,8 @@ InputParameters validParams<RandomPointUserObject>()
 
 RandomPointUserObject::RandomPointUserObject(const InputParameters & parameters) :
     GeneralUserObject(parameters),
-    _mesh(_fe_problem.mesh())
+    _mesh(_fe_problem.mesh()),
+    _random(declareRestartableData<MooseRandom>("random_point_user_object_generator"))
 {
   if (parameters.isParamSetByUser("seed"))
     _random.seed(0,getParam<unsigned int>("seed"));

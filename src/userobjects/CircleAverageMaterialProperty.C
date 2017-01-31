@@ -37,8 +37,8 @@ CircleAverageMaterialProperty::CircleAverageMaterialProperty(const InputParamete
     _inserter(NULL),
     _radius((parameters.isParamSetByUser("inserter") && (parameters.isParamSetByUser("radius"))) ? getParam<Real>("radius") : 0.0),
     _mesh(_fe_problem.mesh()),
-    _integral_sum(0),
-    _volume_sum(0),
+    _integral_sum(declareRestartableData<std::vector<Real> >("integral_sum")),
+    _volume_sum(declareRestartableData<std::vector<Real> >("volume_sum")),
     _old_event_list(0),
     _Npoints(0)
 {
@@ -63,7 +63,7 @@ CircleAverageMaterialProperty::initialSetup()
 Real
 CircleAverageMaterialProperty::averageValue(const unsigned int i) const
 {
-  if (i < _old_event_list.size())
+  if (i < _volume_sum.size())
     if (_volume_sum[i] > 0.0)
       return _integral_sum[i]/_volume_sum[i];
 

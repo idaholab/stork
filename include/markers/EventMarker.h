@@ -46,6 +46,8 @@ public:
 protected:
   virtual void initialSetup();
 
+  virtual void markerSetup();
+
   virtual void timestepSetup();
 
   virtual MarkerValue computeElementMarker();
@@ -95,6 +97,8 @@ protected:
   bool _sink_refinement_needed;
 
   EventList _old_event_list;
+
+  bool _first_time_after_restart;
 
   Real _sink_refine_distance;
 

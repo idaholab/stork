@@ -75,5 +75,6 @@
     type = 'Exodiff'
     input = 'random_circle_marker.i'
     exodiff = 'random_circle_marker_out.e-s005'
+    recover = false
   [../]
 []
