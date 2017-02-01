@@ -52,13 +52,6 @@
   [../]
 []
 
-[Postprocessors]
-  [./num_elems]
-    type = NumElems
-    execute_on = 'initial timestep_end'
-  [../]
-[]
-
 [Outputs]
   exodus = true
   [./console]

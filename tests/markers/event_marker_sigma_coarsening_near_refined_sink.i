@@ -216,9 +216,6 @@
     type = ElementAverageValue
     variable = sink_map_aux
   [../]
-  [./num_elems]
-    type = NumElems
-  [../]
 []
 
 [Outputs]
