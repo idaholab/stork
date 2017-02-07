@@ -44,15 +44,9 @@ public:
   typedef std::vector<Event> EventList;
 
 protected:
-  virtual void initialSetup();
-
   virtual void markerSetup();
 
-  virtual void timestepSetup();
-
   virtual MarkerValue computeElementMarker();
-
-  void checkForEvent();
 
   const EventInserter & _inserter;
 
@@ -90,15 +84,11 @@ protected:
 
   Point _event_location;
 
-  unsigned int _input_cycles_per_step;
-
   bool _coarsening_needed;
 
   bool _sink_refinement_needed;
 
   EventList _old_event_list;
-
-  bool _first_time_after_restart;
 
   Real _sink_refine_distance;
 

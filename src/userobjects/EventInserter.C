@@ -73,9 +73,7 @@ EventInserter::EventInserter(const InputParameters & parameters) :
     _old_event_removed(declareRestartableData<bool>("old_event_removed",false)),
     _global_event_list(declareRestartableData<EventList>("global_event_list")),
     _old_event_list(declareRestartableData<EventList>("old_event_list")),
-    _older_event_list(declareRestartableData<EventList>("older_event_list")),
     _old_sigma_list(declareRestartableData<std::vector<Real> >("old_sigma_list")),
-    _older_sigma_list(declareRestartableData<std::vector<Real> >("older_sigma_list")),
     _random(declareRestartableData<MooseRandom>("event_inserter_generator")),
     _first_time_after_restart(_app.isRestarting() || _app.isRecovering())
 {
@@ -257,28 +255,6 @@ EventInserter::execute()
     // expire entries from old list
     if (_track_old_events)
     {
-      // if an Event is active *now* and an old event was removed on the previous step
-      // then EventMarker would be triggered to both REFINE and COARSEN, but REFINE takes
-      // precedence so we revert the old event list so COARSEN will take place on
-      // the next step
-      if ((isEventActive(_t - _time_tol, _t + _time_tol)) && (_old_event_removed))
-      {
-        if (_verbose)
-          _console << "Coarsening was requested on the previous step but was delayed due to an Event, reverting old list..." << std::endl;
-        _old_event_list = _older_event_list;
-
-        // also revert the sigma list
-        if ((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio"))
-          _old_sigma_list = _older_sigma_list;
-      }
-
-      // save old event list
-      _older_event_list = _old_event_list;
-
-      // save old sigma list
-      if ((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio"))
-        _older_sigma_list = _old_sigma_list;
-
       // check if old events need to be removed
       _old_event_removed = false;
       for (unsigned int i=0; i<_old_event_list.size(); i++)
@@ -312,6 +288,17 @@ EventInserter::execute()
             if (_verbose)
               _console << "event needs to be coarsened: (old) event time: " << _old_event_list[i].first << " location: " << _old_event_list[i].second << " estimated sigma: " << _old_sigma_list[i] << " local max original element size: " << max_element_size << " ratio: " << _old_sigma_list[i]/max_element_size << std::endl;
           }
+        }
+
+        // if an Event is active *now* and an old event needs to be removed,
+        // then EventMarker will be triggered to both REFINE and COARSEN, but REFINE takes
+        // precedence so we leave the old event list alone so COARSEN will take place on
+        // the next step
+        if ((isEventActive(_t - _time_tol, _t + _time_tol)) && (_old_event_removed))
+        {
+          _old_event_removed = false;
+          if (_verbose)
+            _console << "Wait, an event is incoming so delay coarsening until the next step..." << std::endl;
         }
 
         if (_old_event_removed)

@@ -143,14 +143,8 @@ protected:
   /// List of old events
   EventList & _old_event_list;
 
-  /// List of old events from previous time step
-  EventList & _older_event_list;
-
   /// List of sigma estimates for old events
   std::vector<Real> & _old_sigma_list;
-
-  /// List of sigma estimates for old events from previous time step
-  std::vector<Real> & _older_sigma_list;
 
   /// Random number generator instance, mutable so it can be used inside const functions
   MooseRandom & _random;
