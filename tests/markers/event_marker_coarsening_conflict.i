@@ -97,7 +97,7 @@
     seed = 3
     track_old_events = true
     removal_method = time
-    removal_time = 0.25
+    removal_time = 0.35
   [../]
   [./gaussian_uo]
     type = GaussianUserObject

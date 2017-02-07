@@ -50,10 +50,10 @@ protected:
   const bool _verbose;
 
   /// Flag if dt was cut
-  bool _was_dt_cut;
+  bool & _was_dt_cut;
 
   /// timestep computed by computeDT
-  Real _new_dt;
+  Real & _new_dt;
 
   /// Pointer to EventInserter UserObject
   const EventInserter * _inserter_ptr;

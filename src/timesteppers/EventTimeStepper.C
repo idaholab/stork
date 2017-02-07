@@ -33,11 +33,10 @@ EventTimeStepper::EventTimeStepper(const InputParameters & parameters) :
     _input_dt(getParam<Real>("dt")),
     _growth_factor(getParam<Real>("growth_factor")),
     _verbose(getParam<bool>("verbose")),
-    _was_dt_cut(false),
-    _new_dt(_input_dt),
+    _was_dt_cut(declareRestartableData<bool>("was_dt_cut",false)),
+    _new_dt(declareRestartableData<Real>("new_dt",_input_dt)),
     _inserter_ptr(NULL)
 {
-
 }
 
 EventTimeStepper::~EventTimeStepper()
@@ -81,9 +80,9 @@ EventTimeStepper::computeDT()
 
   if (_was_dt_cut)
   {
-    // reduce timestep to initial after event has been inserted
+    // reset timestep to initial after event has been inserted
     if (_verbose)
-      _console << "Reducing dt to " << _input_dt << " following alignment with event." << std::endl;
+      _console << "Resetting dt to " << _input_dt << " following alignment with event." << std::endl;
     _new_dt = _input_dt;
     _was_dt_cut = false;
   }

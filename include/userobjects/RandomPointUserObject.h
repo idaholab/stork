@@ -48,7 +48,7 @@ protected:
   MooseMesh & _mesh;
 
   /// Random number generator instance, mutable so it can be used inside const functions
-  mutable MooseRandom _random;
+  MooseRandom & _random;
 
 };
 

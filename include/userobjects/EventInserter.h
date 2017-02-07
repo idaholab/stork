@@ -28,6 +28,8 @@ class EventInserter : public GeneralUserObject
 public:
   EventInserter(const InputParameters & parameters);
 
+  virtual void initialSetup();
+
   virtual void initialize(){} // Not used
   virtual void execute();
   virtual void finalize(){} // Not used
@@ -82,10 +84,10 @@ protected:
   const Real _mean;
 
   /// Flag to add an event at the beginning of the simulation
-  bool _insert_initial;
+  const bool _insert_initial;
 
   /// Flag to add an extra event at user-specified time and place
-  bool _insert_test;
+  const bool _insert_test;
 
   /// Time to insert test event
   Real _test_time;
@@ -123,9 +125,6 @@ protected:
   /// Distance, in multiples of the Event sigma, around an old event, to sample the original mesh
   const Real _radius;
 
-  /// Pointer to GaussianUserObject
-  //const GaussianUserObject * _gaussian_user_object_ptr;
-
   /// Pointer to CircleAverageMaterialProperty UserObject
   const CircleAverageMaterialProperty * _circle_average_mat_prop_uo_ptr;
 
@@ -136,33 +135,25 @@ protected:
   const CircleMaxOriginalElementSize * _circle_max_elem_size_uo_ptr;
 
   /// Flag when Event has been removed from old list
-  bool _old_event_removed;
-
-  /// Flag to insert the first event
-  bool _insert_first;
-
-  /// Flag to insert the second event
-  bool _insert_second;
+  bool & _old_event_removed;
 
   /// the global list of all events
-  EventList _global_event_list;
+  EventList & _global_event_list;
 
   /// List of old events
-  EventList _old_event_list;
-
-  /// List of old events from previous time step
-  EventList _older_event_list;
+  EventList & _old_event_list;
 
   /// List of sigma estimates for old events
-  std::vector<Real> _old_sigma_list;
-
-  /// List of sigma estimates for old events from previous time step
-  std::vector<Real> _older_sigma_list;
-
-  Real _initial_sigma;
+  std::vector<Real> & _old_sigma_list;
 
   /// Random number generator instance, mutable so it can be used inside const functions
-  mutable MooseRandom _random;
+  MooseRandom & _random;
+
+  /// Holds initial sigma from GaussianUserObject
+  Real _initial_sigma;
+
+  /// Flag for starting up after restart
+  bool _first_time_after_restart;
 };
 
 #endif //EVENTINSERTER_H

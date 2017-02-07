@@ -57,7 +57,6 @@ EventMarker::EventMarker(const InputParameters & parameters) :
     _sink_gaussian_user_object_ptr(NULL),
     _event_incoming(false),
     _event_location(0),
-    _input_cycles_per_step(_adaptivity.getCyclesPerStep()),
     _coarsening_needed(false),
     _sink_refinement_needed(false),
     _old_event_list(0)
@@ -85,55 +84,40 @@ EventMarker::EventMarker(const InputParameters & parameters) :
 }
 
 void
-EventMarker::initialSetup()
+EventMarker::markerSetup()
 {
-  // need to check for initial events
-  checkForEvent();
-
-  // refine around sinks
-  if (_refine_sinks)
-    _sink_refinement_needed = true;
-}
-
-void
-EventMarker::timestepSetup()
-{
-  // check for events at the next timestep
-  checkForEvent();
-
-  // get old event list if coarsening requested
+  // default to no adaptivity
+  _event_incoming = false;
   _coarsening_needed = false;
+  _sink_refinement_needed = false;
 
-  // coarsen if requested, and if old event was removed, and there is no refinement needed
-  if ((_coarsen_events) && (_inserter.wasOldEventRemoved()) && (!_event_incoming))
+  // Check if event will occur during the NEXT timestep, so we can refine now and be ready for it
+  // Event will be active on the next time step if we are at the next event time NOW
+  if (_inserter.isEventActive(_fe_problem.time() - _inserter.getTimeTolerance(), _fe_problem.time() + _inserter.getTimeTolerance()))  // fuzzy math comparing floats
   {
-    _old_event_list = _inserter.getOldEventList();
-    _coarsening_needed = true;
-    _adaptivity.setCyclesPerStep(_input_cycles_per_step);  // turn adaptivity on
+    _event_location = _inserter.getActiveEventPoint(_fe_problem.time() - _inserter.getTimeTolerance(), _fe_problem.time() + _inserter.getTimeTolerance());
+    _event_incoming = true;
     if (_verbose)
-      _console << "EventMarker detected an old event was removed, coarsening mesh (at the end of timestep)..." << std::endl;
-
-    // if an event just occured on the last step, need to add the recent Event to the old list once since UserObjects haven't been executed yet
-    if (_inserter.isEventActive(_fe_problem.timeOld() - _inserter.getTimeTolerance(), _fe_problem.timeOld() + _inserter.getTimeTolerance()))
-    {
-      if (_verbose)
-        _console << "EventMarker detecting coarsening immediately after an active Event, adding Event manually..." << std::endl;
-      Point recent_event_location = _inserter.getActiveEventPoint(_fe_problem.timeOld() - _inserter.getTimeTolerance(), _fe_problem.timeOld() + _inserter.getTimeTolerance());
-      _old_event_list.push_back(Event(_fe_problem.timeOld(), recent_event_location));
-    }
+      _console << "Event incoming! location: " << _event_location << std::endl;
   }
 
-  // if both an event is incoming and an old event was removed, then Marker will be asked to both REFINE and COARSEN in some places
-  // let REFINE take precedence and skip the coarsening for this step
-  if ((_coarsen_events) && (_inserter.wasOldEventRemoved()) && (_event_incoming))
+  // coarsen if requested and if old event was removed
+  if ((_coarsen_events) && (_inserter.wasOldEventRemoved()))
+  {
+    // get old event list to know where to NOT coarsen
+    _old_event_list = _inserter.getOldEventList();
+    _coarsening_needed = true;
     if (_verbose)
-      _console << "EventMarker detected both refinement and coarsening are needed, so coarsening was skipped..." << std::endl;
+      _console << "EventMarker detected an old event was removed, coarsening mesh..." << std::endl;
+  }
+
+  // refine around sinks initially
+  if ((_refine_sinks) && (_fe_problem.timeStep() == 0))
+    _sink_refinement_needed = true;
 
   // might need to re-refine around sinks if coarsening is happening to a nearby event
   if ((_refine_sinks) && (_coarsening_needed))
     _sink_refinement_needed = true;
-  else
-    _sink_refinement_needed = false;
 }
 
 Marker::MarkerValue
@@ -216,23 +200,4 @@ EventMarker::computeElementMarker()
   }
 
   return marker_value;
-}
-
-void
-EventMarker::checkForEvent()
-{
-  // turn adaptivity off by default
-  _adaptivity.setCyclesPerStep(0);
-
-  // Check if event will occur during the NEXT timestep, so we can refine now and be ready for it
-  // Event will be active on the next time step if we are at the next event time NOW
-  _event_incoming = false;
-  if (_inserter.isEventActive(_fe_problem.time() - _inserter.getTimeTolerance(), _fe_problem.time() + _inserter.getTimeTolerance()))  // fuzzy math comparing floats
-  {
-    _event_location = _inserter.getActiveEventPoint(_fe_problem.time() - _inserter.getTimeTolerance(), _fe_problem.time() + _inserter.getTimeTolerance());
-    if (_verbose)
-      _console << "Event incoming! location: " << _event_location << std::endl;
-    _adaptivity.setCyclesPerStep(_input_cycles_per_step);  // turn adaptivity on
-    _event_incoming = true;
-  }
 }
