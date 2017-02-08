@@ -32,29 +32,35 @@
 [Executioner]
   # Preconditioned JFNK (default)
   type = Transient
-  num_steps = 100
-  dt = 0.1
+  num_steps = 1000
+  dt = 1.0
   solve_type = PJFNK
 []
 
 [Adaptivity]
   initial_marker = marker
-  initial_steps = 10
+  initial_steps = 100
   marker = marker
-  cycles_per_step = 10
-  max_h_level = 3
+  cycles_per_step = 100
+  max_h_level = 6
   recompute_markers_during_cycles = true
   [./Markers]
     [./marker]
       type = RandomCircleMarker
-      radius = 0.1
+      radius = 0.01
     [../]
   [../]
 []
 
 [Postprocessors]
-  [./num_elems]
+  [./active_elems]
     type = NumElems
+    elem_filter = active
+    execute_on = 'initial timestep_end'
+  [../]
+  [./total_elems]
+    type = NumElems
+    elem_filter = total
     execute_on = 'initial timestep_end'
   [../]
 []
@@ -65,4 +71,3 @@
     print_mesh_changed_info = true
   [../]
 []
-
