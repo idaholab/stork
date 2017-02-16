@@ -182,7 +182,7 @@ EventInserter::execute()
         // in case D changed from the previous step, calculate new t_star (described below) based on
         // last time step (which when is when sigma would have been affected by the change)
         if (D <= 0.0)
-          mooseError("Tried to calculate effective time for sigma evolution but received a diffusion coefficient of " << D);
+          mooseError2("Tried to calculate effective time for sigma evolution but received a diffusion coefficient of ", D);
         Real t_star = (_t - _dt) - _old_sigma_list[i]*_old_sigma_list[i]/2.0/D;
 
         // calculate increase in sigma over this step
@@ -213,7 +213,7 @@ EventInserter::execute()
             // calculate fictitious time that event with sigma=0 (dirac delta) would need to occur to grow to
             // be initial sigma when actually inserted, measure time relative to this
             if (D <= 0.0)
-              mooseError("Tried to calculate effective time for sigma evolution but received a diffusion coefficient of " << D);
+              mooseError2("Tried to calculate effective time for sigma evolution but received a diffusion coefficient of ", D);
             Real t_star = _global_event_list[i].first - _initial_sigma*_initial_sigma/2.0/D;
 
             // estimate current value of sigma because the old events are not updated right away
