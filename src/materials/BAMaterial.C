@@ -124,17 +124,17 @@ BAMaterial::computeProperties()
 
   // error checking
   if (_insitu_perm_zone[0] < 0)
-    mooseError("BAMaterial: insitu_perm_zone is " << _insitu_perm_zone[0] << " which is negative!\n");
+    mooseError2("BAMaterial: insitu_perm_zone is ", _insitu_perm_zone[0], " which is negative!\n");
   if (i_zone >= _kh.size())
-    mooseError("BAMaterial: insitu_perm_zone is " << i_zone << " which is not smaller than the size of kh!\n");
+    mooseError2("BAMaterial: insitu_perm_zone is ", i_zone, " which is not smaller than the size of kh!\n");
   if (_insitu_por_zone[0] < 0)
-    mooseError("BAMaterial: insitu_por_zone is " << _insitu_por_zone[0] << " which is negative!\n");
+    mooseError2("BAMaterial: insitu_por_zone is ", _insitu_por_zone[0], " which is negative!\n");
   if (ipor_zone >= _por.size())
-    mooseError("BAMaterial: insitu_por_zone is " << ipor_zone << " which is not smaller than the size of por!\n");
+    mooseError2("BAMaterial: insitu_por_zone is ", ipor_zone, " which is not smaller than the size of por!\n");
   if (_change_perm_zone[0] < 0)
-    mooseError("BAMaterial: change_perm_zone is " << _change_perm_zone[0] << " which is negative!\n");
+    mooseError2("BAMaterial: change_perm_zone is ", _change_perm_zone[0], " which is negative!\n");
   if (ch_zone >= _change_kh.size())
-    mooseError("BAMaterial: change_perm_zone is " << ch_zone << " which is not smaller than the size of change_kh!\n");
+    mooseError2("BAMaterial: change_perm_zone is ", ch_zone, " which is not smaller than the size of change_kh!\n");
 
   // all of the following are assumed to be constant throughout the material
   // This is a requirement in other parts of Richards
