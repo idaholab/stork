@@ -66,6 +66,7 @@ traceout*.txt
 *.vtu
 .depend
 .clang_complete
+.failed_tests
 
 # Allow certain files in gold directories
 !**/gold/*.e
