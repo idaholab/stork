@@ -62,7 +62,7 @@ BAQuantity::finalize()
   else if (themax == 0.0 && themin < 0)
     _quant = themin; // _quant must actually be a negative number
   else
-    mooseError("BAQuantity has themax = " << themax << " and themin = " << themin << "\n");
+    mooseError2("BAQuantity has themax = ", themax, " and themin = ", themin, "\n");
 }
 
 Real
