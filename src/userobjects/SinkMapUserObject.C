@@ -157,7 +157,7 @@ SinkMapUserObject::getLocalSinkMap(const Elem * elem) const
 
   // if no entry in the map was found then something went wrong
   if (i == _sink_strength_map.end())
-    mooseError2("no sinks found in element ", elem->id());
+    mooseError("no sinks found in element ", elem->id());
 
   return i->second;
 }

@@ -69,7 +69,7 @@ CircleMaxOriginalElementSize::value(const Point & p, const Real & radius) const
     if (r < radius)
     {
       if (_original_element_sizes.find(id) == _original_element_sizes.end())
-        mooseError2("In CircleMaxOriginalElementSize, element id ", id, " not found.");
+        mooseError("In CircleMaxOriginalElementSize, element id ", id, " not found.");
       else
       {
         Real element_size = _original_element_sizes.at(id);
