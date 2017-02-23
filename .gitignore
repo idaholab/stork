@@ -7,6 +7,8 @@
 *-opt
 *-dbg
 *-oprof
+*-prof
+*-devel
 *.e
 *.nav
 *.log
@@ -16,6 +18,7 @@
 *.csv
 *.dylib
 *.so
+*.so.*
 *.gitignore*
 *.vrb
 *.jou
@@ -35,6 +38,7 @@
 *.spl
 *.idx
 traceout*.txt
+temp_print_trace.*
 *.xda
 *.xda.*
 *.xdr
@@ -64,8 +68,19 @@ traceout*.txt
 *.out
 *.vtk
 *.vtu
+*.pvtu
 .depend
+*.png
+*.gif
+*.tif
+*.html
+*.xyz
+*Revision.h
+*.json
+*.bak
+*.processor.*
 .clang_complete
+.failed_tests
 
 # Allow certain files in gold directories
 !**/gold/*.e
@@ -73,9 +88,16 @@ traceout*.txt
 !**/gold/*.csv
 !**/gold/*.vtk
 !**/gold/*.vtu
+!**/gold/*.pvtu
 
 peacock_run_tmp.i
 yaml_dump*
+
+# Generated header file
+MooseRevision.h
+
+# Precompiled headers
+moose/include/base/Precompiled.h.gch
 
 # test garbagge
 *.FAILED.txt
@@ -91,6 +113,8 @@ yaml_dump*
 *~
 .*.swp
 .*.swo
+
+framework/contrib/exodiff/exodiff
 
 # Mac garbage
 .DS_Store
@@ -136,11 +160,23 @@ framework/contrib/asio/
 *.cpa-*
 *.cpr-*
 
-# Revision files
-include/base/*Revision.h
-
 # phase_field/tests/solution_rasterizer
 out.xyz
 
-# lib dir
-lib/
+# JIT and automatic differentiation cache files
+.jitcache/
+.jitdir/
+
+# Do not store ipython notebook checkpoints
+*-checkpoint.ipynb*
+
+# Documentation Generation
+site
+*.moose.md
+*.moose.yml
+*.moose.svg
+docs/.moosedocs
+!docs/templates/*.html
+!docs/media/**/*.png
+!docs/media/**/*.gif
+!docs/tests/**/gold/*.html
