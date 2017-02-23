@@ -101,7 +101,7 @@ CircleAverageMaterialProperty::averageValue(const Point & p, const Real & radius
     if (r < radius)
     {
       if ((_integral_values.find(id) == _integral_values.end()) || (_volume_values.find(id) == _volume_values.end()))
-        mooseError2("In CircleAverageMaterialProperty, element id ", id, " not found.");
+        mooseError("In CircleAverageMaterialProperty, element id ", id, " not found.");
       else
       {
         // c++11!!
