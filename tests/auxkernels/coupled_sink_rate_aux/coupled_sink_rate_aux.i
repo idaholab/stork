@@ -11,7 +11,7 @@
 
 [Variables]
   [./u]
-    initial_condition = 1.0
+    initial_condition = 1
   [../]
 []
 
@@ -23,7 +23,7 @@
   [./sink_rate]
     order = CONSTANT
     family = MONOMIAL
-  [../]
+  []
 []
 
 [BCs]
@@ -40,61 +40,63 @@
     type = TimeDerivative
     variable = u
   [../]
-  [./matdiffusion]
-    type = MaterialDiffusion
+  [./diffusion]
+    type = Diffusion
     variable = u
-    diffusivity_name = diffusivity
   [../]
-  [./sink]
-    type = MaterialSinkKernel
+  [./sink_map_loss]
+    type = SinkMapKernel
     variable = u
     diffusivity_name = diffusivity
-    sink_strength_name = sink_strength
+    sink_map_user_object = sink_map_uo
   [../]
 []
 
 [AuxKernels]
   [./sink_map_aux]
-    type = MaterialRealAux
+    type = SinkMapAux
     variable = sink_strength
-    property = sink_strength
+    sink_map_user_object = sink_map_uo
     execute_on = 'timestep_end'
   [../]
   [./sink_rate_aux]
-    type = MaterialSinkRateAux
+    type = CoupledSinkRateAux
     variable = sink_rate
+    sink_strength_variable = sink_strength
     diffusivity_name = diffusivity
-    sink_strength_name = sink_strength
     solution_variable = u
-  [../]
-[]
-
-[Functions]
-  [./gaussian_2d]
-    # 2D gaussian function, centered at origin, sigma=0.05, integrates to 3
-    type = ParsedFunction
-    value = 3.0/0.05/0.05/2.0/pi*exp(-(x*x+y*y)/2/0.05/0.05)
+    execute_on = 'timestep_end'
   [../]
 []
 
 [Materials]
-  [./uniform_diffusivity]
+  [./simple]
     type = GenericConstantMaterial
-    prop_names = diffusivity
-    prop_values = 0.5
-  [../]
-  [./gaussian_sink]
-    type = GenericFunctionMaterial
     block = 0
-    prop_names = sink_strength
-    prop_values = gaussian_2d
+    prop_names = diffusivity
+    prop_values = 2.0
+  [../]
+[]
+
+[UserObjects]
+  [./sink_gaussian_uo]
+    type = GaussianUserObject
+    sigma = 0.05
+  [../]
+  [./sink_map_uo]
+    type = SinkMapUserObject
+    spacing = 1.0
+    strength = 3.0
+    gaussian_user_object = sink_gaussian_uo
+    periodic_variable = u
+    sink_placement = corner
   [../]
 []
 
 [Executioner]
   type = Transient
   num_steps = 3
-  dt = 0.001
+  dt = 0.01
   solve_type = NEWTON
   petsc_options_iname = '-pc_type -pc_hypre_type'
   petsc_options_value = 'hypre boomeramg'

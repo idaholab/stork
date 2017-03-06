@@ -61,11 +61,12 @@
     execute_on = 'timestep_end'
   [../]
   [./sink_rate_aux]
-    type = MaterialSinkRateAux
+    type = CoupledSinkRateAux
     variable = sink_rate
     diffusivity_name = diffusivity
-    sink_strength_name = sink_strength
+    sink_strength_variable = sink_strength
     solution_variable = u
+    execute_on = 'timestep_end'
   [../]
 []
 
