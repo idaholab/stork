@@ -1,0 +1,12 @@
+[Tests]
+  [./coupled_material_sink_rate_aux]
+    type = 'Exodiff'
+    input = 'coupled_material_sink_rate_aux.i'
+    exodiff = 'coupled_material_sink_rate_aux_out.e'
+  [../]
+  [./coupled_sink_map_rate_aux]
+    type = 'Exodiff'
+    input = 'coupled_sink_rate_aux.i'
+    exodiff = 'coupled_sink_rate_aux_out.e'
+  [../]
+[]
