@@ -101,6 +101,13 @@
   petsc_options_value = 'hypre boomeramg'
 []
 
+[Postprocessors]
+  [./avg_sink_map_rate]
+    type = ElementAverageValue
+    variable = sink_rate
+  [../]
+[]
+
 [Outputs]
   exodus = true
 []
