@@ -26,6 +26,10 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
+  [./sink_map_rate_aux]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
 []
 
 [Kernels]
@@ -60,6 +64,14 @@
     type = SinkMapAux
     variable = sink_map_aux
     sink_map_user_object = sink_map_uo
+    execute_on = timestep_end
+  [../]
+  [./sink_map_rate]
+    type = SinkMapRateAux
+    variable = sink_map_rate_aux
+    diffusivity_name = diffusivity
+    sink_map_user_object = sink_map_uo
+    solution_variable = u
     execute_on = timestep_end
   [../]
 []
@@ -218,6 +230,10 @@
   [../]
   [./num_elems]
     type = NumElems
+  [../]
+  [./sink_rate_average]
+    type = ElementAverageValue
+    variable = sink_map_rate_aux
   [../]
 []
 
