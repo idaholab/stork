@@ -26,6 +26,7 @@
 #include "SinkMapRateAux.h"
 #include "MaterialDiracSinkKernel.h"
 #include "RandomCircleMarker.h"
+#include "CoupledSinkRateAux.h"
 
 template<>
 InputParameters validParams<PrariedogApp>()
@@ -71,6 +72,7 @@ PrariedogApp::registerObjects(Factory & factory)
   registerAuxKernel(SinkMapAux);
   registerAuxKernel(MaterialSinkRateAux);
   registerAuxKernel(SinkMapRateAux);
+  registerAuxKernel(CoupledSinkRateAux);
 
   registerDiracKernel(DiracSinkMapKernel);
   registerDiracKernel(MaterialDiracSinkKernel);
