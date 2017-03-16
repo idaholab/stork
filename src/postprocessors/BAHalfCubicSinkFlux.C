@@ -9,7 +9,10 @@
 //  This post processor returns the mass due to a half-gaussian sink flux from the boundary of a volume.
 //
 #include "BAHalfCubicSinkFlux.h"
+
+// MOOSE includes
 #include "Function.h"
+#include "FEProblem.h"
 
 template<>
 InputParameters validParams<BAHalfCubicSinkFlux>()
