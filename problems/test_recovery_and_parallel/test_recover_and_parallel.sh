@@ -29,7 +29,7 @@ do
       # do half-transient and recover
       echo "running a half-transient and recover..."
       mpiexec -np $cpus ../../PRARIEDOG-opt -i test.i Executioner/num_steps=$steps Outputs/file_base=recover UserObjects/random_point_uo/seed=$seed1 UserObjects/inserter/seed=$seed2 --half-transient Outputs/checkpoint=true > run-recover
-      mpiexec -np $cpus ../../PRARIEDOG-opt -i test.i Executioner/num_steps=$steps Outputs/file_base=recover UserObjects/random_point_uo/seed=$seed1 UserObjects/inserter/seed=$seed2--recover  >> run-recover
+      mpiexec -np $cpus ../../PRARIEDOG-opt -i test.i Executioner/num_steps=$steps Outputs/file_base=recover UserObjects/random_point_uo/seed=$seed1 UserObjects/inserter/seed=$seed2 --recover  >> run-recover
 
       # count exodus output files again
       num_recover_files=`for file in recover.e*; do echo $file; done | wc -l`
