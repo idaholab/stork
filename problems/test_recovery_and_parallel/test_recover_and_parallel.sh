@@ -5,6 +5,9 @@ runs=10
 max_cpus=4
 max_steps=20
 
+# write information on failed tests to file
+rm -f failed-tests
+
 for ((run=1;run<=$runs;run++))
 do
   for ((cpus=1;cpus<=$max_cpus;cpus++))
@@ -37,8 +40,8 @@ do
       # number of output files should be the same
       if [ $num_gold_files != $num_recover_files ]
       then
-          echo "error: number of output files does not match"
-          exit
+          echo "error: number of output files does not match, cpus: $cpus, steps: $steps, seeds: $seed1 $seed2" | tee -a failed-tests
+          continue
       fi
 
       if [ $num_gold_files -gt 1 ]
@@ -57,8 +60,8 @@ do
       # check for message in exodiff output
       if ! grep -q 'Files are the same' exodiff-output
       then
-          echo "error: outputs are different"
-          exit
+          echo "error: outputs are different, cpus: $cpus, steps: $steps, seeds: $seed1 $seed2" | tee -a failed-tests
+          continue
       else
           echo "OK!"
       fi
