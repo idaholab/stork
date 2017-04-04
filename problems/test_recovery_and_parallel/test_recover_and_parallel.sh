@@ -5,6 +5,12 @@ runs=10
 max_cpus=4
 max_steps=20
 
+# choose executable type (e.g. "opt" or "dbg")
+exec_type=opt
+
+# write information on failed tests to file
+rm -f failed-tests
+
 for ((run=1;run<=$runs;run++))
 do
   for ((cpus=1;cpus<=$max_cpus;cpus++))
@@ -21,15 +27,15 @@ do
 
       # run once all the way through
       echo "running all the way through..."
-      mpiexec -np $cpus ../../PRARIEDOG-opt -i test.i Executioner/num_steps=$steps Outputs/file_base=gold UserObjects/random_point_uo/seed=$seed1 UserObjects/inserter/seed=$seed2 > run
+      mpiexec -np $cpus ../../PRARIEDOG-$exec_type -i test.i Executioner/num_steps=$steps Outputs/file_base=gold UserObjects/random_point_uo/seed=$seed1 UserObjects/inserter/seed=$seed2 > run
 
       # count exodus output files
       num_gold_files=`for file in gold.e*; do echo $file; done | wc -l`
 
       # do half-transient and recover
       echo "running a half-transient and recover..."
-      mpiexec -np $cpus ../../PRARIEDOG-opt -i test.i Executioner/num_steps=$steps Outputs/file_base=recover UserObjects/random_point_uo/seed=$seed1 UserObjects/inserter/seed=$seed2 --half-transient Outputs/checkpoint=true > run-recover
-      mpiexec -np $cpus ../../PRARIEDOG-opt -i test.i Executioner/num_steps=$steps Outputs/file_base=recover UserObjects/random_point_uo/seed=$seed1 UserObjects/inserter/seed=$seed2 --recover  >> run-recover
+      mpiexec -np $cpus ../../PRARIEDOG-$exec_type -i test.i Executioner/num_steps=$steps Outputs/file_base=recover UserObjects/random_point_uo/seed=$seed1 UserObjects/inserter/seed=$seed2 --half-transient Outputs/checkpoint=true > run-recover
+      mpiexec -np $cpus ../../PRARIEDOG-$exec_type -i test.i Executioner/num_steps=$steps Outputs/file_base=recover UserObjects/random_point_uo/seed=$seed1 UserObjects/inserter/seed=$seed2 --recover  >> run-recover
 
       # count exodus output files again
       num_recover_files=`for file in recover.e*; do echo $file; done | wc -l`
@@ -37,8 +43,8 @@ do
       # number of output files should be the same
       if [ $num_gold_files != $num_recover_files ]
       then
-          echo "error: number of output files does not match"
-          exit
+          echo "error: number of output files does not match, cpus: $cpus, steps: $steps, seeds: $seed1 $seed2" | tee -a failed-tests
+          continue
       fi
 
       if [ $num_gold_files -gt 1 ]
@@ -57,8 +63,8 @@ do
       # check for message in exodiff output
       if ! grep -q 'Files are the same' exodiff-output
       then
-          echo "error: outputs are different"
-          exit
+          echo "error: outputs are different, cpus: $cpus, steps: $steps, seeds: $seed1 $seed2" | tee -a failed-tests
+          continue
       else
           echo "OK!"
       fi
