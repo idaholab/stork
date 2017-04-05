@@ -115,10 +115,10 @@ protected:
   std::map<dof_id_type, Point> _centroids;
 
   /// This vector will hold integral around inserter points
-  std::vector<Real> & _integral_sum;
+  std::vector<Real> _integral_sum;
 
   /// This vector will hold volume around inserter points
-  std::vector<Real> & _volume_sum;
+  std::vector<Real> _volume_sum;
 
   /// List of old events
   EventList _old_event_list;

@@ -26,6 +26,14 @@ InputParameters validParams<CircleAverageMaterialProperty>()
   params.addParam<UserObjectName>("inserter", "Name of the EventInserter UserObject.");
   params.addParam<Real>("radius", "Radius of circle to average material property in.");
 
+  MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
+  // The mapping needs to run at timestep begin, which is after the adaptivity
+  // run of the previous timestep. Also run at timestep end to have updated values
+  // from EventInserter for Postprocessors. The latter is really just for debugging
+  // purposes and could be removed for efficiency.
+  setup_options = "timestep_begin timestep_end";
+  params.set<MultiMooseEnum>("execute_on") = setup_options;
+
   return params;
 }
 
@@ -37,8 +45,8 @@ CircleAverageMaterialProperty::CircleAverageMaterialProperty(const InputParamete
     _inserter(NULL),
     _radius((parameters.isParamSetByUser("inserter") && (parameters.isParamSetByUser("radius"))) ? getParam<Real>("radius") : 0.0),
     _mesh(_fe_problem.mesh()),
-    _integral_sum(declareRestartableData<std::vector<Real> >("integral_sum")),
-    _volume_sum(declareRestartableData<std::vector<Real> >("volume_sum")),
+    _integral_sum(0),
+    _volume_sum(0),
     _old_event_list(0),
     _Npoints(0)
 {
