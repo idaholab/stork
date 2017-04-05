@@ -72,3 +72,13 @@ do
     done
   done
 done
+
+if [ -e "failed-tests" ]
+then
+  echo "-----------------"
+  echo "summary:"
+  cat failed-tests
+else
+  echo "-----------------"
+  echo "no errors!"
+fi
