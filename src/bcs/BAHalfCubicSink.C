@@ -7,8 +7,11 @@
 
 
 #include "BAHalfCubicSink.h"
+
+// MOOSE includes
 #include "Material.h"
 #include "Function.h"
+#include "MooseVariable.h"
 
 #include <iostream>
 
