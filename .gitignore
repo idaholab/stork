@@ -157,3 +157,4 @@ peacock_*.e
 *.cpa-*
 *.cpr-*
 
+include/base/BaHunRevision.h
