@@ -9,20 +9,28 @@ fi
 steps=$1
 seed1=$2
 seed2=$3
-
-rm -rf *.e* *_cp run run-recover exodus-output
-
 echo "run using $steps steps with these seeds: $seed1 $seed2 ..."
+
+# set path to executable
+exec=../../PRARIEDOG-opt
+
+# set path to exodiff
+exodiff=../../../moose/framework/contrib/exodiff/exodiff
+
+# set name of input file
+inputfile=test.i
+
+# clean
+rm -rf *.e* *_cp run run-recover exodus-output
 
 # run once all the way through
 echo "running all the way through..."
-../../PRARIEDOG-opt -i test.i Executioner/num_steps=$steps Outputs/file_base=gold UserObjects/random_point_uo/seed=$seed1 UserObjects/inserter/seed=$seed2 > run
-
+$exec -i $inputfile Executioner/num_steps=$steps Outputs/file_base=gold UserObjects/random_point_uo/seed=$seed1 UserObjects/inserter/seed=$seed2 > run
 
 # do half-transient and recover
 echo "running a half-transient and recover..."
-../../PRARIEDOG-opt -i test.i Executioner/num_steps=$steps Outputs/file_base=recover UserObjects/random_point_uo/seed=$seed1 UserObjects/inserter/seed=$seed2 --half-transient Outputs/checkpoint=true > run-recover
-../../PRARIEDOG-opt -i test.i Executioner/num_steps=$steps Outputs/file_base=recover UserObjects/random_point_uo/seed=$seed1 UserObjects/inserter/seed=$seed2 --recover  >> run-recover
+$exec -i $inputfile Executioner/num_steps=$steps Outputs/file_base=recover UserObjects/random_point_uo/seed=$seed1 UserObjects/inserter/seed=$seed2 --half-transient Outputs/checkpoint=true > run-recover
+$exec -i $inputfile Executioner/num_steps=$steps Outputs/file_base=recover UserObjects/random_point_uo/seed=$seed1 UserObjects/inserter/seed=$seed2 --recover  >> run-recover
 
 # count exodus output files
 num_gold_files=`for file in gold.e*; do echo $file; done | wc -l`
@@ -35,6 +43,7 @@ then
   exit 1
 fi
 
+# get name of last exodus file
 if [ $num_gold_files -gt 1 ]
 then
   gold_file=gold.e-s`printf "%03d" $num_gold_files`
@@ -46,7 +55,7 @@ fi
 
 # now compare the last files the same way the moose tester does it
 # this assumes you have this app installed next to moose
-../../../moose/framework/contrib/exodiff/exodiff -m  -F 1e-10 -t 5.5e-06 $gold_file $recover_file > exodiff-output
+$exodiff -m  -F 1e-10 -t 5.5e-06 $gold_file $recover_file > exodiff-output
 
 # check for message in exodiff output
 if ! grep -q 'Files are the same' exodiff-output
