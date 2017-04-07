@@ -33,6 +33,7 @@
 []
 
 [Kernels]
+  active = 'ie diff event_inserter_source'
   [./ie]
     type = TimeDerivative
     variable = u
@@ -90,7 +91,7 @@
     type = GenericConstantMaterial
     block = 0
     prop_names = 'diffusivity'
-    prop_values = '2.0'
+    prop_values = '0.2'
   [../]
 []
 
@@ -153,9 +154,9 @@
 
 [Adaptivity]
   initial_marker = event_marker
-  initial_steps = 10
+  initial_steps = 1
   marker = event_marker
-  cycles_per_step = 10
+  cycles_per_step = 1
   max_h_level = 0
   recompute_markers_during_cycles = true
   [./Markers]
