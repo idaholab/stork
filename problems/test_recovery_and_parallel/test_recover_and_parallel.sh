@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# This script is for testing the robustness of PRARIEDOG in terms of recovery.
+# It can do several loops over the input file for a range of steps and numbers of cpus
+#   to test if the recovery works with timestepping, mesh adaptivity, etc...
+# It picks random seeds for the cascade timing and location objects, so it is best to
+#   do several iterations ("runs").
+
 # enter these parameters
 runs=1
 max_cpus=1

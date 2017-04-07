@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# This script is to be used to run one set of simulations to test recovery.
+# It requires 3 parameters from the command line (in this order):
+#   1. total number of steps to perform
+#   2. seed 1
+#   3. seed 2
+
 if [ $# -ne 3 ]
 then
   echo "usage: $0 num_steps seed1 seed2"
