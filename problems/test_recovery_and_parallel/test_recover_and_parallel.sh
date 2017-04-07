@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # enter these parameters
-runs=10
-max_cpus=4
-max_steps=20
+runs=1
+max_cpus=1
+max_steps=10
 
 # choose executable type (e.g. "opt" or "dbg")
 exec_type=opt
@@ -73,12 +73,12 @@ do
   done
 done
 
+# print results
+echo "-----------------"
 if [ -e "failed-tests" ]
 then
-  echo "-----------------"
   echo "summary:"
   cat failed-tests
 else
-  echo "-----------------"
   echo "no errors!"
 fi
