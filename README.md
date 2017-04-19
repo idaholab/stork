@@ -1,6 +1,4 @@
-Stork
-=====
+THIS REPOSITORY IS DEPRECATED.
 
-"Fork Stork" to create a new MOOSE-based application.
-
-For more information see: [http://mooseframework.org/create-an-app/](http://mooseframework.org/create-an-app/)
+To create new MOOSE-based applications, use the ``stork.sh`` script in the main MOOSE repository.
+For more information, see [http://mooseframework.org/create-an-app/](http://mooseframework.org/create-an-app/)
