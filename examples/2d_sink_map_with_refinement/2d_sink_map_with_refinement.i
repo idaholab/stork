@@ -235,6 +235,10 @@
     type = ElementAverageValue
     variable = sink_map_rate_aux
   [../]
+  [./num_past_events]
+    type = NumPastEvents
+    inserter = inserter
+  [../]
 []
 
 [Outputs]
