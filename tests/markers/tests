@@ -83,4 +83,9 @@
     exodiff = 'random_circle_marker_initial_out.e'
     recover = false
   [../]
+  [./event_marker_coarsening_with_uniform_refine]
+    type = 'Exodiff'
+    input = 'event_marker_coarsening_with_uniform_refine.i'
+    exodiff = 'event_marker_coarsening_with_uniform_refine_out.e-s002'
+  [../]
 []
