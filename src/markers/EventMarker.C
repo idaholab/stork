@@ -53,6 +53,7 @@ EventMarker::EventMarker(const InputParameters & parameters) :
     _sink_marker_radius(getParam<Real>("sink_marker_radius")),
     _refine_sinks_by_ratio(parameters.isParamSetByUser("sink_sigma_mesh_ratio")),
     _sink_sigma_mesh_ratio(getParam<Real>("sink_sigma_mesh_ratio")),
+    _uniform_refinement_level(_mesh.uniformRefineLevel()),
     _sink_map_user_object_ptr(NULL),
     _sink_gaussian_user_object_ptr(NULL),
     _event_incoming(false),
@@ -198,6 +199,11 @@ EventMarker::computeElementMarker()
         marker_value = REFINE;
     }
   }
+
+  // one last check to make sure we are not coarsening beyond the applied uniform refinement
+  // the last expression is to leave it alone when no intervening is needed
+  if ((marker_value == COARSEN) && (_current_elem->level() == _uniform_refinement_level) && (_uniform_refinement_level > 0))
+    marker_value = DO_NOTHING;
 
   return marker_value;
 }

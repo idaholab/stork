@@ -76,6 +76,8 @@ protected:
 
   const Real  _sink_sigma_mesh_ratio;
 
+  const unsigned int _uniform_refinement_level;
+
   const SinkMapUserObject * _sink_map_user_object_ptr;
 
   const GaussianUserObject * _sink_gaussian_user_object_ptr;
