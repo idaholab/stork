@@ -17,7 +17,7 @@ for file in os.listdir("."):
 
 data=np.loadtxt(csvfile, delimiter=',', skiprows=1)
 
-plt.plot(data[:,0], data[:,5], 'r-', label='solution')
+plt.plot(data[:,0], data[:,7], 'r-', label='solution')
 plt.xlabel('time')
 plt.ylabel('average concentration')
 

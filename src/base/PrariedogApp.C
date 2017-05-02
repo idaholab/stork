@@ -27,6 +27,7 @@
 #include "MaterialDiracSinkKernel.h"
 #include "RandomCircleMarker.h"
 #include "CoupledSinkRateAux.h"
+#include "NumPastEvents.h"
 
 template<>
 InputParameters validParams<PrariedogApp>()
@@ -84,6 +85,7 @@ PrariedogApp::registerObjects(Factory & factory)
 
   registerPostprocessor(CircleAverageMaterialPropertyPPS);
   registerPostprocessor(CircleMaxOriginalElementSizePPS);
+  registerPostprocessor(NumPastEvents);
 
   registerTimeStepper(EventTimeStepper);
 

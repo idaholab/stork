@@ -73,6 +73,9 @@ public:
   /// Print out event lists
   void printEventLists() const;
 
+  /// Get number of past events
+  unsigned int getNumPastEvents() const { return _num_past_events; }
+
 protected:
   /// Timing to use between event
   const bool _use_random_timing;
@@ -151,6 +154,9 @@ protected:
 
   /// Holds initial sigma from GaussianUserObject
   Real _initial_sigma;
+
+  /// Count number of events
+  unsigned int & _num_past_events;
 
   /// Flag for starting up after restart
   bool _first_time_after_restart;
