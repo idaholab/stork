@@ -75,6 +75,7 @@ EventInserter::EventInserter(const InputParameters & parameters) :
     _old_event_list(declareRestartableData<EventList>("old_event_list")),
     _old_sigma_list(declareRestartableData<std::vector<Real> >("old_sigma_list")),
     _random(declareRestartableData<MooseRandom>("event_inserter_generator")),
+    _num_past_events(declareRestartableData<unsigned int>("num_past_events",0)),
     _first_time_after_restart(_app.isRestarting() || _app.isRecovering())
 {
   if (parameters.isParamSetByUser("seed"))
@@ -199,6 +200,9 @@ EventInserter::execute()
       // look for past Events
       if (_global_event_list[i].first < _t)
       {
+        // increment past event counter
+        _num_past_events++;
+
         // add past Event to old list if requested
         if (_track_old_events)
         {
