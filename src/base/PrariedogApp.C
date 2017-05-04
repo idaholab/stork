@@ -28,6 +28,7 @@
 #include "RandomCircleMarker.h"
 #include "CoupledSinkRateAux.h"
 #include "NumPastEvents.h"
+#include "ElementHLevel.h"
 
 template<>
 InputParameters validParams<PrariedogApp>()
@@ -69,6 +70,7 @@ PrariedogApp::registerObjects(Factory & factory)
   registerAuxKernel(MaterialSinkRateAux);
   registerAuxKernel(SinkMapRateAux);
   registerAuxKernel(CoupledSinkRateAux);
+  registerAuxKernel(ElementHLevel);
 
   registerDiracKernel(DiracSinkMapKernel);
   registerDiracKernel(MaterialDiracSinkKernel);
