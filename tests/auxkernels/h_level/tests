@@ -1,0 +1,13 @@
+[Tests]
+  [./element_h_level]
+    type = 'Exodiff'
+    input = 'h_level.i'
+    exodiff = 'h_level_out.e-s003'
+  [../]
+  [./element_h_level_nodal]
+    type = 'RunException'
+    input = 'h_level_nodal.i'
+    expect_err = 'Cannot use ElementHLevel AuxKernel with Nodal variables.'
+    recover = false
+  [../]
+[]
