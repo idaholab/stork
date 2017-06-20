@@ -19,7 +19,7 @@
 
 //Forward Declarations
 class EventInserterSource;
-class EventInserter;
+class EventInserterBase;
 class GaussianUserObject;
 
 template<>
@@ -47,7 +47,7 @@ protected:
    */
   virtual Real computeQpResidual();
 
-  const EventInserter & _inserter;
+  const EventInserterBase & _inserter;
 
   const GaussianUserObject * _gaussian_user_object_ptr;
 
