@@ -13,7 +13,7 @@
 /****************************************************************/
 
 #include "EventInserterSource.h"
-#include "EventInserter.h"
+#include "EventInserterBase.h"
 #include "GaussianUserObject.h"
 
 template<>
@@ -30,7 +30,7 @@ InputParameters validParams<EventInserterSource>()
 
 EventInserterSource::EventInserterSource(const InputParameters & parameters) :
     Kernel(parameters),
-    _inserter(getUserObject<EventInserter>("inserter")),
+    _inserter(getUserObject<EventInserterBase>("inserter")),
     _gaussian_user_object_ptr(parameters.isParamSetByUser("gaussian_user_object") ? &getUserObject<GaussianUserObject>("gaussian_user_object") : NULL),
     _use_uniform_source(getParam<bool>("uniform_source")),
     _magnitude(getParam<Real>("magnitude")),

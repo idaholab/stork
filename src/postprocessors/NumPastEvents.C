@@ -26,7 +26,7 @@ InputParameters validParams<NumPastEvents>()
 
 NumPastEvents::NumPastEvents(const InputParameters & parameters) :
     GeneralPostprocessor(parameters),
-    _inserter(getUserObject<EventInserter>("inserter"))
+    _inserter(getUserObject<EventInserterBase>("inserter"))
 {
 }
 

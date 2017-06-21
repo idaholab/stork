@@ -13,7 +13,7 @@
 /****************************************************************/
 
 #include "CircleAverageMaterialProperty.h"
-#include "EventInserter.h"
+#include "EventInserterBase.h"
 
 #include "libmesh/parallel_algebra.h"
 
@@ -61,7 +61,7 @@ CircleAverageMaterialProperty::initialSetup()
   // Doing this here because all UserObjects will be constructed and order won't matter in the input file
   if (_use_inserter_points)
   {
-    _inserter = &getUserObject<EventInserter>("inserter");
+    _inserter = &getUserObject<EventInserterBase>("inserter");
 
     if (!_inserter->areOldEventsBeingTracked())
       mooseError("CircleAverageMaterialProperty cannot be used on inserter points unless old events are being tracked. Set 'track_old_events = true' in EventInserter block.");

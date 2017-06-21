@@ -20,7 +20,7 @@
 
 //Forward Declarations
 class CircleAverageMaterialProperty;
-class EventInserter;
+class EventInserterBase;
 
 template<>
 InputParameters validParams<CircleAverageMaterialProperty>();
@@ -91,7 +91,7 @@ protected:
   const bool _use_inserter_points;
 
   /// Reference to EventInserter UserObject
-  const EventInserter * _inserter;
+  const EventInserterBase * _inserter;
 
   /// Distance to search around inserter points
   const Real _radius;

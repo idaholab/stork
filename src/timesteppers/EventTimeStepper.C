@@ -47,7 +47,7 @@ void
 EventTimeStepper::init()
 {
   // called here because timesteppers are initialized before user objects
-  _inserter_ptr = &getUserObject<EventInserter>("event_inserter");
+  _inserter_ptr = &getUserObject<EventInserterBase>("event_inserter");
 }
 
 Real

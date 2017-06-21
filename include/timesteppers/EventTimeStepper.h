@@ -15,7 +15,7 @@
 #define EVENTTIMESTEPPER_H
 
 #include "TimeStepper.h"
-#include "EventInserter.h"
+#include "EventInserterBase.h"
 #include "UserObjectInterface.h"
 
 class EventTimeStepper;
@@ -56,7 +56,7 @@ protected:
   Real & _new_dt;
 
   /// Pointer to EventInserter UserObject
-  const EventInserter * _inserter_ptr;
+  const EventInserterBase * _inserter_ptr;
 };
 
 #endif /* EVENTTIMESTEPPER_H */

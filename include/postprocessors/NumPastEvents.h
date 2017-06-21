@@ -16,7 +16,7 @@
 #define NUMPASTEVENTS_H
 
 #include "GeneralPostprocessor.h"
-#include "EventInserter.h"
+#include "EventInserterBase.h"
 
 class NumPastEvents;
 
@@ -37,7 +37,7 @@ public:
   virtual Real getValue();
 
 protected:
-  const EventInserter & _inserter;
+  const EventInserterBase & _inserter;
 };
 
 #endif /* NUMPASTEVENTS_H */

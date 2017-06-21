@@ -39,7 +39,7 @@ InputParameters validParams<EventMarker>()
 EventMarker::EventMarker(const InputParameters & parameters) :
     Marker(parameters),
     Coupleable(this, false),
-    _inserter(getUserObject<EventInserter>("inserter")),
+    _inserter(getUserObject<EventInserterBase>("inserter")),
     _gaussian_uo(getUserObject<GaussianUserObject>("gaussian_user_object")),
     _marker_radius(getParam<Real>("marker_radius")),
     _verbose(getParam<bool>("verbose")),

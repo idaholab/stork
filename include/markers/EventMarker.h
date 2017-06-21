@@ -16,7 +16,7 @@
 #define EVENTMARKER_H
 
 #include "Marker.h"
-#include "EventInserter.h"
+#include "EventInserterBase.h"
 #include "GaussianUserObject.h"
 #include "SinkMapUserObject.h"
 #include "Coupleable.h"
@@ -48,7 +48,7 @@ protected:
 
   virtual MarkerValue computeElementMarker();
 
-  const EventInserter & _inserter;
+  const EventInserterBase & _inserter;
 
   const GaussianUserObject & _gaussian_uo;
 
