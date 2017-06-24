@@ -60,7 +60,7 @@ EventInserterSource::timestepSetup()
   {
     _is_event_active = true;
     _active_point = _inserter.getActiveEventPoint(_t - _dt, _t);
-    _console << "*** EventInserterSource::timestepSetup: active cascade detected!" << std::endl;
+    _console << "*** EventInserterSource::timestepSetup: active event detected!" << std::endl;
     _console << "*** EventInserterSource::timestepSetup: Point:" << _active_point << std::endl;
   }
 }
