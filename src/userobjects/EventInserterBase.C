@@ -31,7 +31,7 @@ InputParameters validParams<EventInserterBase>()
   params.addParam<bool>("verbose", false, "Print out extra information about when events are inserted and deleted.");
   params.addParam<Real>("time_tolerance", 1.0e-12, "Tolerance when comparing times.");
   params.addParam<bool>("track_old_events", false, "Enable this to allow mesh from previous events to be coarsened. If true, choose removal method with 'removal_method'.");
-  params.addParam<MooseEnum>("removal_method", removal_method, "How to decide when to remove old cascade events. Choices are 'time' or 'sigma'.");
+  params.addParam<MooseEnum>("removal_method", removal_method, "How to decide when to remove old events. Choices are 'time' or 'sigma'.");
   params.addParam<Real>("removal_time", "Time to wait after an event to remove from the list.");
   params.addParam<Real>("removal_sigma", "Target (approx.) sigma value at which to remove the event from the list.");
   params.addParam<Real>("removal_sigma_element_size_ratio", "Target sigma to original element size ratio at which to remove the event from the list.");
