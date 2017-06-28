@@ -33,7 +33,6 @@ public:
   virtual void initialize();
   virtual void execute();
   virtual PostprocessorValue getValue();
-  virtual void threadJoin(const UserObject & uo);
 
 protected:
 
