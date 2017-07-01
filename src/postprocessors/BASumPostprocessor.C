@@ -64,10 +64,3 @@ BASumPostprocessor::getValue()
       val += (*_pps_vals[i])/(*_w[i]);
   return val;
 }
-
-void
-BASumPostprocessor::threadJoin(const UserObject & /*uo*/)
-{
-  // nothing to do here, general PPS do not run threaded
-}
-
