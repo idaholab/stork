@@ -43,6 +43,7 @@ public:
    * @return The average value of a material property in that circle
    */
   Real averageValue(const Point & p, const Real & radius) const;
+  Real averageValue(const Point & p) const;
   Real averageValue(const unsigned int i) const;
 
   /**

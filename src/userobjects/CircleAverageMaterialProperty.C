@@ -82,6 +82,20 @@ CircleAverageMaterialProperty::averageValue(const unsigned int i) const
 }
 
 Real
+CircleAverageMaterialProperty::averageValue(const Point & p) const
+{
+  // loop through the event list and find which index the incoming Point corresponds to
+  for (unsigned int i=0; i<_event_list.size(); i++)
+    if (p.absolute_fuzzy_equals(_event_list[i].second))
+      return _integral_sum[i]/_volume_sum[i];
+    else
+      return 0.0;  // in case volume postprocessor hasn't been run
+
+  // if we made it here, the point wasn't found
+  mooseError("In CircleAverageMaterialProperty::averageValue(), Point", p, "not found");
+}
+
+Real
 CircleAverageMaterialProperty::averageValue(const Point & p, const Real & radius) const
 {
   // Note that we can't use operator[] for a std::map in a const function!
