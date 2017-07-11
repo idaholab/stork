@@ -120,10 +120,10 @@ protected:
   /// This vector will hold volume around inserter points
   std::vector<Real> _volume_sum;
 
-  /// List of old events
-  EventList _old_event_list;
+  /// List of events
+  EventList _event_list;
 
-  /// Length of old events
+  /// Number of events
   unsigned int _Npoints;
 
 };

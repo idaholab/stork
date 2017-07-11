@@ -47,7 +47,7 @@ CircleAverageMaterialProperty::CircleAverageMaterialProperty(const InputParamete
     _mesh(_fe_problem.mesh()),
     _integral_sum(0),
     _volume_sum(0),
-    _old_event_list(0),
+    _event_list(0),
     _Npoints(0)
 {
 
@@ -74,8 +74,11 @@ CircleAverageMaterialProperty::averageValue(const unsigned int i) const
   if (i < _volume_sum.size())
     if (_volume_sum[i] > 0.0)
       return _integral_sum[i]/_volume_sum[i];
+    else
+      return 0.0;  // in case volume postprocessor hasn't been run
 
-  return 0.0;
+  // if we made it here, the index wasn't found
+  mooseError("In CircleAverageMaterialProperty::averageValue(), index", i, "not found");
 }
 
 Real
@@ -138,9 +141,13 @@ CircleAverageMaterialProperty::initialize()
 {
   if (_use_inserter_points)
   {
-    // get old event list to see how many points we are averaging
-    _old_event_list = _inserter->getOldEventList();
-    _Npoints = _old_event_list.size();
+    // get old and event lists and put them together
+    _event_list = _inserter->getOldEventList();
+    EventList upcoming_events = _inserter->getEventList();
+    _event_list.insert(_event_list.end(), upcoming_events.begin(), upcoming_events.end());
+
+    // keep track of number of points
+    _Npoints = _event_list.size();
 
     // resize vectors to number of points
     _integral_sum.resize(_Npoints);
@@ -170,11 +177,11 @@ CircleAverageMaterialProperty::execute()
     for (unsigned int i=0; i < _Npoints; i++)
     {
       // get distance from event point to element centroid
-      Real r = distance(_current_elem->centroid(), _old_event_list[i].second);
+      Real r = distance(_current_elem->centroid(), _event_list[i].second);
 
       // check if distance between points is less than supplied radius
       // or if point is in element
-      if ((r < _radius) || (_current_elem->contains_point(_old_event_list[i].second)))
+      if ((r < _radius) || (_current_elem->contains_point(_event_list[i].second)))
       {
         _integral_sum[i] += computeIntegral();
         _volume_sum[i] += _current_elem_volume;
