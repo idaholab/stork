@@ -98,7 +98,7 @@
 
 [UserObjects]
   [./inserter_circle_average]
-    type = CircleAverageMaterialProperty
+    type = InserterPointCircleAverageMaterialProperty
     mat_prop = diffusivity
     periodic_variable = u
     inserter = inserter

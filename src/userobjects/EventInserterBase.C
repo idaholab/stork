@@ -7,6 +7,7 @@
 #include "EventInserterBase.h"
 #include "GaussianUserObject.h"
 #include "CircleAverageMaterialProperty.h"
+#include "InserterPointCircleAverageMaterialProperty.h"
 #include "CircleMaxOriginalElementSize.h"
 
 #include <time.h> // for time function to seed random number generator
@@ -19,7 +20,6 @@ InputParameters validParams<EventInserterBase>()
   MooseEnum distribution("uniform exponential", "uniform");
   MooseEnum removal_method("time sigma sigma_element_size_ratio", "time");
 
-  //params.addRequiredParam<Real>("mean", "Mean (time) of probability distribution");
   params.addRequiredParam<UserObjectName>("random_point_user_object", "Name of RandomPointUserObject to get random points on the mesh.");
   params.addParam<bool>("random_timing", false, "Use random timing (true) or constistent timing (false).");
   params.addParam<MooseEnum>("distribution", distribution, "Type of probability distribution to use in picking random event times.");
@@ -38,7 +38,7 @@ InputParameters validParams<EventInserterBase>()
   params.addParam<Real>("radius", "Distance, in multiples of the Event sigma, around an old event, to sample the original mesh.");
   params.addParam<UserObjectName>("gaussian_user_object", "Name of the GaussianUserObject for initial sigma value when coarsening by sigma values.");
   params.addParam<UserObjectName>("circle_average_material_property_user_object", "Name of the CircleAverageMaterialProperty UserObject for arbitrary circles and radii.");
-  params.addParam<UserObjectName>("inserter_circle_average_material_property_user_object", "Name of the CircleAverageMaterialProperty UserObject that gets points from EventInserterBase.");
+  params.addParam<UserObjectName>("inserter_circle_average_material_property_user_object", "Name of the InserterPointCircleAverageMaterialProperty UserObject that gets points from an EventInserter.");
   params.addParam<UserObjectName>("circle_max_original_element_size_user_object", "Name of the CircleMaxOriginalElementSize UserObject for arbitrary circles and radii.");
 
   MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
@@ -68,7 +68,7 @@ EventInserterBase::EventInserterBase(const InputParameters & parameters) :
     _removal_ratio(((_track_old_events) && (_removal_method == "sigma_element_size_ratio") && (parameters.isParamSetByUser("removal_sigma_element_size_ratio"))) ? getParam<Real>("removal_sigma_element_size_ratio") : std::numeric_limits<Real>::max()),
     _radius(((_track_old_events) && (_removal_method == "sigma_element_size_ratio") && (parameters.isParamSetByUser("radius"))) ? getParam<Real>("radius") : std::numeric_limits<Real>::max()),
     _circle_average_mat_prop_uo_ptr((parameters.isParamSetByUser("circle_average_material_property_user_object") && (_removal_method == "sigma" || _removal_method == "sigma_element_size_ratio")) ? &getUserObject<CircleAverageMaterialProperty>("circle_average_material_property_user_object") : NULL),
-    _inserter_circle_average_mat_prop_uo_ptr((parameters.isParamSetByUser("inserter_circle_average_material_property_user_object") && (_removal_method == "sigma" || _removal_method == "sigma_element_size_ratio")) ? &getUserObject<CircleAverageMaterialProperty>("inserter_circle_average_material_property_user_object") : NULL),
+    _inserter_circle_average_mat_prop_uo_ptr((parameters.isParamSetByUser("inserter_circle_average_material_property_user_object") && (_removal_method == "sigma" || _removal_method == "sigma_element_size_ratio")) ? &getUserObject<InserterPointCircleAverageMaterialProperty>("inserter_circle_average_material_property_user_object") : NULL),
     _circle_max_elem_size_uo_ptr((parameters.isParamSetByUser("circle_max_original_element_size_user_object") && (_removal_method == "sigma" || _removal_method == "sigma_element_size_ratio")) ? &getUserObject<CircleMaxOriginalElementSize>("circle_max_original_element_size_user_object") : NULL),
     _old_event_removed(declareRestartableData<bool>("old_event_removed",false)),
     _global_event_list(declareRestartableData<EventList>("global_event_list")),

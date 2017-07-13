@@ -13,6 +13,7 @@
 
 class EventInserterBase;
 class CircleAverageMaterialProperty;
+class InserterPointCircleAverageMaterialProperty;
 class CircleMaxOriginalElementSize;
 
 template<>
@@ -132,7 +133,7 @@ protected:
   const CircleAverageMaterialProperty * _circle_average_mat_prop_uo_ptr;
 
   /// Pointer to another CircleAverageMaterialProperty UserObject
-  const CircleAverageMaterialProperty * _inserter_circle_average_mat_prop_uo_ptr;
+  const InserterPointCircleAverageMaterialProperty * _inserter_circle_average_mat_prop_uo_ptr;
 
   /// Pointer to CircleMaxOriginalElementSize UserObject
   const CircleMaxOriginalElementSize * _circle_max_elem_size_uo_ptr;

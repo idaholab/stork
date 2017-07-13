@@ -87,7 +87,7 @@
     periodic_variable = u
   [../]
   [./circle_average]
-    type = CircleAverageMaterialProperty
+    type = InserterPointCircleAverageMaterialProperty
     mat_prop = diffusivity
     periodic_variable = u
     inserter = inserter
@@ -127,8 +127,7 @@
     variable = u
   [../]
   [./circle_average_pps]
-    type = CircleAverageMaterialPropertyPPS
-    method = inserter
+    type = InserterPointCircleAverageMaterialPropertyPPS
     user_object = circle_average
     entry = 0
   [../]

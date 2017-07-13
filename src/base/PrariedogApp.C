@@ -29,6 +29,9 @@
 #include "CoupledSinkRateAux.h"
 #include "NumPastEvents.h"
 #include "ElementHLevel.h"
+#include "CircleAverageMaterialPropertyBase.h"
+#include "InserterPointCircleAverageMaterialProperty.h"
+#include "InserterPointCircleAverageMaterialPropertyPPS.h"
 
 template<>
 InputParameters validParams<PrariedogApp>()
@@ -88,6 +91,7 @@ PrariedogApp::registerObjects(Factory & factory)
   registerPostprocessor(CircleAverageMaterialPropertyPPS);
   registerPostprocessor(CircleMaxOriginalElementSizePPS);
   registerPostprocessor(NumPastEvents);
+  registerPostprocessor(InserterPointCircleAverageMaterialPropertyPPS);
 
   registerTimeStepper(EventTimeStepper);
 
@@ -97,6 +101,8 @@ PrariedogApp::registerObjects(Factory & factory)
   registerUserObject(CircleAverageMaterialProperty);
   registerUserObject(CircleMaxOriginalElementSize);
   registerUserObject(SinkMapUserObject);
+  registerUserObject(CircleAverageMaterialPropertyBase);
+  registerUserObject(InserterPointCircleAverageMaterialProperty);
 }
 
 // External entry point for dynamic syntax association
