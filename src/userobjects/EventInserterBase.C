@@ -178,7 +178,7 @@ EventInserterBase::execute()
       for (unsigned int i=0; i<_old_sigma_list.size(); i++)
       {
         // get average diffusion coefficient around the old event point
-        Real D = _inserter_circle_average_mat_prop_uo_ptr->averageValue(i);
+        Real D = _inserter_circle_average_mat_prop_uo_ptr->averageValue(_old_event_list[i].second);
 
         // in case D changed from the previous step, calculate new t_star (described below) based on
         // last time step (which when is when sigma would have been affected by the change)
@@ -212,7 +212,7 @@ EventInserterBase::execute()
           if ((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio"))
           {
             // assume D has been constant from when event occured until now (have to assume something!)
-            Real D = _circle_average_mat_prop_uo_ptr->averageValue(_global_event_list[i].second, _initial_sigma);
+            Real D = _inserter_circle_average_mat_prop_uo_ptr->averageValue(_global_event_list[i].second);
 
             // calculate fictitious time that event with sigma=0 (dirac delta) would need to occur to grow to
             // be initial sigma when actually inserted, measure time relative to this
