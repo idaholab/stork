@@ -33,8 +33,10 @@ class InserterPointCircleAverageMaterialProperty : public CircleAverageMaterialP
 public:
   InserterPointCircleAverageMaterialProperty(const InputParameters & parameters);
 
+  /**
+   * Look up average material property value by Point if it is in an Event list.
+   */
   Real averageValue(const Point & p) const;
-  Real averageValue(const unsigned int i) const;
 
   /**
    * This is called at the beginning of the simulation.

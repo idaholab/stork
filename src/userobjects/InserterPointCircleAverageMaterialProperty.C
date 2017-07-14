@@ -44,22 +44,6 @@ InserterPointCircleAverageMaterialProperty::initialSetup()
 {
   // Doing this here because all UserObjects will be constructed and order won't matter in the input file
   _inserter = &getUserObject<EventInserterBase>("inserter");
-
-  if (!_inserter->areOldEventsBeingTracked())
-    mooseWarning("InserterPointCircleAverageMaterialProperty::averageValue(int) should not be used unless old events are being tracked. Set 'track_old_events = true' in EventInserter block.");
-}
-
-Real
-InserterPointCircleAverageMaterialProperty::averageValue(const unsigned int i) const
-{
-  if (i < _volume_sum.size())
-    if (_volume_sum[i] > 0.0)
-      return _integral_sum[i]/_volume_sum[i];
-    else
-      return 0.0;  // in case volume postprocessor hasn't been run
-
-  // if we made it here, the index wasn't found
-  mooseError("In InserterPointCircleAverageMaterialProperty::averageValue(), index", i, "not found");
 }
 
 Real

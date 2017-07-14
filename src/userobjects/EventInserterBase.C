@@ -413,6 +413,6 @@ EventInserterBase::printEventLists() const
       _console << " i: " << i << ": sigma: " << _old_sigma_list[i] << std::endl;
     _console << " printing CircleAverageMaterialProperty values for old events..." << std::endl;
     for (unsigned int i=0; i<_old_event_list.size(); i++)
-      _console << " old event list, i: " << i << ": location: " << _old_event_list[i].second << " average value: " << _inserter_circle_average_mat_prop_uo_ptr->averageValue(i) << std::endl;
+      _console << " old event list, i: " << i << ": location: " << _old_event_list[i].second << " average value: " << _inserter_circle_average_mat_prop_uo_ptr->averageValue(_old_event_list[i].second) << std::endl;
   }
 }

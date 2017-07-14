@@ -21,8 +21,7 @@ InputParameters validParams<InserterPointCircleAverageMaterialPropertyPPS>()
   InputParameters params = validParams<GeneralPostprocessor>();
 
   params.addRequiredParam<UserObjectName>("user_object", "The name of the InserterPointCircleAverageMaterialProperty user object");
-  params.addParam<unsigned int>("entry", 0, "Which entry when multiple InserterPointCircleAverageMaterialProperty values are being computed. Default is 0.");
-  params.addParam<Point>("location", 0.0, "Point indicating which EventInserter Event to look up.");
+  params.addRequiredParam<Point>("location", "Point indicating which EventInserter Event to look up.");
 
   return params;
 }
@@ -30,17 +29,12 @@ InputParameters validParams<InserterPointCircleAverageMaterialPropertyPPS>()
 InserterPointCircleAverageMaterialPropertyPPS::InserterPointCircleAverageMaterialPropertyPPS(const InputParameters & parameters) :
     GeneralPostprocessor(parameters),
     _uo(getUserObject<InserterPointCircleAverageMaterialProperty>("user_object")),
-    _entry(getParam<unsigned int>("entry")),
-    _p(getParam<Point>("location")),
-    _use_inserter_point(parameters.isParamSetByUser("location"))
+    _p(getParam<Point>("location"))
 {
 }
 
 Real
 InserterPointCircleAverageMaterialPropertyPPS::getValue()
 {
-  if (_use_inserter_point)
-    return _uo.averageValue(_p);
-  else
-    return _uo.averageValue(_entry);
+  return _uo.averageValue(_p);
 }
