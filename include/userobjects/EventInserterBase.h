@@ -12,7 +12,6 @@
 #include "MooseRandom.h"
 
 class EventInserterBase;
-class CircleAverageMaterialProperty;
 class InserterPointCircleAverageMaterialProperty;
 class CircleMaxOriginalElementSize;
 
@@ -128,9 +127,6 @@ protected:
 
   /// Distance, in multiples of the Event sigma, around an old event, to sample the original mesh
   const Real _radius;
-
-  /// Pointer to CircleAverageMaterialProperty UserObject
-  const CircleAverageMaterialProperty * _circle_average_mat_prop_uo_ptr;
 
   /// Pointer to another CircleAverageMaterialProperty UserObject
   const InserterPointCircleAverageMaterialProperty * _inserter_circle_average_mat_prop_uo_ptr;
