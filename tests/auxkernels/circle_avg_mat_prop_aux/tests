@@ -1,0 +1,12 @@
+[Tests]
+  [./circle_avg_mat_prop_aux]
+    type = 'Exodiff'
+    input = 'circle_avg_mat_prop_aux.i'
+    exodiff = 'circle_avg_mat_prop_aux_out.e'
+  [../]
+  [./circle_avg_mat_prop_aux_adapt]
+    type = 'Exodiff'
+    input = 'circle_avg_mat_prop_aux_adapt.i'
+    exodiff = 'circle_avg_mat_prop_aux_adapt_out.e'
+  [../]
+[]

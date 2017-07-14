@@ -32,6 +32,7 @@
 #include "CircleAverageMaterialPropertyBase.h"
 #include "InserterPointCircleAverageMaterialProperty.h"
 #include "InserterPointCircleAverageMaterialPropertyPPS.h"
+#include "CircleAverageMaterialPropertyAux.h"
 
 template<>
 InputParameters validParams<PrariedogApp>()
@@ -74,6 +75,7 @@ PrariedogApp::registerObjects(Factory & factory)
   registerAuxKernel(SinkMapRateAux);
   registerAuxKernel(CoupledSinkRateAux);
   registerAuxKernel(ElementHLevel);
+  registerAuxKernel(CircleAverageMaterialPropertyAux);
 
   registerDiracKernel(DiracSinkMapKernel);
   registerDiracKernel(MaterialDiracSinkKernel);
