@@ -12,33 +12,32 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#ifndef CIRCLEAVERAGEMATERIALPROPERTYPPS_H
-#define CIRCLEAVERAGEMATERIALPROPERTYPPS_H
+#ifndef INSERTERPOINTCIRCLEAVERAGEMATERIALPROPERTYPPS_H
+#define INSERTERPOINTCIRCLEAVERAGEMATERIALPROPERTYPPS_H
 
 #include "GeneralPostprocessor.h"
 
-class CircleAverageMaterialPropertyPPS;
-class CircleAverageMaterialProperty;
+class InserterPointCircleAverageMaterialPropertyPPS;
+class InserterPointCircleAverageMaterialProperty;
 
 template<>
-InputParameters validParams<CircleAverageMaterialPropertyPPS>();
+InputParameters validParams<InserterPointCircleAverageMaterialPropertyPPS>();
 
 /**
- * This PPS just retrieves the value from CircleAverageMaterialProperty User Object
+ * This PPS just retrieves the value from InserterPointCircleAverageMaterialProperty User Object
  */
-class CircleAverageMaterialPropertyPPS : public GeneralPostprocessor
+class InserterPointCircleAverageMaterialPropertyPPS : public GeneralPostprocessor
 {
 public:
-  CircleAverageMaterialPropertyPPS(const InputParameters & parameters);
+  InserterPointCircleAverageMaterialPropertyPPS(const InputParameters & parameters);
 
   virtual void initialize() {};  // not used
   virtual void execute() {};  // not used
   virtual Real getValue();
 
 protected:
-  const CircleAverageMaterialProperty & _uo;
+  const InserterPointCircleAverageMaterialProperty & _uo;
   const Point _p;
-  const Real _radius;
 };
 
-#endif /* CIRCLEAVERAGEMATERIALPROPERTYPPS_H */
+#endif /* INSERTERPOINTCIRCLEAVERAGEMATERIALPROPERTYPPS_H */

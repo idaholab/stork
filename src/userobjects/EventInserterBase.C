@@ -6,7 +6,7 @@
 /****************************************************************/
 #include "EventInserterBase.h"
 #include "GaussianUserObject.h"
-#include "CircleAverageMaterialProperty.h"
+#include "InserterPointCircleAverageMaterialProperty.h"
 #include "CircleMaxOriginalElementSize.h"
 
 #include <time.h> // for time function to seed random number generator
@@ -19,7 +19,6 @@ InputParameters validParams<EventInserterBase>()
   MooseEnum distribution("uniform exponential", "uniform");
   MooseEnum removal_method("time sigma sigma_element_size_ratio", "time");
 
-  //params.addRequiredParam<Real>("mean", "Mean (time) of probability distribution");
   params.addRequiredParam<UserObjectName>("random_point_user_object", "Name of RandomPointUserObject to get random points on the mesh.");
   params.addParam<bool>("random_timing", false, "Use random timing (true) or constistent timing (false).");
   params.addParam<MooseEnum>("distribution", distribution, "Type of probability distribution to use in picking random event times.");
@@ -37,8 +36,7 @@ InputParameters validParams<EventInserterBase>()
   params.addParam<Real>("removal_sigma_element_size_ratio", "Target sigma to original element size ratio at which to remove the event from the list.");
   params.addParam<Real>("radius", "Distance, in multiples of the Event sigma, around an old event, to sample the original mesh.");
   params.addParam<UserObjectName>("gaussian_user_object", "Name of the GaussianUserObject for initial sigma value when coarsening by sigma values.");
-  params.addParam<UserObjectName>("circle_average_material_property_user_object", "Name of the CircleAverageMaterialProperty UserObject for arbitrary circles and radii.");
-  params.addParam<UserObjectName>("inserter_circle_average_material_property_user_object", "Name of the CircleAverageMaterialProperty UserObject that gets points from EventInserterBase.");
+  params.addParam<UserObjectName>("inserter_circle_average_material_property_user_object", "Name of the InserterPointCircleAverageMaterialProperty UserObject that gets points from an EventInserter.");
   params.addParam<UserObjectName>("circle_max_original_element_size_user_object", "Name of the CircleMaxOriginalElementSize UserObject for arbitrary circles and radii.");
 
   MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
@@ -52,7 +50,6 @@ EventInserterBase::EventInserterBase(const InputParameters & parameters) :
     GeneralUserObject(parameters),
     _use_random_timing(getParam<bool>("random_timing")),
     _distribution(getParam<MooseEnum>("distribution")),
-    //_mean(getParam<Real>("mean")),
     _insert_initial(getParam<bool>("insert_initial")),
     _insert_test(getParam<bool>("insert_test")),
     _test_time(((_insert_test) && (parameters.isParamSetByUser("test_time"))) ? getParam<Real>("test_time") : -std::numeric_limits<Real>::max()),
@@ -67,8 +64,7 @@ EventInserterBase::EventInserterBase(const InputParameters & parameters) :
     _removal_sigma(((_track_old_events) && (_removal_method == "sigma") && (parameters.isParamSetByUser("removal_sigma"))) ? getParam<Real>("removal_sigma") : std::numeric_limits<Real>::max()),
     _removal_ratio(((_track_old_events) && (_removal_method == "sigma_element_size_ratio") && (parameters.isParamSetByUser("removal_sigma_element_size_ratio"))) ? getParam<Real>("removal_sigma_element_size_ratio") : std::numeric_limits<Real>::max()),
     _radius(((_track_old_events) && (_removal_method == "sigma_element_size_ratio") && (parameters.isParamSetByUser("radius"))) ? getParam<Real>("radius") : std::numeric_limits<Real>::max()),
-    _circle_average_mat_prop_uo_ptr((parameters.isParamSetByUser("circle_average_material_property_user_object") && (_removal_method == "sigma" || _removal_method == "sigma_element_size_ratio")) ? &getUserObject<CircleAverageMaterialProperty>("circle_average_material_property_user_object") : NULL),
-    _inserter_circle_average_mat_prop_uo_ptr((parameters.isParamSetByUser("inserter_circle_average_material_property_user_object") && (_removal_method == "sigma" || _removal_method == "sigma_element_size_ratio")) ? &getUserObject<CircleAverageMaterialProperty>("inserter_circle_average_material_property_user_object") : NULL),
+    _inserter_circle_average_mat_prop_uo_ptr((parameters.isParamSetByUser("inserter_circle_average_material_property_user_object") && (_removal_method == "sigma" || _removal_method == "sigma_element_size_ratio")) ? &getUserObject<InserterPointCircleAverageMaterialProperty>("inserter_circle_average_material_property_user_object") : NULL),
     _circle_max_elem_size_uo_ptr((parameters.isParamSetByUser("circle_max_original_element_size_user_object") && (_removal_method == "sigma" || _removal_method == "sigma_element_size_ratio")) ? &getUserObject<CircleMaxOriginalElementSize>("circle_max_original_element_size_user_object") : NULL),
     _old_event_removed(declareRestartableData<bool>("old_event_removed",false)),
     _global_event_list(declareRestartableData<EventList>("global_event_list")),
@@ -101,8 +97,6 @@ EventInserterBase::EventInserterBase(const InputParameters & parameters) :
       mooseError("User requested to remove old events by sigma ratio but 'radius' was not set.");
     if (((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio")) && (!parameters.isParamSetByUser("gaussian_user_object")))
       mooseError("User requested to remove old events by a sigma method but 'gaussian_user_object' was not set.");
-    if (((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio")) && (!parameters.isParamSetByUser("circle_average_material_property_user_object")))
-      mooseError("User requested to remove old events by a sigma method but 'circle_average_material_property_user_object' was not set.");
     if (((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio")) && (!parameters.isParamSetByUser("inserter_circle_average_material_property_user_object")))
       mooseError("User requested to remove old events by a sigma method but 'inserter_circle_average_material_property_user_object' was not set.");
     if ((_removal_method == "sigma_element_size_ratio") && (!parameters.isParamSetByUser("circle_max_original_element_size_user_object")))
@@ -178,7 +172,7 @@ EventInserterBase::execute()
       for (unsigned int i=0; i<_old_sigma_list.size(); i++)
       {
         // get average diffusion coefficient around the old event point
-        Real D = _inserter_circle_average_mat_prop_uo_ptr->averageValue(i);
+        Real D = _inserter_circle_average_mat_prop_uo_ptr->averageValue(_old_event_list[i].second);
 
         // in case D changed from the previous step, calculate new t_star (described below) based on
         // last time step (which when is when sigma would have been affected by the change)
@@ -212,7 +206,7 @@ EventInserterBase::execute()
           if ((_removal_method == "sigma") || (_removal_method == "sigma_element_size_ratio"))
           {
             // assume D has been constant from when event occured until now (have to assume something!)
-            Real D = _circle_average_mat_prop_uo_ptr->averageValue(_global_event_list[i].second, _initial_sigma);
+            Real D = _inserter_circle_average_mat_prop_uo_ptr->averageValue(_global_event_list[i].second);
 
             // calculate fictitious time that event with sigma=0 (dirac delta) would need to occur to grow to
             // be initial sigma when actually inserted, measure time relative to this
@@ -419,6 +413,6 @@ EventInserterBase::printEventLists() const
       _console << " i: " << i << ": sigma: " << _old_sigma_list[i] << std::endl;
     _console << " printing CircleAverageMaterialProperty values for old events..." << std::endl;
     for (unsigned int i=0; i<_old_event_list.size(); i++)
-      _console << " old event list, i: " << i << ": location: " << _old_event_list[i].second << " average value: " << _inserter_circle_average_mat_prop_uo_ptr->averageValue(i) << std::endl;
+      _console << " old event list, i: " << i << ": location: " << _old_event_list[i].second << " average value: " << _inserter_circle_average_mat_prop_uo_ptr->averageValue(_old_event_list[i].second) << std::endl;
   }
 }

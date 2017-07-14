@@ -12,31 +12,29 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#include "CircleAverageMaterialPropertyPPS.h"
-#include "CircleAverageMaterialProperty.h"
+#include "InserterPointCircleAverageMaterialPropertyPPS.h"
+#include "InserterPointCircleAverageMaterialProperty.h"
 
 template<>
-InputParameters validParams<CircleAverageMaterialPropertyPPS>()
+InputParameters validParams<InserterPointCircleAverageMaterialPropertyPPS>()
 {
   InputParameters params = validParams<GeneralPostprocessor>();
 
-  params.addRequiredParam<UserObjectName>("user_object", "The name of the CircleAverageMaterialProperty user object");
-  params.addRequiredParam<Point>("location", "Point of the center of the circle.");
-  params.addRequiredParam<Real>("radius", "Distance to search around the specified location.");
+  params.addRequiredParam<UserObjectName>("user_object", "The name of the InserterPointCircleAverageMaterialProperty user object");
+  params.addRequiredParam<Point>("location", "Point indicating which EventInserter Event to look up.");
 
   return params;
 }
 
-CircleAverageMaterialPropertyPPS::CircleAverageMaterialPropertyPPS(const InputParameters & parameters) :
+InserterPointCircleAverageMaterialPropertyPPS::InserterPointCircleAverageMaterialPropertyPPS(const InputParameters & parameters) :
     GeneralPostprocessor(parameters),
-    _uo(getUserObject<CircleAverageMaterialProperty>("user_object")),
-    _p(getParam<Point>("location")),
-    _radius(getParam<Real>("radius"))
+    _uo(getUserObject<InserterPointCircleAverageMaterialProperty>("user_object")),
+    _p(getParam<Point>("location"))
 {
 }
 
 Real
-CircleAverageMaterialPropertyPPS::getValue()
+InserterPointCircleAverageMaterialPropertyPPS::getValue()
 {
-  return _uo.averageValue(_p, _radius);
+  return _uo.averageValue(_p);
 }

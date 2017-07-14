@@ -98,16 +98,11 @@
 
 [UserObjects]
   [./inserter_circle_average]
-    type = CircleAverageMaterialProperty
+    type = InserterPointCircleAverageMaterialProperty
     mat_prop = diffusivity
     periodic_variable = u
     inserter = inserter
     radius = 0.2
-  [../]
-  [./circle_average]
-    type = CircleAverageMaterialProperty
-    mat_prop = diffusivity
-    periodic_variable = u
   [../]
   [./random_point_uo]
     type = RandomPointUserObject
@@ -135,7 +130,6 @@
     removal_sigma_element_size_ratio = 2.0
     radius = 3.0
     gaussian_user_object = gaussian_uo
-    circle_average_material_property_user_object = circle_average
     inserter_circle_average_material_property_user_object = inserter_circle_average
     circle_max_original_element_size_user_object = circle_max_original_element_size_uo
   [../]

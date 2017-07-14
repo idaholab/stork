@@ -12,35 +12,36 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#ifndef CIRCLEAVERAGEMATERIALPROPERTY_H
-#define CIRCLEAVERAGEMATERIALPROPERTY_H
+#ifndef INSERTERPOINTCIRCLEAVERAGEMATERIALPROPERTY_H
+#define INSERTERPOINTCIRCLEAVERAGEMATERIALPROPERTY_H
 
 #include "CircleAverageMaterialPropertyBase.h"
+#include "MooseMesh.h"
 
 //Forward Declarations
-class CircleAverageMaterialProperty;
+class InserterPointCircleAverageMaterialProperty;
+class EventInserterBase;
 
 template<>
-InputParameters validParams<CircleAverageMaterialProperty>();
+InputParameters validParams<InserterPointCircleAverageMaterialProperty>();
 
 /**
  * Computes the average value of a material property in side a circle
  */
-class CircleAverageMaterialProperty : public CircleAverageMaterialPropertyBase
+class InserterPointCircleAverageMaterialProperty : public CircleAverageMaterialPropertyBase
 {
 public:
-  CircleAverageMaterialProperty(const InputParameters & parameters);
+  InserterPointCircleAverageMaterialProperty(const InputParameters & parameters);
 
   /**
-   * Given a Point and a radius, return the average value for a material property in that circle
-   *
-   * Note that accessor functions on UserObjects like this _must_ be const.
-   * That is because the UserObject system returns const references to objects
-   * trying to use UserObjects.  This is done for parallel correctness.
-   *
-   * @return The average value of a material property in that circle
+   * Look up average material property value by Point if it is in an Event list.
    */
-  Real averageValue(const Point & p, const Real & radius) const;
+  Real averageValue(const Point & p) const;
+
+  /**
+   * This is called at the beginning of the simulation.
+   */
+  virtual void initialSetup();
 
   /**
    * This is called before execute so you can reset any internal data.
@@ -65,14 +66,30 @@ public:
   virtual void finalize();
 
 protected:
-  /// This map will hold the integral of each element
-  std::map<dof_id_type, Real> _integral_values;
+  /// An event has an start time and a location
+  typedef std::pair<Real, Point> Event;
 
-  /// This map will hold the volume of each element
-  std::map<dof_id_type, Real> _volume_values;
+  /// A list of future time/location pairs
+  typedef std::vector<Event> EventList;
 
-  /// This map will hold the centroid of each element
-  std::map<dof_id_type, Point> _centroids;
+  /// Reference to EventInserter UserObject
+  const EventInserterBase * _inserter;
+
+  /// Distance to search around inserter points
+  const Real _radius;
+
+  /// This vector will hold integral around inserter points
+  std::vector<Real> _integral_sum;
+
+  /// This vector will hold volume around inserter points
+  std::vector<Real> _volume_sum;
+
+  /// List of events
+  EventList _event_list;
+
+  /// Number of events
+  unsigned int _Npoints;
+
 };
 
 #endif

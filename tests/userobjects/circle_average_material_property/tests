@@ -11,9 +11,9 @@
     prereq = circle_average_material_property
     min_parallel = 2
   [../]
-  [./points_from_inserter]
+  [./point_from_inserter]
     type = 'CSVDiff'
-    input = 'points_from_inserter.i'
-    csvdiff = 'points_from_inserter_out.csv'
-  [../]  
+    input = 'point_from_inserter.i'
+    csvdiff = 'point_from_inserter_out.csv'
+  [../]
 []
