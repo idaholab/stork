@@ -38,6 +38,8 @@ public:
 protected:
   const InserterPointCircleAverageMaterialProperty & _uo;
   const unsigned int _entry;
+  const Point _p;
+  const bool _use_inserter_point;
 };
 
 #endif /* INSERTERPOINTCIRCLEAVERAGEMATERIALPROPERTYPPS_H */

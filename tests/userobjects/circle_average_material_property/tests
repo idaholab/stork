@@ -15,5 +15,10 @@
     type = 'CSVDiff'
     input = 'points_from_inserter.i'
     csvdiff = 'points_from_inserter_out.csv'
-  [../]  
+  [../]
+  [./point_from_inserter]
+    type = 'CSVDiff'
+    input = 'point_from_inserter.i'
+    csvdiff = 'point_from_inserter_out.csv'
+  [../]
 []
