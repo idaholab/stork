@@ -53,8 +53,6 @@ InserterPointCircleAverageMaterialProperty::averageValue(const Point & p) const
   for (unsigned int i=0; i<_event_list.size(); i++)
     if (p.absolute_fuzzy_equals(_event_list[i].second))
       return _integral_sum[i]/_volume_sum[i];
-    else
-      return 0.0;  // in case volume postprocessor hasn't been run
 
   // if we made it here, the point wasn't found
   mooseError("In InserterPointCircleAverageMaterialProperty::averageValue(), Point", p, "not found");
