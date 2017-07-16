@@ -47,6 +47,7 @@
     variable = u
     sink_map_user_object = sink_map_uo
     diffusivity_name = diffusivity
+    volume_pps = volume
   [../]
 []
 
@@ -190,6 +191,9 @@
   [../]
   [./num_elems]
     type = NumElems
+  [../]
+  [./volume]
+    type = VolumePostprocessor
   [../]
 []
 
