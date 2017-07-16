@@ -11,13 +11,6 @@
 
 [Variables]
   [./u]
-    order = FIRST
-    family = LAGRANGE
-
-    [./InitialCondition]
-      type = ConstantIC
-      value = 0
-    [../]
   [../]
 []
 
@@ -26,12 +19,10 @@
     type = TimeDerivative
     variable = u
   [../]
-
   [./diff]
     type = Diffusion
     variable = u
   [../]
-
   [./event_inserter_source]
     type = EventInserterSource
     variable = u
@@ -128,4 +119,3 @@
   exodus = true
   print_mesh_changed_info = true
 []
-

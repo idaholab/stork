@@ -30,7 +30,6 @@
 []
 
 [Executioner]
-  # Preconditioned JFNK (default)
   type = Transient
   num_steps = 1
   dt = 0.1
@@ -57,4 +56,3 @@
     print_mesh_changed_info = true
   [../]
 []
-

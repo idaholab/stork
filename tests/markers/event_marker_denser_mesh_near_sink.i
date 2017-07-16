@@ -11,13 +11,6 @@
 
 [Variables]
   [./u]
-    order = FIRST
-    family = LAGRANGE
-
-    [./InitialCondition]
-      type = ConstantIC
-      value = 0
-    [../]
   [../]
 []
 
@@ -33,20 +26,17 @@
     type = TimeDerivative
     variable = u
   [../]
-
   [./diff]
     type = MaterialDiffusion
     variable = u
     diffusivity_name = diffusivity
   [../]
-
   [./sink_map]
     type = SinkMapKernel
     variable = u
     sink_map_user_object = sink_map_uo
     diffusivity_name = diffusivity
   [../]
-
   [./event_inserter_source]
     type = EventInserterSource
     variable = u
