@@ -1,0 +1,8 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = '2d_with_sink.i'
+    exodiff = '2d_with_sink_out.e-s002'
+    cli_args = 'Executioner/num_steps=10'
+  [../]
+[]

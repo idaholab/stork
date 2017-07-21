@@ -1,0 +1,8 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = '2d_sigma_ratio_adaptivity.i'
+    exodiff = '2d_sigma_ratio_adaptivity_out.e'
+    cli_args = 'Executioner/num_steps=2'
+  [../]
+[]

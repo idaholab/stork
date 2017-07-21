@@ -1,0 +1,8 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = '2d_exponential_timing.i'
+    exodiff = '2d_exponential_timing_out.e-s002'
+    cli_args = 'Executioner/num_steps=10'
+  [../]
+[]

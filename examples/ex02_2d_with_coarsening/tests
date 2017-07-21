@@ -1,0 +1,8 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = '2d_with_coarsening.i'
+    exodiff = '2d_with_coarsening_out.e-s004'
+    cli_args = 'Executioner/num_steps=20'
+  [../]
+[]
