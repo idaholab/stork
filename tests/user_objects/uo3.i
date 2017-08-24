@@ -272,7 +272,6 @@
 
 [Outputs]
   execute_on = 'timestep_end'
-  execute_on = 'timestep_end'
   active = 'csv'
   file_base = uo3
   [./csv]
