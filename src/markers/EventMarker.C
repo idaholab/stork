@@ -200,6 +200,11 @@ EventMarker::computeElementMarker()
     }
   }
 
+  // don't bother trying to coarsen an element that is already at level 0
+  // plus it will make the marker field easier to interpret
+  if ((marker_value == COARSEN) && (_current_elem->level() == 0))
+    marker_value = DO_NOTHING;
+
   // one last check to make sure we are not coarsening beyond the applied uniform refinement
   // the last expression is to leave it alone when no intervening is needed
   if ((marker_value == COARSEN) && (_current_elem->level() == _uniform_refinement_level) && (_uniform_refinement_level > 0))
