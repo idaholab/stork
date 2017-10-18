@@ -221,6 +221,7 @@
   [../]
   [./num_elems]
     type = NumElems
+    execute_on = 'initial timestep_end'
   [../]
   [./sink_rate_average]
     type = ElementAverageValue
