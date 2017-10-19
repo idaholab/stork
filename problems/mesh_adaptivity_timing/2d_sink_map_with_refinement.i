@@ -243,17 +243,17 @@
     # out of all samples that have been taken (at linear and non-linear iterations)
     execute_on = 'INITIAL TIMESTEP_END NONLINEAR LINEAR'
   [../]
-  [./elapsed_active]
+  [./total_time]
     type = PerformanceData
     event = 'ACTIVE'
   [../]
-  [./refine_and_coarsen_elements]
+  [./adaptivity_time]
     type = PerformanceData
     column = total_time_with_sub
     category = 'Mesh Adaptivity'
     event = refine_and_coarsen_elements()
   [../]
-  [./eq.reinit]
+  [./reinit_time]
     type = PerformanceData
     column = total_time_with_sub
     category = 'Mesh Adaptivity'
