@@ -190,7 +190,7 @@
 
   [./TimeStepper]
     type = EventTimeStepper
-    dt = 0.01
+    dt = 0.001
     event_inserter = inserter
     growth_factor = 2.0
   [../]
