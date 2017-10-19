@@ -140,6 +140,10 @@
     sink_placement = inside
     gaussian_user_object = sink_gaussian_uo
   [../]
+  [./terminator]
+    type = Terminator
+    expression = 'num_past_events>=10'
+  [../]
 []
 
 [Adaptivity]
@@ -175,7 +179,7 @@
   solve_type = 'NEWTON'
 
   start_time = 0.0
-  num_steps = 20
+  # num_steps = 20
 
   verbose = true
 
