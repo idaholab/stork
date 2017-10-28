@@ -39,10 +39,6 @@ EventTimeStepper::EventTimeStepper(const InputParameters & parameters) :
 {
 }
 
-EventTimeStepper::~EventTimeStepper()
-{
-}
-
 void
 EventTimeStepper::init()
 {

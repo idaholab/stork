@@ -33,7 +33,6 @@ class EventMarker : public Marker, public Coupleable
 {
 public:
   EventMarker(const InputParameters & parameters);
-  virtual ~EventMarker(){};
 
   // copying these from EventInserter.h
 

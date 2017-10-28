@@ -29,8 +29,6 @@ class SinkMapAux : public AuxKernel
 public:
   SinkMapAux(const InputParameters & parameters);
 
-  virtual ~SinkMapAux() {}
-
 protected:
   virtual void precalculateValue();
   virtual Real computeValue();

@@ -28,8 +28,6 @@ class SinkMapRateAux : public SinkMapAux
 public:
   SinkMapRateAux(const InputParameters & parameters);
 
-  virtual ~SinkMapRateAux() {}
-
 protected:
   virtual Real computeValue();
 

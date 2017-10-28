@@ -28,8 +28,6 @@ class ElementHLevel : public AuxKernel
 public:
   ElementHLevel(const InputParameters & parameters);
 
-  virtual ~ElementHLevel() {}
-
 protected:
   virtual Real computeValue();
 };

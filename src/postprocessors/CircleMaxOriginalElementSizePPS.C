@@ -34,10 +34,6 @@ CircleMaxOriginalElementSizePPS::CircleMaxOriginalElementSizePPS(const InputPara
 {
 }
 
-CircleMaxOriginalElementSizePPS::~CircleMaxOriginalElementSizePPS()
-{
-}
-
 Real
 CircleMaxOriginalElementSizePPS::getValue()
 {

@@ -43,11 +43,6 @@ public:
    */
   GaussianUserObject(const InputParameters & parameters);
 
-  /**
-   * Class destructor
-   */
-  virtual ~GaussianUserObject();
-
   virtual void initialSetup();
   virtual void initialize(){}  // Not used
   virtual void execute(){}  // Not used
