@@ -30,10 +30,6 @@ NumPastEvents::NumPastEvents(const InputParameters & parameters) :
 {
 }
 
-NumPastEvents::~NumPastEvents()
-{
-}
-
 Real
 NumPastEvents::getValue()
 {

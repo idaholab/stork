@@ -43,11 +43,6 @@ public:
   GaussianFunction(const InputParameters & parameters);
 
   /**
-   * Class destructor
-   */
-  virtual ~GaussianFunction();
-
-  /**
    * Return the function value for the given point
    * @param t Time (unused)
    * @param p The point at which to get function value

@@ -41,10 +41,6 @@ GaussianFunction::GaussianFunction(const InputParameters & parameters) :
 {
 }
 
-GaussianFunction::~GaussianFunction()
-{
-}
-
 Real
 GaussianFunction::value(Real /*t*/, const Point & p)
 {

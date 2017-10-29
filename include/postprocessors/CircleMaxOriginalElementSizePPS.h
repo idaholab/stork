@@ -30,7 +30,6 @@ class CircleMaxOriginalElementSizePPS : public GeneralPostprocessor
 {
 public:
   CircleMaxOriginalElementSizePPS(const InputParameters & parameters);
-  virtual ~CircleMaxOriginalElementSizePPS();
 
   virtual void initialize() {};  // not used
   virtual void execute() {};  // not used

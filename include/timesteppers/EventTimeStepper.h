@@ -33,7 +33,6 @@ class EventTimeStepper :
 {
 public:
   EventTimeStepper(const InputParameters & parameters);
-  virtual ~EventTimeStepper();
 
 protected:
   virtual void init();

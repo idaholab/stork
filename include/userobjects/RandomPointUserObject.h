@@ -31,8 +31,6 @@ class RandomPointUserObject : public GeneralUserObject
 public:
   RandomPointUserObject(const InputParameters & parameters);
 
-  virtual ~RandomPointUserObject() {}
-
   /**
    * Returns a Point located randomly on mesh
    */

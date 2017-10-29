@@ -54,10 +54,6 @@ GaussianUserObject::GaussianUserObject(const InputParameters & parameters) :
     mooseError("In GaussianUserObject, the parameter 'random_point_user_object' needs to be set to use random points.");
 }
 
-GaussianUserObject::~GaussianUserObject()
-{
-}
-
 void
 GaussianUserObject::initialSetup()
 {

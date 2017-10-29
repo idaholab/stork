@@ -30,7 +30,6 @@ class NumPastEvents : public GeneralPostprocessor
 {
 public:
   NumPastEvents(const InputParameters & parameters);
-  virtual ~NumPastEvents();
 
   virtual void initialize() {};  // not used
   virtual void execute() {};  // not used

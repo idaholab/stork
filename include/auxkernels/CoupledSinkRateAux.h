@@ -28,8 +28,6 @@ class CoupledSinkRateAux : public AuxKernel
 public:
   CoupledSinkRateAux(const InputParameters & parameters);
 
-  virtual ~CoupledSinkRateAux() {}
-
 protected:
   virtual Real computeValue();
 

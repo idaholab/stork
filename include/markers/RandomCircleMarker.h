@@ -27,7 +27,6 @@ class RandomCircleMarker : public Marker
 {
 public:
   RandomCircleMarker(const InputParameters & parameters);
-  virtual ~RandomCircleMarker(){};
 
 protected:
   virtual void initialSetup();
