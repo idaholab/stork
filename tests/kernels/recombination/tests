@@ -1,0 +1,17 @@
+[Tests]
+  [./recombination]
+    type = 'Exodiff'
+    input = 'recombination.i'
+    exodiff = 'recombination_out.e'
+  [../]
+  [./recombination_one_way]
+    type = 'Exodiff'
+    input = 'recombination_one_way.i'
+    exodiff = 'recombination_one_way_out.e'
+  [../]
+  [./recombination_other_way]
+    type = 'Exodiff'
+    input = 'recombination_other_way.i'
+    exodiff = 'recombination_other_way_out.e'
+  [../]
+[]
