@@ -33,6 +33,7 @@
 #include "InserterPointCircleAverageMaterialProperty.h"
 #include "InserterPointCircleAverageMaterialPropertyPPS.h"
 #include "CircleAverageMaterialPropertyAux.h"
+#include "Recombination.h"
 
 template<>
 InputParameters validParams<PrariedogApp>()
@@ -86,6 +87,7 @@ PrariedogApp::registerObjects(Factory & factory)
   registerKernel(MaterialDiffusion);
   registerKernel(MaterialSinkKernel);
   registerKernel(SinkMapKernel);
+  registerKernel(Recombination);
 
   registerMarker(EventMarker);
   registerMarker(RandomCircleMarker);
