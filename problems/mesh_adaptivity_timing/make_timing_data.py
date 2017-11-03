@@ -13,11 +13,14 @@ import matplotlib.patches as mpatches
 
 ### set some parameters here ###
 
-# specify base file name (no extention)
-input_basename = '2d_sink_map_with_refinement'
+# 2d or 3d?
+dim = 2
 
-# specify output filename storing times
-output_filename = 'timing_data.csv'
+# specify base file name (no extention)
+input_basename = str(dim) + 'd_sink_map_with_refinement'
+
+# specify output filename storing times (no extention)
+output_filename = 'timing_data'
 
 # specify which cpu counts to run
 cpu_list = [1, 2, 4, 8, 16]
@@ -38,6 +41,10 @@ console = False
 
 if not console:
   FNULL = open(os.devnull, 'w')
+
+# append output filename with problem info
+filename_append_string = '-' + str(dim) + 'd-nx-' + str(nx)
+output_filename = output_filename + filename_append_string + '.csv'
 
 # write headers to output file
 with open(output_filename, 'w') as outfile:
@@ -103,14 +110,14 @@ plt.gca().xaxis.set_major_formatter(ticker.ScalarFormatter())
 plt.minorticks_off()
 
 # creating the legend manually
-plt.legend([mpatches.Patch(color='r'),  
-            mpatches.Patch(color='b'), 
-            mpatches.Patch(color='g'), 
-            mpatches.Patch(color='grey')], 
+plt.legend([mpatches.Patch(color='r'),
+            mpatches.Patch(color='b'),
+            mpatches.Patch(color='g'),
+            mpatches.Patch(color='grey')],
            ['_eq.reinit()','refine_and_coarsen_elements()','solve','other'])
 
 # output plot to file
-plt.savefig('timing_breakdown.png')
+plt.savefig('timing_breakdown' + filename_append_string + '.png')
 
 # now make a plot of elements and memory from the last run
 df = pandas.read_csv(input_basename + '_out.csv')
@@ -126,4 +133,4 @@ ax2.set_xlabel('simulation time')
 ax2.set_ylim(bottom=0)
 ax2.tick_params(axis='y', colors='r')
 fig.tight_layout()
-plt.savefig('elements_and_memory.png')
+plt.savefig('elements_and_memory' + filename_append_string + '.png')
