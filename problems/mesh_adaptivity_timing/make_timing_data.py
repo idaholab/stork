@@ -113,7 +113,7 @@ for nx in nx_list:
   plt.ylabel('time (seconds)')
   plt.gca().xaxis.set_major_formatter(ticker.ScalarFormatter())
   plt.minorticks_off()
-  plt.text(0.8, 0.1, 'nx=' + str(nx), transform=ax.transAxes)
+  plt.text(0.8, 0.1, 'nx=' + str(nx), transform=ax.transAxes, bbox=dict(facecolor='white', edgecolor='black'))
 
   # creating the legend manually
   plt.legend([mpatches.Patch(color='r'),
@@ -140,6 +140,7 @@ for nx in nx_list:
   ax2.set_xlabel('simulation time')
   ax2.set_ylim(bottom=0)
   ax2.tick_params(axis='y', colors='r')
+  plt.text(0.8, 0.1, 'nx=' + str(nx), transform=ax.transAxes, bbox=dict(facecolor='white', edgecolor='black'))
   fig.tight_layout()
   plt.savefig('elements_and_memory' + filename_append_string + '.png')
 
