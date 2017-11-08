@@ -150,11 +150,14 @@ for nx in nx_list:
 # now we are going to make a composite image of all the above images
 
 # loop over images to determine the canvas size
+scale = 0.7  # scale down images a little bit
 total_width = 0
 max_height = 0
 for image in image_filename_list:
   im = Image.open(image)
   width, height = im.size
+  width = int(width*scale)
+  height = int(height*scale)
   total_width += width
   max_height = max(max_height, height)
 
@@ -164,7 +167,9 @@ canvas = Image.new('RGB', (total_width, max_height))
 for image in image_filename_list:
   im = Image.open(image)
   width, height = im.size
-  canvas.paste(im, (location, 0))
+  width = int(width*scale)
+  height = int(height*scale)
+  canvas.paste(im.resize((width, height), resample=Image.LANCZOS), (location, 0))
   location += width
 
 canvas.save(str(dim) + 'd_results.png', 'PNG')
