@@ -41,10 +41,37 @@ console = False
 
 ### should not need to edit below this line ###
 
+def stitch_images(image_list, output_filename, scale=0.7):
+  # make a composite image of all the input images
+  total_width = 0
+  max_height = 0
+  for image in image_list:
+    im = Image.open(image)
+    width, height = im.size
+    width = int(width*scale)  # resize a bit
+    height = int(height*scale)  # resize a bit
+    total_width += width
+    max_height = max(max_height, height)
+
+  # make a big canvas and paste each image into it
+  location = 0
+  canvas = Image.new('RGB', (total_width, max_height))
+  for image in image_list:
+    im = Image.open(image)
+    width, height = im.size
+    width = int(width*scale)  # resize a bit
+    height = int(height*scale)  # resize a bit
+    canvas.paste(im.resize((width, height), resample=Image.LANCZOS), (location, 0))
+    location += width
+
+  canvas.save(output_filename, 'PNG')
+
+
 if not console:
   FNULL = open(os.devnull, 'w')
 
-image_filename_list = []
+timing_image_filename_list = []
+elements_image_filename_list = []
 
 for nx in nx_list:
   # append output filename with problem info
@@ -125,7 +152,7 @@ for nx in nx_list:
   # output plot to file
   timing_filename = 'timing_breakdown' + filename_append_string + '.png'
   plt.savefig(timing_filename)
-  image_filename_list.append(timing_filename)
+  timing_image_filename_list.append(timing_filename)
 
   # now make a plot of elements and memory from the last run
   df = pandas.read_csv(input_filename_base + '_out.csv')
@@ -142,34 +169,12 @@ for nx in nx_list:
   ax2.tick_params(axis='y', colors='r')
   plt.text(0.8, 0.1, 'nx=' + str(nx), transform=ax.transAxes, bbox=dict(facecolor='white', edgecolor='black'))
   fig.tight_layout()
-  plt.savefig('elements_and_memory' + filename_append_string + '.png')
+  elements_filename = 'elements_and_memory' + filename_append_string + '.png'
+  plt.savefig(elements_filename)
+  elements_image_filename_list.append(elements_filename)
 
   # clear the plot for the next one
   plt.close(fig)
 
-# now we are going to make a composite image of all the above images
-
-# loop over images to determine the canvas size
-scale = 0.7  # scale down images a little bit
-total_width = 0
-max_height = 0
-for image in image_filename_list:
-  im = Image.open(image)
-  width, height = im.size
-  width = int(width*scale)
-  height = int(height*scale)
-  total_width += width
-  max_height = max(max_height, height)
-
-# make the big canvas and paste each image into it
-location = 0
-canvas = Image.new('RGB', (total_width, max_height))
-for image in image_filename_list:
-  im = Image.open(image)
-  width, height = im.size
-  width = int(width*scale)
-  height = int(height*scale)
-  canvas.paste(im.resize((width, height), resample=Image.LANCZOS), (location, 0))
-  location += width
-
-canvas.save(str(dim) + 'd_results.png', 'PNG')
+stitch_images(timing_image_filename_list, str(dim) + 'd_timing.png')
+stitch_images(elements_image_filename_list, str(dim) + 'd_elements.png')
