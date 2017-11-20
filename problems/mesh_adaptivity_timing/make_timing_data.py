@@ -34,7 +34,7 @@ cpu_list = [1, 2, 4, 8, 16, 32]
 exodus = False
 
 # how many events?
-num_events = 20
+num_events = 10
 
 # show console output?
 console = False
