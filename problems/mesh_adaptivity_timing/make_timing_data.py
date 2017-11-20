@@ -25,7 +25,7 @@ input_filename_base = str(dim) + 'd_sink_map_with_refinement'
 output_filename_base = 'timing_data'
 
 # how many elements in each direction
-nx_list = [20, 40, 80, 160]
+nx_list = [20, 40, 80, 160, 200]
 
 # specify which cpu counts to run
 cpu_list = [1, 2, 4, 8, 16, 32]
@@ -34,7 +34,7 @@ cpu_list = [1, 2, 4, 8, 16, 32]
 exodus = False
 
 # how many events?
-num_events = 20
+num_events = 10
 
 # show console output?
 console = False
