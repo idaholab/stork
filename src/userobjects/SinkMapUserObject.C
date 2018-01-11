@@ -26,11 +26,9 @@ InputParameters validParams<SinkMapUserObject>()
   params.addParam<MooseEnum>("sink_shape_3d", sink_shape_3d, "Shape to use for sinks in 3D, choices are 'spheres' or 'lines'.");
   params.addCoupledVar("periodic_variable", "Use the periodicity settings of this variable to populate the sink map");
 
-  MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
   // the mapping needs to run at timestep begin, which is after the adaptivity
   // run of the previous timestep.
-  setup_options = "timestep_begin";
-  params.set<MultiMooseEnum>("execute_on") = setup_options;
+  params.set<ExecFlagEnum>("execute_on") = EXEC_TIMESTEP_BEGIN;
 
   return params;
 }

@@ -22,11 +22,9 @@ InputParameters validParams<CircleMaxOriginalElementSize>()
   InputParameters params = validParams<ElementUserObject>();
   params.addCoupledVar("periodic_variable", "Use perodic boundary conditions of this variable to determine the distance to the function peak location");
 
-  MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
   // the mapping needs to run at timestep begin, which is after the adaptivity
   // run of the previous timestep.
-  setup_options = "timestep_begin";
-  params.set<MultiMooseEnum>("execute_on") = setup_options;
+  params.set<ExecFlagEnum>("execute_on") = EXEC_TIMESTEP_BEGIN;
 
   return params;
 }
@@ -155,4 +153,3 @@ CircleMaxOriginalElementSize::meshChanged()
 {
   _mesh_changed = true;
 }
-
