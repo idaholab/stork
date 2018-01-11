@@ -39,9 +39,7 @@ InputParameters validParams<EventInserterBase>()
   params.addParam<UserObjectName>("inserter_circle_average_material_property_user_object", "Name of the InserterPointCircleAverageMaterialProperty UserObject that gets points from an EventInserter.");
   params.addParam<UserObjectName>("circle_max_original_element_size_user_object", "Name of the CircleMaxOriginalElementSize UserObject for arbitrary circles and radii.");
 
-  MultiMooseEnum setup_options(SetupInterface::getExecuteOptions());
-  setup_options = "timestep_begin";
-  params.set<MultiMooseEnum>("execute_on") = setup_options;
+  params.set<ExecFlagEnum>("execute_on") = EXEC_TIMESTEP_BEGIN;
 
   return params;
 }
