@@ -129,7 +129,7 @@
   [./circle_average_pps]
     type = InserterPointCircleAverageMaterialPropertyPPS
     user_object = circle_average
-    location = '-0.165956, 0.440649, 0.0'
+    location = '-0.165956 0.440649 0.0'
   [../]
 []
 
