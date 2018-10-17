@@ -122,6 +122,7 @@
 [Executioner]
   type = Transient
   solve_type = Newton
+  num_steps = 1
   dt = 1E-5
 []
 
