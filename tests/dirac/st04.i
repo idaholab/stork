@@ -70,6 +70,7 @@
     variable = pressure
     min = 0
     max = 2E6
+    seed = 5
   [../]
 []
 
